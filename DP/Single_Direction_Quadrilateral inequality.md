@@ -4,14 +4,6 @@
 
 ## 定义
 
-<!-- 
-在 $四边形ABCD$ 中, 边 $AB$, $CD$, 对角线 $AC$, $BD$ 有以下不等关系
-
-$$
-AD + CD \geq AD + BC
-$$
- -->
-
 定义某函数 $f_{i, j}$, 使其满足
 
 $$
@@ -141,11 +133,156 @@ $$
 本题有多组数据, 首先预处理 + 清数组
 
 ```cpp
+inline void Clr() {
+  n = RD();
+  L = RD();
+  P = RD();
+  flg = 0;
+  He = 1;  // 队列
+  Ta = 1;
+  Li[1].Adre = 0;  // 从 0 转移
+  Li[1].l = 1;
+  Li[1].r = n;
+  f[0] = 0;  // 阶段 0 是 0
+  Sum[0] = 0;
+  char chtmp(getchar());
+  for (register unsigned i(1); i <= n; ++i) {
+    while (chtmp < 33 || chtmp > 127) {
+      chtmp = getchar();
+    }
+    a[i] = 0;
+    while (chtmp >= 33 && chtmp <= 127) {
+      Poem[i][a[i]++] = chtmp;
+      chtmp = getchar();
+    }
+  }
+  return;
+}
+```
 
+这里用了逐字符输入, 就可以在输入的同时统计长度, 不用再用 `strlen()` 再扫一遍. 这里避免了对数组的 `memset()` 虽然已经处理了边界, 但是在比赛中不建议省略
+
+然后是快速幂和转移
+
+```cpp
+#define Abs(x) ((x) > 0 ? (x) : -(x))
+#define Do(x, y) (f[(x)] + Power(Abs(Sum[y] - Sum[x] - 1 - L), P))
+inline long double Power(long double x, unsigned y) {
+  if (!y) {
+    return 1;
+  }
+  if (y & 1) {
+    return Power(x * x, y >> 1) * x;
+  }
+  return Power(x * x, y >> 1);
+}
 ```
+
+$p$ 数组区间的维护, 检查新转移的 $x$ 作为最优决策的阶段, 删除被 $x$ 淘汰的区间, 并且把过时的区间删除
+
+```cpp
+void Best(unsigned x) {
+  while (He < Ta && Do(Li[Ta].Adre, Li[Ta].l) >=
+                        Do(x, Li[Ta].l)) {  // 决策 x 对于区间起点表示的阶段更优
+    --Ta;                                   // 整个区间无用
+  }
+  if (Do(Li[Ta].Adre, Li[Ta].r) >=
+      Do(x, Li[Ta].r)) {  // 决策 x 对于区间终点更优 (至少一个阶段给 x)
+    Bin(x, Li[Ta].l, Li[Ta].r);
+  } else {
+    if (Li[Ta].r != n) {
+      ++Ta;
+      Li[Ta].l = Li[Ta - 1].r + 1;
+      Li[Ta].r = n;
+      Li[Ta].Adre = x;
+    }
+  }
+  while (He < Ta && Li[He].r <= x) {  // 过时决策
+    ++He;
+  }
+  Li[He].l = x + 1;
+  return;
+}
 ```
-git config --global http.proxy socks5://127.0.0.1:1089
-git config --global https.proxy socks5://127.0.0.1:1089
-git config --global http.proxy http://127.0.0.1:8000
-git config --global https.proxy https://127.0.0.1:8000
+
+二分查找, 查找断点, 并且建立 $x$ 对应的区间
+
+```cpp
+inline void Bin(unsigned x /*新决策下标*/, unsigned le,
+                unsigned ri) {  // 区间内二分查找
+  if (le == ri) {               // 新增一个区间
+    Li[Ta].r = le - 1;
+    Li[++Ta].l = le;
+    Li[Ta].r = n;
+    Li[Ta].Adre = x;
+    return;
+  }
+  unsigned m((le + ri) >> 1);
+  if (Do(x, m) <= Do(Li[Ta].Adre, m)) {  // x 作为阶段 mid 的决策更优
+    return Bin(x, le, m);
+  }
+  return Bin(x, m + 1, ri);
+}
 ```
+
+输出, 递归的方式倒序输出, `Prt[x]` 是转移时记录的路径, 由于每组测试数据没有对 `Poem` 进行 `memset`, 所以必须根据记录的长度进行输出, 否则会输出过长, `short` 控制内层循环对常数进行优化
+
+```cpp
+inline void Print() {
+  Cnt = 0;
+  Prt[0] = 0;
+  Back(n);
+  return;
+}
+inline void Back(unsigned x) {
+  if (Prt[x]) {
+    Back(Prt[x]);
+  }
+  for (register unsigned i(Prt[x] + 1); i < x; ++i) {
+    for (register short j(0); j < a[i]; ++j) {
+      putchar(Poem[i][j]);
+    }
+    putchar(' ');
+  }
+  for (register short i(0); i < a[x]; ++i) {
+    putchar(Poem[x][i]);
+  }
+  putchar('\n');
+}
+```
+
+最后是注释相对充足的主函数
+
+```cpp
+int main() {
+  t = RD();
+  for (register unsigned T(1); T <= t; ++T) {
+    Clr();
+    for (register unsigned i(1); i <= n; ++i) {
+      Sum[i] = Sum[i - 1] + a[i] + 1;
+    }
+    for (register unsigned i(1); i < n; ++i) {
+      f[i] = Do(Li[He].Adre, i);  // 从已经求出的最优决策转移
+      Prt[i] = Li[He].Adre;
+      Best(i);  // 更新数组 p
+    }
+    f[n] = Do(Li[He].Adre, n);  // 从已经求出的最优决策转移
+    Prt[n] = Li[He].Adre;
+    if (f[n] > 1000000000000000000) {  // 直接溢出
+      printf("Too hard to arrange\n");
+    } else {
+      printf("%lld\n", (long long)f[n]);
+      Print();
+    }
+    for (register short i(1); i <= 20; ++i) {
+      putchar('-');
+    }
+    if (T < t) {
+      putchar('\n');
+    }
+  }
+  return Wild_Donkey;
+}
+```
+
+由于调试用了较长时间, 所以本题代码一度达到 $5.32KB$ [(记录)](https://www.luogu.com.cn/record/48058572), 第一次 AC 时也有足足 $5.15KB$, 时间达到 $3.14s$, 行业里一般用 "[屎山](https://www.luogu.com.cn/record/48096505)" 形容此类代码. 随后, 无所不用其极地优化, 提交了一页多, 最终优化到了 $626ms$, 坐上了最优解的[榜首](https://www.luogu.com.cn/record/48102166) (03-19-2021)
