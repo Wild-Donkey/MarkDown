@@ -195,9 +195,10 @@ f_{i, j}\\
 \leq f_{D, j - 1} + g_{D + 1, i}\\
 f_{i', j}\\
 \leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}
+\leq f_{D, j - 1} + g_{Dec_{i, j} + 1, i'}
 $$
 
-因为 $i' \geq i$
+因为 $i' > i$, 所以 $g$
 
 <!--
 两式相加
