@@ -187,18 +187,30 @@ $$
 
 设 $0 \leq D < Dec_{i, j}$, $i < i' \leq n$
 
-由 $Dec_{i, j}$ 最优得
-
 $$
 f_{i, j}\\
 = f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i}\\
 \leq f_{D, j - 1} + g_{D + 1, i}\\
 f_{i', j}\\
-\leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}
-\leq f_{D, j - 1} + g_{Dec_{i, j} + 1, i'}
+= f_{Dec_{i', j}, j - 1} + g_{Dec_{i', j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + g_{D + 1, i'}\\
 $$
 
 因为 $i' > i$, 所以 $g$
+
+$$
+2f_{i', j}\\
+= f_{Dec_{i', j}, j - 1} + f_{i', j} + g_{Dec_{i', j} + 1, i'}\\
+\leq f_{i', j - 1} + f_{D, j} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{i', j - 1} + f_{D, j} + g_{D + 1, i'}
+$$
+
+$$
+f_{i', j - 1} + f_{D, j} \geq f_{D, j - 1} + f_{i', j}\\
+
+f_{i', j}\\
+$$
 
 <!--
 两式相加
