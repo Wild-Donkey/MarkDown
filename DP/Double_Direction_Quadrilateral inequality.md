@@ -176,11 +176,28 @@ $$
 希望证明对于任意 $i \geq j$, 有
 
 $$
-Dec_{i, j} \leq Dec_{i, j + 1}\\
-Dec_{i, j} \leq Dec_{i + 1, j}
+Dec_{i, j} \leq Dec_{i + 1, j}\tag{1}
 $$
 
+$$
+Dec_{i, j} \leq Dec_{i, j + 1}\tag{2}
+$$
 
+先证明 $(1)$ 式
+
+设 $0 \leq D < Dec_{i, j}$, $i < i' \leq n$
+
+由 $Dec_{i, j}$ 最优得
+
+$$
+f_{i, j}\\
+= f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i}\\
+\leq f_{D, j - 1} + g_{D + 1, i}\\
+f_{i', j}\\
+\leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}
+$$
+
+因为 $i' \geq i$
 
 <!--
 两式相加
