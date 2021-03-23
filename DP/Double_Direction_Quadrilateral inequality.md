@@ -169,6 +169,7 @@ $$
 
 $$
 f_{d, a} + f_{c, b} \geq f_{c, a} + f_{d, b}\\
+f_{b, a} \leq f_{c, a}\\
 g_{a, d} + g_{b, c} \geq g_{a, c} + g_{b, d}\\
 g_{a, d} \geq g_{b, c}
 $$
@@ -185,32 +186,100 @@ $$
 
 先证明 $(1)$ 式
 
-设 $0 \leq D < Dec_{i, j}$, $i < i' \leq n$
+设 $i < i' \leq n$, $0 \leq D < Dec_{i, j}$
+
+又因为 $g_{i, j}$ 满足四边形不等式, $D + 1 < Dec_{i, j} + 1 \leq i < i'$, 所以有
 
 $$
-f_{i, j}\\
-= f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i}\\
-\leq f_{D, j - 1} + g_{D + 1, i}\\
-f_{i', j}\\
-= f_{Dec_{i', j}, j - 1} + g_{Dec_{i', j} + 1, i'}\\
-\leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}\\
-\leq f_{Dec_{i, j}, j - 1} + g_{D + 1, i'}\\
+g_{D + 1, i} + g_{Dec_{i, j} + 1, i'} \leq g_{D + 1, i'} + g_{Dec_{i, j} + 1, i}
 $$
 
-因为 $i' > i$, 所以 $g$
+两边同时加 $f_{D, j - 1} + f_{Dec_{i, j}, j - 1}$ 得
 
 $$
-2f_{i', j}\\
-= f_{Dec_{i', j}, j - 1} + f_{i', j} + g_{Dec_{i', j} + 1, i'}\\
-\leq f_{i', j - 1} + f_{D, j} + g_{Dec_{i, j} + 1, i'}\\
-\leq f_{i', j - 1} + f_{D, j} + g_{D + 1, i'}
+f_{D, j - 1} + f_{Dec_{i, j}, j - 1} + g_{D + 1, i} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + f_{D, j - 1} + g_{D + 1, i'} + g_{Dec_{i, j} + 1, i}
 $$
 
-$$
-f_{i', j - 1} + f_{D, j} \geq f_{D, j - 1} + f_{i', j}\\
+因为 $Dec_{i, j}$ 是 $(i, j)$ 的最优决策, 所以有 $f_{i, j} = f_{Dec_{i, j}, j - 1}$
 
-f_{i', j}\\
 $$
+f_{i, j} + f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{D, j - 1} + f_{Dec_{i, j}, j - 1} + g_{D + 1, i} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + f_{D, j - 1} + g_{D + 1, i'} + g_{Dec_{i, j} + 1, i}\\
+= f_{i, j} + f_{D, j - 1} + g_{D + 1, i'}
+$$
+
+整理得到
+
+$$
+f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'} \leq f_{D, j - 1} + g_{D + 1, i'}
+$$
+
+即对于状态 $(i', j)$, 决策 $Dec_{i, j}$ 不劣于决策 $D < Dec_{i, j}$
+
+注意到没有用到 $f_{i, j}$ 的四边形不等式性质, 
+
+接下来证明 $(2)$ 式
+
+设 $j < j' \leq m$, $D < Dec_{i, j}$
+
+只要 $f_{D, j' - 1}$ 存在, 则一定有 $D \geq j' - 1$, 因为 $f_{i, j}$ 满足四边形不等式, 且 $j - 1 < j' - 1 \leq D < Dec_{i, j}$, 所以
+
+$$
+f_{D, j - 1} + f_{Dec_{i, j}, j' - 1} \leq f_{D, j' - 1} + f_{Dec_{i, j}, j - 1}
+$$
+
+两边同时加上 $g_{D + 1, i} + g_{Dec_{i, j} + 1, i}$ 得
+
+$$
+f_{i, j} + f_{Dec_{i, j}, j' - 1} + g_{Dec_{i, j} + 1, i}\\
+\leq f_{D, j - 1} + f_{Dec_{i, j}, j' - 1} + g_{D + 1, i} + g_{Dec_{i, j} + 1, i}\\
+\leq f_{Dec_{i, j}, j - 1} + f_{D, j' - 1} + g_{D + 1, i} + g_{Dec_{i, j} + 1, i}\\
+= f_{i, j} + f_{D, j' - 1} + g_{D + 1, i}\\
+$$
+
+意义是对于状态 $(i, j')$, 决策 $Dec_{i, j}$ 不劣于决策 $D < Dec_{i, j}$
+
+决策单调性得证
+
+## 代码
+
+递推求出 $g_{i, j}$, $O(n^2)$
+
+```cpp
+for (register unsigned i(1); i <= n; ++i) {
+  a[i] = RD();
+}
+for (register unsigned i(1); i <= n; ++i) {
+  g[1][i] = 0;
+}
+for (register unsigned i(1); i <= n; ++i) {
+  for (register unsigned j(i + 1); j <= n; ++j) {
+    g[i][j] = g[i][j - 1] + a[j] - a[(i + j) >> 1]; // 预处理 
+  }
+}
+```
+
+转移, 决策单调性优化, $O(n^2)$
+
+```cpp
+memset(f, 0x3f, sizeof(f));
+f[0][0] = 0;
+for (register unsigned i(1); i <= n; ++i) {
+  Dec[i][min(i, m) + 1] = 0x3f3f3f3f; // 对于本轮DP, Dec[i][min(i, m) + 1] 是状态 (i, min(i, m)) 可行决策的右边界 
+  for (register unsigned j(min(i, m)); j >= 1; --j) {
+    unsigned Mxn(min(i - 1, Dec[i][j + 1]));  // 右边界 
+    for (register unsigned k(Dec[i - 1][j])/*左边界*/; k <= Mxn; ++k) {
+      if(f[k][j - 1] + g[k + 1][i] < f[i][j]) {
+        f[i][j] = f[k][j - 1] + g[k + 1][i];
+        Dec[i][j] = k;
+      }
+    }
+  }
+  Dec[i][min(i, m) + 1] = 0;  // 对于下一轮, Dec[i][min(i, m) + 1] 是状态 (i + 1, min(i, m)) 的左边界 
+}
+```
 
 <!--
 两式相加
@@ -284,8 +353,15 @@ g_{j + 1, j + 2} = f_{j + 2, j}\\
 f_{j, j} + g_{j + 1, j + 2} = f_{j + 2, j} + g_{j + 2, j + 2}\\
 $$
 f_{i, j} + f_{i + 1, j + 1} \leq f_{i, j + 1} + f_{i + 1, j}
-$$
+设 $0 \leq D < Dec_{i, j}$, $i < i' \leq n$
 
-Dec_{j + 1}
+$$
+f_{i, j}\\
+= f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i}\\
+\leq f_{D, j - 1} + g_{D + 1, i}\\
+f_{i', j}\\
+= f_{Dec_{i', j}, j - 1} + g_{Dec_{i', j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + g_{Dec_{i, j} + 1, i'}\\
+\leq f_{Dec_{i, j}, j - 1} + g_{D + 1, i'}\\
 $$
 -->
