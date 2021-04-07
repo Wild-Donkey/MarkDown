@@ -31,13 +31,15 @@ ___
 * 第二周
 动态规划 (DP) 的巩固和加深, 内容是: 期望 DP, 基环树 DP, 树上 DP, 斜率优化, 四边形不等式优化.
 
-| 出处                                                                                                     | 题目     | 知识点                         |
-| -------------------------------------------------------------------------------------------------------- | -------- | ------------------------------ |
-| [P3195-HNOI2008](https://www.luogu.com.cn/problem/P3195)                                                 | 玩具装箱 | 斜率优化                       |
-| [P2365](https://www.luogu.com.cn/problem/P2365)&[P5785-SDOI2012](https://www.luogu.com.cn/problem/P5785) | 任务安排 | 斜率优化, 二分查找             |
-| [P2120-ZJOI2007](https://www.luogu.com.cn/problem/P2120)                                                 | 仓库建设 | 斜率优化                       |
-| [P1912-NOI2009](https://www.luogu.com.cn/problem/P1912)                                                  | 诗人小G  | 四边形不等式, 字符串, 二分查找 |
-| [P4767-IOI2000](https://www.luogu.com.cn/problem/P4767)                                                  | 邮局     | 四边形不等式                   |
+| 出处                                                     | 题目              | 知识点                         |
+| -------------------------------------------------------- | ----------------- | ------------------------------ |
+| [P3195-HNOI2008](https://www.luogu.com.cn/problem/P3195) | 玩具装箱          | 斜率优化                       |
+| [P2365](https://www.luogu.com.cn/problem/P2365)          | 任务安排          | 斜率优化                       |
+| [P5785-SDOI2012](https://www.luogu.com.cn/problem/P5785) | 任务安排 (加强版) | 斜率优化, 二分查找             |
+| [P2120-ZJOI2007](https://www.luogu.com.cn/problem/P2120) | 仓库建设          | 斜率优化                       |
+| [P1912-NOI2009](https://www.luogu.com.cn/problem/P1912)  | 诗人小G           | 四边形不等式, 字符串, 二分查找 |
+| [P4767-IOI2000](https://www.luogu.com.cn/problem/P4767)  | 邮局              | 四边形不等式                   |
+| [P3628-APIO2010](https://www.luogu.com.cn/problem/P3628) | 特别行动队        | 斜率优化                       |
 
 ___
 
@@ -45,17 +47,25 @@ ___
 图论, 字符串的巩固和加深, 内容是: 双连通分量,  求 LCA 的 Tarjan, KMP
 
 
-| 出处                                            | 题目          | 知识点  |
-| ----------------------------------------------- | ------------- | ------- |
-| [P3375](https://www.luogu.com.cn/problem/P3375) | KMP字符串匹配 | KMP算法 |
-
-
+| 出处                                                    | 题目                   | 知识点    |
+| ------------------------------------------------------- | ---------------------- | --------- |
+| [P3375](https://www.luogu.com.cn/problem/P3375)         | KMP字符串匹配          | KMP算法   |
+| [P2375-NOI2014](https://www.luogu.com.cn/problem/P2375) | 动物园                 | KMP算法   |
+| [P2580](https://www.luogu.com.cn/problem/P2580)         | 于是他错误的点名开始了 | Trie      |
+| [P3808](https://www.luogu.com.cn/problem/P3808)         | AC 自动机 (简单版)     | AC 自动机 |
+| [P3796](https://www.luogu.com.cn/problem/P3796)         | AC 自动机 (加强版)     | AC 自动机 |
+| [P5357](https://www.luogu.com.cn/problem/P5357)         | AC 自动机 (二次加强版) | AC 自动机 |
 ___
 
 ### 第二阶段
 
 * 第 $1-2$ 周
 数据结构进阶, 包括数据结构持久化, 边带权/扩展域并查集, CDQ 分治, 莫队算法.
+
+| 出处                                            | 题目          | 知识点  |
+| ----------------------------------------------- | ------------- | ------- |
+| [P3375](https://www.luogu.com.cn/problem/P3375) | KMP字符串匹配 | KMP算法 |
+
 
 * 第 $3-4$ 周
 图论和搜索, $k$ 短路, 二分图, 启发式搜索 ($A^*, IDA^*$), 差分约束, 负环(SPFA).
