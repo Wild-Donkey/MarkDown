@@ -4,7 +4,7 @@
 
 **一个基于后缀自动机的另一种统计子串出现次数的方法**
 
-[万字（符）长文，博客阅读]()
+[万字（符）长文，博客阅读](https://www.luogu.com.cn/blog/Wild-Donkey/hou-zhui-zi-dong-ji-suffix-automaton)
 
 ## 定义
 
