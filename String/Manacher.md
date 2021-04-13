@@ -62,14 +62,73 @@
 
   一定有 $Frontier + {f_1}_{Frontier} - 1 < i + {f_1}_i - 1$, $Frontier$ 被更新成 $i$, $Frontier + {f_1}_{Frontier}$ 比原先多了至少 ${f_1}_i$, 即本次操作步数.
 
-- 当 $Frontier + {f_1}_{Frontier} - 1 \leq i$, 但 $Frontier + {f_1}_{Frontier} - 1 = Reverse + {f_1}_{Reverse} - 1$ 时.
+- 当 $Frontier + {f_1}_
+{Frontier} - 1 \leq i$, 但 $Frontier + {f_1}_{Frontier} - 1 = Reverse + {f_1}_{Reverse} - 1$ 时.
 
-  朴素从原来的 ${f_1}_i$ 开始, 这时 $i + {f_1}_i - 1= Frontier + {f_1}_{Frontier} - 1$, 接下来每执行一步, $i + {f_1}_{Frontier}$
+  朴素从原来的 ${f_1}_i$ 开始, 这时 $i + {f_1}_i - 1= Frontier + {f_1}_{Frontier} - 1$, 接下来每执行一步, $i + {f_1}_{Frontier}$ 都增加 $1$.
 
-因为每次朴素执行 $k$ 步后, $Frontier + {f_1}_{Frontier}$ 都右移至少 $k$
+因为每次朴素执行 $k$ 步后, $Frontier + {f_1}_{Frontier}$ 都右移至少 $k$ 位, 而 $Frontier + {f_1}_{Frontier}$ 最大是 $n$, 所以朴素的总复杂度是 $O(n)$.
 
-## 实现
+综上, Manacher 可以在 $O(n)$, 求出长度为 $n$ 的字符串的所有回文子串.
+
+## [模板](https://www.luogu.com.cn/problem/P3805)
+
+一个长度为 $n$ 的字符串, 求最长回文子串长度. ($n \leq 1.1*10^7$)
+
+用 $Manacher$ 求出 $f_1$, $f_2$, 第 $i$ 个字符为中心的最长回文子串即为 $\max(2{f_1}_i - 1, 2{f_2}_i)$, 求 $f_1$, $f_2$ 时顺便统计即可.
+
+**代码**, 缺省源省略
 
 ```cpp
-
+unsigned n, Frontier(0), Ans(0), Tmp(0), f1[11000005], f2[11000005];
+char a[11000005];
+int main() {
+	fread(a+1,1,11000000,stdin);        // fread 优化 
+  n = strlen(a + 1);                  // 字符串长度 
+  a[0] = 'A';
+  a[n + 1] = 'B';                     // 哨兵 
+  for (register unsigned i(1); i <= n; ++i) {   // 先求 f1 
+    if(i + 1 > Frontier + f1[Frontier]) {       // 朴素 
+      while (!(a[i - f1[i]] ^ a[i + f1[i]])) {
+        ++f1[i];
+      }
+      Frontier = i;                             // 更新 Frontier 
+    }
+    else {
+      register unsigned Reverse((Frontier << 1) - i), A(Reverse - f1[Reverse]), B(Frontier - f1[Frontier]);
+      f1[i] = Reverse - ((A < B) ? B : A);                      // 确定 f1[i] 下界 
+      if (!(Reverse - f1[Reverse] ^ Frontier - f1[Frontier])) { // 特殊情况 
+        while (!(a[i - f1[i]] ^ a[i + f1[i]])) {
+          ++f1[i];
+        }
+        Frontier = i;                                           // 更新 Frontier 
+      }
+    }
+    Ans = ((Ans < f1[i]) ? f1[i] : Ans);
+  }
+  Ans = (Ans << 1) - 1;                             // 根据 max(f1) 求长度 
+  Frontier = 0;
+  for (register unsigned i(1); i <= n; ++i) {
+    if(i + 1 > Frontier + f2[Frontier]) {           // 朴素 
+      while (!(a[i - f2[i] - 1] ^ a[i + f2[i]])) {
+        ++f2[i];
+      }
+      Frontier = i;                                 // 更新 Frontier 
+    }
+    else {
+      register unsigned Reverse ((Frontier << 1) - i - 1), A(Reverse - f2[Reverse]), B(Frontier - f2[Frontier]);
+        f2[i] = Reverse - ((A < B) ? B : A);        // 确定 f2[i] 下界 
+      if (A == B) { // 特殊情况, 朴素 
+        while (a[i - f2[i] - 1] == a[i + f2[i]]) {
+          ++f2[i];
+        }
+        Frontier = i;                               // 更新 Frontier 
+      }
+    }
+    Tmp = ((Tmp < f2[i]) ? f2[i] : Tmp);
+  }
+  Tmp <<= 1;                                        // 根据 max(f2) 求长度 
+  printf("%u\n", (Ans < Tmp) ? Tmp : Ans);          // 奇偶取其大 
+  return Wild_Donkey;
+}
 ```
