@@ -28,55 +28,11 @@ SA-IS 算法在实现线性求后缀数组的同时, 做到了比 DC3 更强的�
 
 所以无论如何都有 $Suff_i > Suff_j$, 证毕.
 
-## 特殊字符 / 子串
-
-如果第一类后缀 $Suff_i$, 满足 $Suff_{i - 1}$ 是第二类后缀, 即局部极小后缀, 则称 $s_i$ 为字符串 $s$ 的一个特殊字符.
-
-如果两个特殊字符 $s_i$, $s_j$ 之间没有特殊字符, 则 $[i, j)$ 是一个特殊子串.
-
-规定 $Suff_{len_s + 1}$ 是特殊子串, 也是唯一的长度为 $1$ 的特殊子串.
-
-因为如果有除 $Suff_{len_s + 1}$ 的子串 $[i, i]$ 是特殊子串, 则 $s_i$, $s_{i + 1}$ 是特殊字符. $s_i$ 是特殊字符要求 $Suff_i$ 是第一类后缀, $s_i + 1$ 是特殊字符要求 $Suff_i$ 是第二类后缀, 矛盾, 所以不会出现第二个长度为 $1$ 的特殊子串, 特殊子串长度最短为 $2$.
-
-可以得到 $s$ 中的特殊子串数量最多为 $\lceil \frac{len_s}{2} \rceil$
-
-接下来证明一个特殊子串不是另一个特殊字串除它本身之外的前缀: 
-
-如果有 $[a, b]$ 是 $[c, d]$ 的真前缀, 说明 $[c, c + b - a] = [a, b]$. 这时 $Suff_{a - 1}$, $Suff_{c - 1}$, $Suff_b$, $Suff_d$ 是第二类后缀, 因为 $s_a$, $s_c$, $s_{b + 1}$, $s_{d + 1}$ 是特殊字符.
-
-考虑 $Suff_{c + b - a}$ 是第几类后缀. 
-
-- 如果 $Suff_{c + b - a}$ 是第一类后缀
-  
-  则 $Suff_{i} (i \in [c, c + b - a])$ 都必须是第一类后缀, 否则就会在 $(c, c + b - a + 1]$ 出现一个新的特殊字符, 和 $(c, d]$ 中没有特殊字符冲突.
-
-  $Suff_{b}$ 是第二类后缀, 所以 $s_{b + lcp(b, b + 1)} < s_{b + lcp(b, b + 1) + 1}$
-
-  $Suff_{b + 1}$ 是第一类后缀, 所以 $s_{b + lcp(b + 1, b + 2) + 1} > s_{b + lcp(b + 1, b + 2) + 2}$.
-
-  分两种情况讨论
-
-  - $lcp(b, b + 1) = 0$
-
-    一定有 $s_b \neq s_{b + 1}$, 因为 $Suff_b$ 是第二类后缀, 所以 $s_b > s_{b + 1}$. 这时 $s_{b + lcp(b, b + 1)} < s_{b + lcp(b, b + 1) + 1}$ 不成立, 所以 $Suff_{c + b - a}$ 不是第一类后缀, 所以
-
-  - $lcp(b + 1, b + 2) + 1 = lcp(b, b + 1)$
-
-    只要 $lcp(b, b + 1) \neq 0$, 就有因为 $[b, b + lcp(b, b + 1)]$ 是连续的同一个字符, 整理得 $[b + 1, b + lcp(b, b + 1)]$ 是同一字符. 因为 $b + lcp(b, b + 1) = b + 1 + lcp(b, b + 1) - 1]$, 所以 $lcp(b + 1, b + 2) = lcp(b, b + 1) - 1$.
-
-    这时必有 $lcp(b)$
-
-- 如果 $Suff_{c + b - a}$ 是第二类后缀
-
-  因为 $[c, d]$ 是特殊子串, 所以 $s_i~(i \in [c + b - a, d])$ 是特殊字符.
-
-  所以 $Suff_{c + b - a}$ 是
-
-<!-- ## LCP (Longest Common Prefix)
+## LCP (Longest Common Prefix)
 
 字符串 $a$, $b$ 的最长公共前缀表示为 $LCP(a, b)$, $LCP(a, b)$ 的长度表示为 $lcp(a, b)$.
 
-设 $j \in [0, lcp(Suff_i, Suff_{i + 1})]$, 则所有 $s_{i + j}$ 都相等.
+设 $j \in [0, lcp(Suff_i, Suff_{i + 1})]$, 则所有 $s_{i + j}$ 都是同一字符.
 
 - 对于第一类后缀
 
@@ -87,12 +43,66 @@ SA-IS 算法在实现线性求后缀数组的同时, 做到了比 DC3 更强的�
 - 对于第二类后缀
 
   $$
-  s_{i + j} > s_{i + lcp(Suff_i, Suff_{i + 1}) + 2}
-  $$ -->
+  s_{i + j} > s_{i + lcp(Suff_i, Suff_{i + 1}) + 1}
+  $$
+
+对于 $lcp(Suff_i, Suff_{i + 1})$ 和 $lcp(Suff_{i + 1}, Suff_{i + 2})$ 的关系, 分两类讨论
+
+- $lcp(Suff_i, Suff_{i + 1}) = 0$
+
+  没有相同前缀, 也就是说首字符也不同, 也就是说 $s_i \neq s_{i + 1}$, 这时的 $lcp(Suff_{i + 1}, Suff_{i + 2})$ 和 $lcp(Suff_i, Suff_{i + 1})$ 无关.
+
+- $lcp(Suff_i, Suff_{i + 1}) > 0$
+
+  因为 $[i, i + lcp(i, i + 1)]$ 是连续的同一个字符, $s_{i + lcp(i, i + 1)} \neq s_{i + 1 + lcp(i, i + 1)}$. 分析 $lcp(i + 1, i + 2)$, 因为 $[i + 1, i + 1 + lcp(i, i + 1) - 1]$ 是同一字符, $s_{i + 1 + lcp(i, i + 1) - 1} \neq s_{i + 2 + lcp(i, i + 1) - 1}$, 所以 $lcp(i + 1, i + 2) = lcp(i, i + 1) - 1$.
+
+## LMS (Left Most Suffix)
+
+如果第一类后缀 $Suff_i$, 满足 $Suff_{i - 1}$ 是第二类后缀, 即局部极小后缀, 则称 $s_i$ 为字符串 $s$ 的一个 LMS 字符.
+
+如果两个 LMS 字符 $s_i$, $s_j$ 之间没有 LMS 字符, 则 $[i, j]$ 是一个 LMS 子串.
+
+分析 LMS 子串长度, 如果有子串 $[i, i + 1]$ 是 LMS 子串, 则 $s_i$, $s_{i + 1}$ 是 LMS 字符. $s_i$ 是 LMS 字符要求 $Suff_i$ 是第一类后缀, $s_i + 1$ 是 LMS 字符要求 $Suff_i$ 是第二类后缀, 自相矛盾, 所以不会出现长度为 $2$ 的 LMS 子串, LMS 子串长度最短为 $3$.
+
+因为相邻的 LMS 子串共用一个公共字符, 所以 $s$ 中的 LMS 子串数量级为 $O(\frac{len_s}{2})$.
+
+接下来证明一个 LMS 子串不是另一个 LMS 子串除它本身之外的前缀, 网上的证明真的看不太懂, 于是自己想方设法给出一个较为详细的简单证明 (可能不是很严谨, 欢迎 Hack)
+
+如果有 LMS 子串 $[a, b]$ 是 $[c, d]$ 的真前缀, 说明 $[c, c + b - a] = [a, b]$.
+
+因为 LMS 子串中, 左边一部分加右端点都是第一类后缀, 右边一部分不加右端点都是第二类后缀, 所以设分界点 $e$, $f$, 使得 $Suff_i~i \in [a, e] \cup [c, f] \cup \{b, d\}$ 是第一类后缀, $Suff_i~i \in [e + 1, b - 1] \cup [f + 1, d - 1]$ 是第二类后缀.
+
+因为 $Suff_e$ 是第一类后缀, $Suff_{e + 1}$ 是第二类后缀, 所以 $s_{e + lcp(Suff_e, Suff_{e + 1})} < s_{e + lcp(Suff_e, Suff_{e + 1}) + 1}$, $s_{e + lcp(Suff_{e + 1}, Suff_{e + 2}) + 1} > s_{e + lcp(Suff_{e + 1}, Suff_{e + 2}) + 2}$.
+
+根据之前的 $lcp(Suff_i, Suff_{i + 1})$ 和 $lcp(Suff_{i + 1}, Suff_{i + 2})$ 的关系, 分类讨论
+
+- $lcp(Suff_e, Suff_{e + 1}) = 0, lcp(Suff_e, Suff_{e + 1}) - 1 \neq lcp(Suff_{e + 1}, Suff_{e + 2})$
+
+  这时 $s_e < s_{e + 1}$.
+
+- $lcp(Suff_e, Suff_{e + 1}) > 0, lcp(Suff_e, Suff_{e + 1}) - 1 = lcp(Suff_{e + 1}, Suff_{e + 2})$
+
+  这时 $s_{e + lcp(Suff_e, Suff_{e + 1})} < s_{e + lcp(Suff_e, Suff_{e + 1}) + 1}$, $s_{e + lcp(Suff_e, Suff_{e + 1})} > s_{e + lcp(Suff_e, Suff_{e + 1}) + 1}$. 自相矛盾, 这种情况不存在.
+
+综上, $s_e < s_{e + 1}$, 同理, $s_f < s_{f + 1}$, $s_{b - 1} > s_b$, $s_{d - 1} > s_d$.
+
+根据之前的结论, $e + 1 < b$. 则只要 $s_e < s_{e + 1}$, 必有 $s_{c + e - a} < s_{c + e + 1 - a}$, 就有 $Suff_{c + e - a}$ 是第一类后缀, 根据 LMS 子串的性质, $Suff_i~i \in [c, c + e - a]$ 是第一类后缀. 因为 $Suff_{f + 1}$ 是第二类后缀, 所以 $c + e - a \leq f$, 即 $e - a \leq f - c$.
+
+同样的, 因为 $s_{b - 1} > s_b$, 所以 $s_{c + b - 1 - a} > s_{c + b - a}$, 所以 $Suff_{c + b - 1 - a}$ 是第二类后缀, 根据 LMS 子串的性质得 $Suff_i~i \in [c + b - 1 - a, d - 1]$ 都是第二类后缀.
+
+至此, 已经证明了 $[c, f] \cup \{d\}$ 的后缀都是第一类后缀, $[c + b - 1 - a, d - 1]$ 的后缀都是第二类后缀, 按照 $f$ 的定义, 第二类后缀的编号区间是 $[f + 1, d - 1]$, 则 $c + b - 1 - a \geq f + 1$, 整理得 $b - 1 - a = f + 1 - c$. 也就是说 
+
+这时将 $Suff_{e + 1}$ 是第二类后缀的情况分为两种
+
+- $e + 1 + lcp(Suff_{e + 1}, Suff_{e + 2}) < b$
+
+这时的 $e + 1 + lcp(Suff_{e + 1}, Suff_{e + 2}) + 1 \leq b$, 所以
+
+- $e + lcp(Suff_{e + 1}, Suff_{e + 2}) > b$ 
 
 ## SA-IS
 
-将特殊子串排序, 结果存入 $s'$, 
+将 LMS 子串排序, 结果存入 $s'$, 
 
 ## 例题
 

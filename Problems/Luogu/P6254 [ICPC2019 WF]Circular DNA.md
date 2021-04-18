@@ -75,30 +75,10 @@
 一些细节都在代码注释中，应该会很好懂吧。
 
 ```cpp
-#include <algorithm>
-#include <cmath>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
 #include <iostream>
-#include <map>
-#include <queue>
-#include <vector>
 #define Wild_Donkey 0
 using namespace std;
-inline unsigned RD() {
-  unsigned intmp = 0;
-  char rdch(getchar());
-  while (rdch < '0' || rdch > '9') {
-    rdch = getchar();
-  }
-  while (rdch >= '0' && rdch <= '9') {
-    intmp = intmp * 10 + rdch - '0';
-    rdch = getchar();
-  }
-  return intmp;
-}
 unsigned n, Cnt(0), Ans(0), Tmp(0), List[1000005], Pos(0);
 char Character;
 int Sum[1000005], Low[1000005];
@@ -107,7 +87,7 @@ struct DNA {
   int SE;           // s or e, 即权值 
 }a[1000005];
 int main() {
-  n = RD();
+  scanf("%u", &n);
   for (register unsigned i(1); i <= n; ++i) { // 读入 
     Character = getchar();
     while (Character != 's' && Character != 'e') {
@@ -119,7 +99,7 @@ int main() {
     else {                                    // 下括号 
       a[i].SE = -1;
     }
-    a[i].Number = RD();
+    scanf("%u", &a[i].Number);
     if(!Low[a[i].Number]) {                   // 这个编号的基因首次出现
       Low[a[i].Number] = 1;                   // 打标记表示这个编号的基因出现过 
       List[++Cnt] = a[i].Number;              // 记录在基因列表中 
