@@ -2,7 +2,12 @@
 
 SA-IS 算法在实现线性求后缀数组的同时, 做到了比 DC3 更强的常数效率, 适合在对求后缀数组效率有要求的题目中使用.
 
-建议先学[倍增求后缀数组](https://www.luogu.com.cn/blog/Wild-Donkey/bei-zeng-qiu-hou-zhui-shuo-zu-suffix-array), 因为编程难度小, 复杂度也能接受, 本篇将沿用上一篇对变量名的定义.
+## ! ! ! FBI Warning 前排提醒 ! ! !
+
+SA-IS, 非常~~毒瘤~~快的后缀数组算法, 貌似效率仅次于[这个算法](https://suffixsorting.github.io/) (我也不懂, 有兴趣的可以自行研究), 但是复杂度都是 $O(n)$, 所以并没有差太多.
+
+如果你不是倍增求后缀数组带师, 就算你会倍增法, 也建议去看上一篇[倍增求后缀数组](https://www.luogu.com.cn/blog/Wild-Donkey/bei-zeng-qiu-hou-zhui-shuo-zu-suffix-array) , 因为编程难度小, 复杂度也能接受, 本篇将沿用上一篇对变量名的定义.. 毕竟能下决心看这个篇幅的文章, 也不差这一点时间了. 英语好直接去看[原文](https://dna049.com/string/LinearSuffixArrayConstructionbyAlmostPureInduced-Sorting.pdf), 我讲的肯定没发明这个算法的人讲得好.
+
 
 ## 后缀分类
 
@@ -20,19 +25,27 @@ $$
 Suff_i > Suff_{i + 1}
 $$
 
-规定 $Suff_{n + 1}$ 是 S-Type 后缀.
+规定 $Suff_{n + 1}$ 是 S-Type.
 
 发现一个性质, 对于 L-Type 后缀 $Suff_i$ 和 L-Type 后缀 $Suff_j$, 如果 $s_i = s_j$, 那么有 $Suff_i > Suff_j$, 证明如下:
 
-对于 $Suff_i$, 有 $s_i < s_{i + 1}$ 成立或 $s_i = s_{i + 1}$ 和 $Suff_{i + 1} < Suff_{i + 2}$ 成立.
+* 对于 $Suff_i$
+  
+  有 $s_i < s_{i + 1}$ 成立或 $s_i = s_{i + 1}$ 和 $Suff_{i + 1} < Suff_{i + 2}$ 成立.
 
-对于 $Suff_j$, 有 $s_j > s_{j + 1}$ 成立或 $s_j = s_{j + 1}$ 和 $Suff_{j + 1} > Suff_{j + 2}$ 成立.
+* 对于 $Suff_j$
+  
+  有 $s_j > s_{j + 1}$ 成立或 $s_j = s_{j + 1}$ 和 $Suff_{j + 1} > Suff_{j + 2}$ 成立.
 
 因为 $s_i = s_j$, 所以 $s_{j + 1} \leq s_i = s_j \leq s_{i + 1}$.
 
-对于 $s_{i + 1} > s_{j + 1}$, 结论显然成立
+* 对于 $s_{i + 1} > s_{j + 1}$
+    
+  结论显然成立
 
-对于 $s_{i + 1} = s_{j + 1}$, 则一定有 $s_{j + 1} = s_i = s_j = s_{i + 1}$. 逐位比较, 只要 $s_i + k = s_j + k$, 就有 $Suff_{i + k} < Suff_{i + k + 1}$, $Suff_{j + k} > Suff_{j + k + 1}$, 然后 $k$ 增加 $1$. 由于已经确定 $Suff_i$ 和 $Suff_j$ 的类别, 所以迟早会遇到 $k$, 使得 $s_{i + k} < s_{i + k + 1}$ 或 $s_{j + k} > s_{j + k + 1}$, 因为 $s_{i + k} = s_{j + k}$, 所以有 $s_{j + k + 1} < s{i + k + 1}$.
+* 对于 $s_{i + 1} = s_{j + 1}$
+    
+  则一定有 $s_{j + 1} = s_i = s_j = s_{i + 1}$. 逐位比较, 只要 $s_i + k = s_j + k$, 就有 $Suff_{i + k} < Suff_{i + k + 1}$, $Suff_{j + k} > Suff_{j + k + 1}$, 然后 $k$ 增加 $1$. 由于已经确定 $Suff_i$ 和 $Suff_j$ 的类别, 所以迟早会遇到 $k$, 使得 $s_{i + k} < s_{i + k + 1}$ 或 $s_{j + k} > s_{j + k + 1}$, 因为 $s_{i + k} = s_{j + k}$, 所以有 $s_{j + k + 1} < s{i + k + 1}$.
 
 所以无论如何都有 $Suff_i > Suff_j$, 证毕.
 
@@ -74,19 +87,29 @@ $$
 
 因为相邻的 LMS 子串共用一个公共字符, 所以 $s$ 中的 LMS 子串数量级为 $O(\frac{len_s}{2})$.
 
-## 新字符串 $S1$
+事实上, LMS 子串也可以不互相共用一个 LMS 字符, 即对于相邻 LMS 字符 $s_i$, $s_j$, 则 $[i, j)$ 是一个 LMS 子串. 貌似也出现了这种的做法 (也可能没有, 我只是在听大佬们交流时道听途说的), 我一开始也是这么理解 LMS 子串的, 因为这样首位相接很美观, 但是失败了. 因为末尾的 LMS 字符相当于一个哨兵, 可以避免很多要判断的边界条件.
 
-将 LMS 子串降序排序, 每个 LMS 根据相对关系离散化成整数存入 $S1$, 为了保证复杂度, 使用 Radix-Sort.
+## 子字符串 $S1$
 
-排序的规则不光是按从左到右比较字符的字典序, 还有第二关键字, 即这个字符对应后缀的 Type, 字符相同时, S-Type 的字符排在 L-Type 字符的前面. 因为前缀相同的 S-Type 后缀大于 L-Type 后缀, 所以这样排序能保证 $S1$ 中后缀的相对大小关系就是 $S$ 中对应的 LMS 后缀的相对大小关系.
+注意, 子字符串不是子串, 而是 $S1$ 在算法的递归中作为子问题出现而这么命名的 (我命名的).
+
+将 LMS 子串降序排序, 每个 LMS 根据相对关系离散化成整数存入 $S1$, 排序的规则不光是按从左到右比较字符的字典序, 还有第二关键字, 即这个字符对应后缀的 Type, 字符相同时, S-Type 的字符排在 L-Type 字符的前面. 因为前缀相同的 S-Type 后缀大于 L-Type 后缀, 所以这样排序能保证 $S1$ 中后缀的相对大小关系就是 $S$ 中对应的 LMS 后缀的相对大小关系.
 
 $S1$ 中的最后一个字符对应的 LMS 子串一定是空串, 离散化后的值是 $0$, 是 $S1$ 中唯一的 $0$, 也是最小值.
 
 排序之后, 因为 $S1$ 降序, 所以 $SA1$ 一定是 $\{len_{S1} + 1, len_{S1}, ..., 1\}$
 
+关于如何为了保证复杂度, 使用 Radix-Sort.
+
+恭喜你得到了 KA 算法, 满足于 $O(n)$ 复杂度的可以关了这篇博客去写代码了, 不过如果只追求 $O(n)$ 复杂度去学 DC3 不行吗, 来受这罪干什么.
+
+为了得到更好的效率, 我们将 LMS 子串的排序问题搁置一下, 假设这个问题已经解决了.
+
+对 LMS 子串的排序结果, 可以存储在 $SA1$ 中, 只要没有本质相同的 LMS 子串, LMS 子串的次序一定可以表示 LMS 后缀的次序; 如果有本质相同的 LMS 子串, 则将排序前的 $S1$ 作为子问题, 递归求解. 这种做法会在下文详细解释.
+
 ## 用 $SA1$ 诱导 $SA$
 
-首先考虑如何根据已经求出的 $SA1$, 求出 $SA$.
+这时假设已经求出 $SA1$, 考虑如何根据已经求出的 $SA1$, 求出 $SA$.
 
 必须保证 $S1$ 中的所有 LMS 子串本质不同, 否则对排序前的 $S1$ 递归诱导, 直到求出严格的次序为止.
 
@@ -140,11 +163,11 @@ $S1$ 中的最后一个字符对应的 LMS 子串一定是空串, 离散化后�
 
 ## $S1$ 的排序
 
-如何高效地求出 $S1$ 的顺序, 成了最后需要解决的问题. 
+如何高效地求出 $S1$ 的顺序, 处理出 $SA1$, 成了最后需要解决的问题. 
 
 引入一个概念: LMS 前缀 (LMS-prefix), $Pre_i$, 表示从 $S_i$ 到从它开始右边第一个 LMS 字符的子串. 特别地, 对于 LMS 字符 $S_i$, 它的 LMS 前缀就是它本身.
 
-先说结论, 只要先将 $S$ 的 LMS 字符 (所有长度为 $1$ 的 LMS 前缀) 随机丢进 $SA$ 里, 然后跑一遍操作二和操作三, 扫描得到的 $SA$, LMS 字符在 $SA$ 中按它们对应的升序排序.
+先说结论, 只要先将 $S$ 的 LMS 字符 (所有长度为 $1$ 的 LMS 前缀) 随机丢进 $SA$ 里, 然后跑一遍操作二和操作三, 扫描得到的 $SA$, LMS 字符的下标在 $SA$ 中按对应的 LMS 子串的字典序升序排序.
 
 - 证明
 
@@ -158,11 +181,198 @@ $S1$ 中的最后一个字符对应的 LMS 子串一定是空串, 离散化后�
 
   这时原长度为 $1$ 的 LMS 前缀被相同起点的 LMS 子串代替, 仍然满足从左到右递增, 所以这时 LMS 子串递增.
 
-需要考虑的是, 存在 LMS 子串相同的情况. 由于 LMS 子串总长度是 $O(n)$ 的, 暴力判重时, 每个串最多扫两边, 总复杂度线性, 直接暴力.
+需要考虑的是, 如何判断 LMS 子串相同的情况. 由于 LMS 子串总长度是 $O(n)$ 的, 且单调排列, 所以只要存在相同的子串, 则它们在 $SA$ 中必定相邻. 暴力判重时, 每个串最多扫两边, 总复杂度线性, 暴力判重复杂度正确.
 
-判重的同时离散化, 因为所有 LMS 子串的左端点都有序地存在 $SA$ 中, 直接线性扫描并且依次命名即可.
+判重的同时离散化 (命名 $S1$ 中的字符), 因为所有 LMS 子串的左端点都有序地存在 $SA$ 中, 直接线性扫描并且依次命名即可.
 
 ## 代码实现
+
+算法呈递归结构, 每一层递归的规模最多是上一层的一半, 所以总体时空复杂度最坏是 $O(2n)$. 空间管理上, 开内存池, 避免在后面的递归中给小规模问题开全规模的空间.
+
+这种递归时传输用到的数组在内存池中的头指针的做法不是很常见, 所以会遇到很多问题. 比如程序中有一些存下标的数组, 在进入下一层或返回上一层时, 随着头指针的位置变化, 同一个下标指向的地址也会发生变化, 这种情况就很难协调, 所以~~物竞卧底~~采用统一参照物的方法:
+
+这里定义 $N$ 表示本层问题规模, $CntLMS$ 是 LMS 字符数量, 也就是可能存在的下一次的问题规模. 定义 $S\_S1_i$ 表示以本层 LMS 字符 $S_i$ 为起点的 LMS 子串在 $S1$ 中的下标, 由于递归中 $S1_1$ 的地址是 $S_{N + 1}$, 也就是 $S1$ 的地址紧跟在 $S$ 的地址后面. 所以 $S\_S1$ 中存储的值域是 $[N + 1, N + CntLMS]$, 所以 $S\_S1$ 表示的是以 $S$ 为参照物的相对下标.
+
+定义 $Address_i$ 表示上一层的 $S1_i$, 即本层的 $S_i$, 所代表的上一层的 $S$ 中的 LMS 子串的首字符的下标. 由于记录的是上一层的下标, 这里如果用本层 $S$ 为参照物, 则坐标值域将是负数, 不方便. 于是以上一层的 $S$ 为参照物, 值域为上一层的 $[1, N]$.
+
+对于 $SA$, 由于 $SA_i$ 和 $i$ 的意义都是在同一层定义的, 所以理所当然地, $SA$ 在哪一层, 下标参照物就是哪一层的 $S$.
+
+顶层设计结束, 接下来进行局部分析:
+
+### 通过 $SA1$ 诱导 $SA$
+
+预处理部分, 首先要确定一个后缀的类型, 扫一遍即可. 然后处理 $Address$, $S\_S1$ 两个数组. 为了开桶, 提前计算出对应字符出现次数, 同时统计字符集. 通过调用 `Induced_Sort()` 来求出 $SA1$, 确定了 LMS 子串的顺序, 在执行 `Induced_Sort()` 时也对本层的 $SA$ 进行了填入, 执行完后要重置本层的 $SA$.
+
+万事俱备, 函数主体是三次对 $SA$ 的填入, 一定要搞清楚方向, 无论是扫描方向还是堆栈方向, 否则会很迷惑. 方向的判断参照对正确性的证明, 通过后缀的单调性来判断. 每次改变堆栈方向要重新确定栈顶 (左端或右端), 因为填入过程中 $Bucket$ 不被修改, 所以每次可以 $O(N)$ 重置 $SumBucket$.
+
+```cpp
+void Induc (unsigned *Address, char *Type, unsigned *SA, unsigned *S, unsigned *S_S1, unsigned *Bucket, unsigned *SumBucket, unsigned N) {// 诱导 SA
+  for (register unsigned i(1), j(1); i < N; ++i) {      // 定性 S/L 
+    if(S[i] < S[i + 1]) {                               // Suff[j~i] 是 S-Type 
+      while (j <= i) {
+        Type[j++] = 1;
+      }
+    }
+    if(S[i] > S[i + 1]) {                               // Suff[j~i] 是 L-Type 
+      while (j <= i) {
+        Type[j++] = 0;
+      }
+    }
+  }
+  Type[N] = 1;
+  Type[0] = 1;
+  register unsigned CntLMS(N)/*记录 LMS 字符数量*/;
+  for (register unsigned i(1); i < N; ++i) {            // 记录 S1 中字符对应的 S 的 LMS 子串左端 LMS 字符的位置 Address[], 和 S 中的 LMS 子串在 S1 中的位置 S_S1[] 
+    if(!Type[i]) {
+      if(Type[i + 1]) {
+        Address[++CntLMS] = i + 1;
+        S_S1[i + 1] = CntLMS;
+      }
+    }
+  }
+  register unsigned bucketSize(0);                      // 本次递归字符集大小 
+  for (register unsigned i(1); i <= N; ++i) {           // 确定 Bucket, 可以线性生成 SumBucket 
+    ++Bucket[S[i]];
+    bucketSize = bucketSize < S[i] ? S[i] : bucketSize; // 统计 Bucket 的空间范围 
+  }
+  Induced_Sort(Address, Type, SA, S, S_S1, Bucket, SumBucket, N, bucketSize, CntLMS);// 诱导排序 LMS 子串, 求 SA1 
+  memset(SA + 1, 0, sizeof(unsigned) * N);              // 在求 SA1 时也填了一遍 SA, 这里进行清空 
+  SumBucket[0] = 1;                                     // SA1 求出来了, 开始诱导 SA 
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(CntLMS); i > N; --i) {       // 放 LMS 后缀 
+    SA[SumBucket[S[Address[SA[i] + N]]]--] = Address[SA[i] + N];
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(1); i <= N; ++i) {           // 从左到右扫 SA 数组 
+    if(SA[i] && (SA[i] - 1)) {
+      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
+        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
+      }
+    }
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(N); i >= 1; --i) {           // 从右往左扫 SA 数组 
+    if(SA[i] && (SA[i] - 1)) {
+      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
+        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
+      }
+    }
+  }
+  return;
+}
+```
+
+### LMS 子串的诱导排序
+
+主体部分还是三轮 $SA$ 的填入, 但是不同的是, 填入后要根据 $SA$ 对 $S1$ 进行命名, 并且处理出 $SA1$ 的数值, 供上一层使用.
+
+由于 `Induc()` 中有对 `Induced_Sort()` 的调用, `Induced_Sort()` 中也有对 `Induc()` 的调用. 所以将 `Induc()` 的定义写在后面, 并且在 `Induced_Sort()` 之前提前声明.
+
+判重命名环节涉及大量的本层和上一层的参照物转换, 脑中一定要有全局的连续的内存空间占用模型, 否则很容易两行写出三个 BUG (不是夸张, 亲身经历, 事实上最多一次两行挤进去四五个 BUG).
+
+最后判重结束后, 只要有本质相同的子串, 就进入下一层递归.
+
+```cpp
+void Induc (unsigned *Address, char *Type, unsigned *SA, unsigned *S, unsigned *S_S1, unsigned *Bucket, unsigned *SumBucket, unsigned N);// 诱导 SA
+void Induced_Sort (unsigned *Address, char *Type, unsigned *SA, unsigned *S, unsigned *S_S1, unsigned *Bucket, unsigned *SumBucket, unsigned N, unsigned bucketSize, unsigned LMSR) {// 通过 S 求 SA
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  memset(SA + 1, 0, sizeof(unsigned) * N);              // 在上一层的诱导排序中, 填入了 SA, 这里进行清空 
+  for (register unsigned i(LMSR); i > N; --i) {         // 放长度为 1 的 LMS 前缀 
+    SA[SumBucket[S[Address[i]]]--] = Address[i];
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(1); i <= N; ++i) {           // 从左到右扫 SA 数组 
+    if(SA[i] && (SA[i] - 1)) {
+      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
+        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
+      }
+    }
+  }
+  SumBucket[0] = 1;
+  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
+    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
+  }
+  for (register unsigned i(N); i >= 1; --i) {           // 从右往左扫 SA 数组 
+    if(SA[i] && (SA[i] - 1)) {
+      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
+        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
+      }
+    }
+  }
+  register char flg(0)/*是否有重*/;
+  register unsigned CntLMS(0)/*本质不同的 LMS 子串数量*/, Pre(N)/*上一个 LMS 子串起点*/, *Pointer(SA + N + 1)/*LMS 子串的 SA 的头指针*/;
+  for (register unsigned i(2); i <= N; ++i) {           // 扫描找出 LMS, 判重并命名 
+    if(Type[SA[i]] && (!Type[SA[i] - 1])) {
+      if(Pre ^ N && Equal(S, Type, SA[i], Pre)) {       // 暴力判重
+        S[S_S1[SA[i]]] = CntLMS;                        // 命名 
+        flg = 1;
+      }
+      else {
+        S[S_S1[SA[i]]] = ++CntLMS;                      // 命名 
+      }
+      Pre = SA[i];                                      // 用来判重 
+      *(++Pointer) = S_S1[SA[i]] - N;                   // 记录 LMS 
+    }
+  }
+  S[LMSR] = 0;
+  SA[N + 1] = LMSR - N;                                 // 末尾空串最小 
+  if(flg) {                                             // 有重复 LMS 子串, 递归排序 S1 
+    Induc(Address + N, Type + N, SA + N, S + N, S_S1 + N, Bucket + bucketSize + 1, SumBucket + bucketSize + 1, LMSR - N); //有重复, 先诱导 SA1, 新的 Bucket 直接接在后面 
+  }
+  return;                                               // 递归跳出, 保证 SA1 是严格的
+}
+```
+
+### LMS 子串的比较
+
+上面证明过, 暴力判断的复杂度正确. 所以只要一个一个字符地判断即可 (我也没有想到别的判重的好办法).
+
+两个 LMS 子串的相等, 无非就是字符相同的同时, Type 也相同. 除了空串外, LMS 子串都分为三部分: 最左边是连续的 S-Type, 我喜欢叫它 S 区; 接着是连续的 L-Type, 也就是 L 区; 末尾是一个 S-Type, 简称尾 S. 处理好边界情况即可.
+
+```cpp
+inline char Equal (unsigned *S, char *Type, unsigned x, unsigned y) {
+  while (Type[x] & Type[y]) {     // 比较 S 区 
+    if(S[x] ^ S[y]) {
+      return 0;
+    }
+    ++x,++y;
+  }
+  if(Type[x] | Type[y]) {         // L 区起点是否整齐 
+    return 0;
+  }
+  while (!(Type[x] | Type[y])) {  // 比较 L 区 
+    if(S[x] ^ S[y]) {
+      return 0;
+    }
+    ++x, ++y;
+  }
+  if(Type[x] ^ Type[y]) {         // 尾 S 位置是否对应 
+    return 0;
+  }
+  if(S[x] ^ S[y]) {               // 尾 S 权值是否相等 
+    return 0;
+  }
+  return 1;
+}
+```
+
+### 剩余部分的代码
+
+只剩下 `main()` 里面的 I/O 接口, 为了提高效率, 采用 `fread()` 读入.
 
 ```cpp
 #include <algorithm>
@@ -177,278 +387,51 @@ $S1$ 中的最后一个字符对应的 LMS 子串一定是空串, 离散化后�
 #include <vector>
 #define Wild_Donkey 0
 using namespace std;
-inline unsigned RD() {
-  unsigned intmp = 0;
-  char rdch(getchar());
-  while (rdch < '0' || rdch > '9') {
-    rdch = getchar();
-  }
-  while (rdch >= '0' && rdch <= '9') {
-    intmp = intmp * 10 + rdch - '0';
-    rdch = getchar();
-  }
-  return intmp;
-}
-inline int RDsg() {
-  int rdtp(0), rdsg(1);
-  char rdch(getchar());
-  while ((rdch < '0' || rdch > '9') && (rdch != '-')) {
-    rdch = getchar();
-  }
-  if (rdch == '-') {
-    rdsg = -1;
-    rdch = getchar();
-  }
-  while (rdch >= '0' && rdch <= '9') {
-    rdtp = rdtp * 10 + rdch - '0';
-    rdch = getchar();
-  }
-  return rdtp * rdsg;
-}
-unsigned Cnt(0), n, Ans(0), Tmp(0), S[2000005], SA[2000005], BucketPool[500005], SumBucketPool[500005], Address[2000005], S_S1[2000005];
-char Type[1000005], IfLMS[2000005];
-void Print(unsigned L, unsigned R) {
-  printf("Address[%u, %u]\n", L, R);
-  for (register unsigned i(L); i <= R; ++i) {
-    printf("%3u", i);
-  }
-  putchar('\n');
-  printf("S[%u, %u]\n", L, R);
-  for (register unsigned i(L); i <= R; ++i) {
-    printf("%3u", S[i]);
-  }
-  putchar('\n');
-  printf("Type[%u, %u]\n", L, R);
-  for (register unsigned i(L); i <= R; ++i) {
-    printf("%3c", Type[i] ? 'S' : 'L');
-  }
-  putchar('\n');
-  printf("SA[%u, %u]\n", L, R);
-  for (register unsigned i(L); i <= R; ++i) {
-    printf("%3u", SA[i]);
-  }
-  putchar('\n');
-  printf("IfLMS[%u, %u]\n", L, R);
-  for (register unsigned i(L); i <= R; ++i) {
-    printf("%3u", IfLMS[i]);
-  }
-  putchar('\n');
-  putchar('\n');
-  putchar('\n');
-  return;
-}
-inline char Equal (unsigned x, unsigned y) {
-//  printf("Compare %u %u\n", x, y);
-  if(S[x] ^ S[y]) {
-    return 0;
-  }
-  while (!(IfLMS[++x] || IfLMS[++y])) {
-    if(S[x] ^ S[y]) {
-//      printf("%u %u %u %u\n", x, y, S[x], S[y]);
-      return 0;
-    }
-  }
-  if(IfLMS[x] ^ IfLMS[y]) {
-    return 0;
-  }
-//  printf("Equal!!\n");
-  return 1;
-}
-void Induc (unsigned SL, unsigned SR, unsigned *Bucket, unsigned *SumBucket);// 诱导 SA
-void Induced_Sort (unsigned SL, unsigned SR, unsigned* Bucket, unsigned *SumBucket, unsigned bucketSize, unsigned LMSR) {// 通过 S 求 SA
-  printf("Induced_Sort %u %u %u %u\n", SL, SR, bucketSize, LMSR);
-  SumBucket[0] = 1;
-  for (register unsigned i(1); i <= bucketSize; ++i) {// 重置每个栈的栈底 (右端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-//    printf("SumBucket[%u] = %u\n", i, SumBucket[i]);
-  }
-  for (register unsigned i(LMSR); i > SR; --i) {// 放长度为 1 的 LMS 前缀 
-    SA[SumBucket[S[Address[i]]]--] = Address[i];
-  }
-//  Print(SL, SR);
-  printf("BooM?!\n");
-  SumBucket[0] = 1;
-  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-  }
-  for (register unsigned i(SL); i <= SR; ++i) {         // 从左到右扫 SA 数组 
-    if(SA[i]) {
-      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
-        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
-      }
-    }
-  }
-  printf("BooM?!\n");
-  SumBucket[0] = 1;
-  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-  }
-  for (register unsigned i(SR); i >= SL; --i) {         // 从右往左扫 SA 数组 
-    if(SA[i]) {
-      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
-        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
-      }
-    }
-  }
-//  Print(SL, SR);
-  printf("BooM?!\n");
-  register char flg(0);
-  register unsigned CntLMS(0)/**/, Pre(SR), Pointer(SR + 1);
-  for (register unsigned i(SL + 1); i <= SR; ++i) {         // 扫描找出 LMS, 判重并命名 
-    if(IfLMS[SA[i]]) {
-      if(Equal(i, Pre)) {                                   // 暴力判重 
-        S[S_S1[SA[i]]] = CntLMS;                            // 命名 
-        flg = 1;
-      }
-      else {
-        S[S_S1[SA[i]]] = ++CntLMS;                          // 命名 
-      }
-      Pre = SA[i];                                          // 用来判重 
-      SA[++Pointer] = S_S1[SA[i]];                          // 记录 LMS 
-//      if(i == 1003) {
-//        Print(1003, 1273);
-//      }
-      printf("SA[%u] %u, SA[%u] = S_S1 %u\n", i, SA[i], Pointer, S_S1[SA[i]]);
-    }
-  }
-  printf("BooM?!\n");
-  S[LMSR] = 0;
-  SA[SR + 1] = LMSR;
-  printf("BooM?!\n");
-  if(flg) {//排序 LMS 子串, 返回是否重复 
-    printf("Do down\n");
-    Induc(SR + 1, LMSR, Bucket + bucketSize + 1, SumBucket + bucketSize + 1); //有重复, 先诱导 SA1, 新的 Bucket 直接接在后面 
-  }
-//  Print(SR + 1, LMSR);
-  return;//这时保证 SA1 是对的 
-}
-void Induc (unsigned SL, unsigned SR, unsigned *Bucket, unsigned *SumBucket) {// 诱导 SA
-  printf("Induc %u %u %u %u\n", SL, SR, Bucket - BucketPool, SumBucket - SumBucketPool);
-  for (register unsigned i(SL), j(SL); i < SR; ++i) {    // 定性
-    if(S[i] < S[i + 1]) { // Suff[j~i] 是 S-Type 
-      while (j <= i) {
-        Type[j++] = 1;
-      }
-    }
-    if(S[i] > S[i + 1]) { // Suff[j~i] 是 L-Type 
-      while (j <= i) {
-        Type[j++] = 0;
-      }
-    }
-  }
-  Type[SR] = 1;
-  register unsigned CntLMS(SR);
-  for (register unsigned i(SL); i < SR; ++i) {         // 找 LMS, 记录在 S 中地址, 统计 LMSR 
-    if(!Type[i]) {
-      if(Type[i + 1]) {
-        Address[++CntLMS] = i + 1;
-        S_S1[i + 1] = CntLMS;
-        IfLMS[i + 1] = 1;
-      }
-    }
-  }
-  register unsigned bucketSize(0);
-  for (register unsigned i(SL); i <= SR; ++i) {         // 确定 Bucket
-    ++Bucket[S[i]];
-    bucketSize = bucketSize < S[i] ? S[i] : bucketSize; // 统计 Bucket 的空间范围 
-  }
-  Induced_Sort(SL, SR, Bucket, SumBucket, bucketSize, CntLMS);// 诱导排序 LMS 子串
-  printf("Continue\n");
-  SumBucket[0] = 1;                                     // SA1 求出来了, 开始诱导 
-  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-//    printf("SumBucket[%u] = %u\n", i, SumBucket[i]);
-  }
-  printf("Memset BooM?!\n");
-  printf("Before SA[%u] %u\n", CntLMS, SA[CntLMS]);
-  memset(SA + SL, 0, sizeof(unsigned) * (SR - SL + 1));
-  printf("After SA[%u] %u\n", CntLMS, SA[CntLMS]);
-  printf("%u %u %u %u\n", SL, SR, (SR - SL + 1), CntLMS);
-  printf("It didn't\n");
-  for (register unsigned i(CntLMS); i > SR; --i) {      // 放长度为 1 的 LMS 前缀 
-//    printf("Excuse me? SA[%u] %u Address %u\n", i, SA[i], Address[SA[i]]);
-    SA[SumBucket[S[Address[SA[i]]]]--] = Address[SA[i]];
-  }
-  printf("BooM_Again?!\n");
-//  Print(SL, SR);
-  SumBucket[0] = 1;
-  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (左端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-  }
-  for (register unsigned i(SL); i <= SR; ++i) {         // 从左到右扫 SA 数组 
-    if(SA[i]) {
-      if(!Type[SA[i] - 1]) {                            // Suff[SA[i] - 1] 是 L-Type 
-//        printf("Insert L-Type %u\n", SA[i] - 1); 
-        SA[++SumBucket[S[SA[i] - 1] - 1]] = SA[i] - 1; 
-      }
-    }
-  }
-//  Print(SL, SR);
-  SumBucket[0] = 1;
-  for (register unsigned i(1); i <= bucketSize; ++i) {  // 重置每个栈的栈底 (右端) 
-    SumBucket[i] = SumBucket[i - 1] + Bucket[i];
-//    printf("SumBucket[%u] = %u\n", i, SumBucket[i]);
-  }
-//  Print(SL, SR);
-  for (register unsigned i(SR); i >= SL; --i) {         // 从右往左扫 SA 数组 
-    if(SA[i]) {
-      if(Type[SA[i] - 1]) {                             // Suff[SA[i] - 1] 是 S-Type 
-//        printf("Insert %u\n", SA[i] - 1);
-        SA[SumBucket[S[SA[i] - 1]]--] = SA[i] - 1; 
-      }
-    }
-  }
-//  Print(SL, SR);
-  for (register unsigned i(SL); i <= SR; ++i) {
-    printf("%u ", SA[i]);
-  }
-  return;
-}
+unsigned Cnt(0), n, Ans(0), Tmp(0), SPool[2000005], SAPool[2000005], BucketPool[2000005], SumBucketPool[2000005], AddressPool[2000005], S_S1Pool[2000005];
+char TypePool[2000005];
 int main() {
-  // double Ti(clock()), Mti(0);
-   freopen("P3809_2.in", "r", stdin);
-//   freopen("P3809.out", "w", stdout);
-//  t = RD();
-//  for (register unsigned T(1); T <= t; ++T){
-//  Clr();
-  fread(Type + 1, 1, 1000004, stdin);
-  for (register unsigned i(1); ; ++i) {
-    if(Type[i] <= '9' && Type[i] >= '0') {
-      S[i] = Type[i] - 47;
+  fread(TypePool + 1, 1, 1000004, stdin);
+  for (register unsigned i(1); ; ++i) {   // 尽量压缩字符集 
+    if(TypePool[i] <= '9' && TypePool[i] >= '0') {
+      SPool[i] = TypePool[i] - 47;
       continue;
     }
-    if(Type[i] <= 'Z' && Type[i] >= 'A') {
-      S[i] = Type[i] - 53;
+    if(TypePool[i] <= 'Z' && TypePool[i] >= 'A') {
+      SPool[i] = TypePool[i] - 53;
       continue;
     }
-    if(Type[i] <= 'z' && Type[i] >= 'a') {
-      S[i] = Type[i] - 59;
+    if(TypePool[i] <= 'z' && TypePool[i] >= 'a') {
+      SPool[i] = TypePool[i] - 59;
       continue;
     }
     n = i;
     break;
   }
-//  printf("%u\n", n);
-  S[n] = 0;
-  Induc (1, n, BucketPool, SumBucketPool);
-  for (register unsigned i(1); i <= n; ++i) {
-    printf("%u ", SA[i]);
+  SPool[n] = 0;// 最后一位存空串, 作为哨兵 
+  Induc (AddressPool, TypePool, SAPool, SPool, S_S1Pool, BucketPool, SumBucketPool, n);
+  for (register unsigned i(2); i <= n; ++i) { // SA[1] 是最小的后缀, 算法中将空串作为最小的后缀, 所以不输出 SA[1] 
+    printf("%u ", SAPool[i]);
   }
-  // Ti = clock() - Ti;
-  // printf("Time %lf MTime %lf\n", Ti, Mti);
-  // system("pause");
-  // fclose(stdin);
-  // fclose(stdout);
   return Wild_Donkey;
 }
-
-
-
 ```
 
 ## 后记
 
+一开始刚学完后缀数组是 `Apr.1st`, 提交的递归求后缀数组效率极低, 工程精神驱使我优化, 结果反向优化 (详情见[倍增求后缀数组](https://www.luogu.com.cn/blog/Wild-Donkey/bei-zeng-qiu-hou-zhui-shuo-zu-suffix-array)). 当时立下 Flag, 等学完字符串的其他主要内容, 一定会来学线性算法. `Apr.15th`, 学完回文自动机的我正要看 DC3, 结果发现 SA-IS 效率更高, 果断选择了它, 没想到竟花了一周多才结束.
 
+大部分时间在学算法, 而不是打代码. 看网上的文章有很多卡住的地方, 因为理解上的偏差和逻辑的不严谨, 比如[这篇文章](https://riteme.site/blog/2016-6-19/sais.html)的 "任何 LMS 子串不是另一个 LMS 子串的真前缀" 的问题, 我花了两天去 Hack 这个命题, 将它证伪了, 看评论才知道作者已经在下面做了补充.
 
-参考文献: [Linear Suffix Array Construction by Almost Pure(2009)](https://dna049.com/string/LinearSuffixArrayConstructionbyAlmostPureInduced-Sorting.pdf)
+接着就是看原文, 因为是第一次看英文论文, 所以非常吃力, 打印了一份, 甚至在早读时都在研究.
 
+代码是 `Apr.21st` 才开始打的, 一晚上就写到 `8KB`, 然后第二晚调了一晚. 今天, `Apr.23rd`, AC 的时候长度来到了 `11KB`(很大一部分是注释和调试). 可以看看[初始代码](https://github.com/Wild-Donkey/Code/blob/main/Luogu/P3400-P3999/P3809_Suffix_Array_SA-IS_Origin.cpp)感受一下 (如果链接炸了, 这里是[提交记录](https://www.luogu.com.cn/record/49865967)).
+
+不过总算是写出来了, 虽然这种不看标程直接莽代码的行为非常愚蠢, 但是学一个新算法最好的方法就是在一点点摸索的过程中把问题都暴露出来了. 看一份代码, 想一个模型以至于提到它就想吐的地步, 为了一个细节推敲半天, 这就是工程精神.
+
+希望以后的算法能友好一些, 也希望 OIer 能不忘初心, 关注一下算法的工程价值和美学价值.
+
+## 参考文献:
+
+[Linear Suffix Array Construction by Almost Pure(2009)](https://dna049.com/string/LinearSuffixArrayConstructionbyAlmostPureInduced-Sorting.pdf)
+
+[诱导排序与 SA-IS 算法](https://riteme.site/blog/2016-6-19/sais.html)
