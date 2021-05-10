@@ -304,12 +304,212 @@ void Delete(register Node *x, unsigned &y) {
 
 ### `Value_Rank()`
 
+根据权值查排名, 可能会没有对应的权值出现. 规定排名为比权值这个数小的元素数量.
+
+寻址过程中统计权值较小的元素数量, 由每个节点的经过方式决定. 如果往左子树走, 无需统计; 如果往右子树走, 统计左子树 $Size$ 和当前节点的 $Count$; 如果当前节点就是, 只统计左子树的 $Size$.
+
+$Rank$ 在传入前初始化为 $1$. 因为 $Rank$ 是引用, 所以答案会直接存入传入 $Rank$ 的变量.
+
+```cpp
+void Value_Rank(register Node *x, unsigned &y, unsigned &Rank) {
+  while (x->Value ^ y) {  // Go Down
+    if(y < x->Value) {    // Go Left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      return;             // No more numbers smaller than y, Rank is the rank
+    }
+    else {                // Go Right
+      if(x->LS) {
+        Rank += x->LS->Size;    // The Left Subtree numbers
+      }
+      Rank += x->Count;         // Mid Point numbers
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      return;             // No more numbers bigger than y, Rank is the rank
+    }
+  }
+  if(x->LS) {             // now, x->Value == y
+    Rank += x->LS->Size;
+  }
+  return;
+}
+```
+
+### `Rank_Value()`
+
+通过排名 $y$ 查权值, 保证有解.
+
+通过左子树的 $Size$ 判断是否在左子树.
+
+设当前节点为 $x$
+
+- $y \leq x \rightarrow LS \rightarrow Size$
+
+  要找的点在左子树, 直接前往左子树, 继续寻找.
+
+- $y > x \rightarrow LS \rightarrow Size$
+
+  要找的点不在左子树, 去掉左子树后排 $y - x \rightarrow LS \rightarrow Size$ 名. 将 $y$ 减去 $x \rightarrow LS \rightarrow Size$ 后, 再次分两种情况讨论:(后面的 $y$ 是减去 $x \rightarrow LS \rightarrow Size$ 后的)
+
+  - $y \leq x \rightarrow Count$
+  
+    这时要找的元素就是 $x$, 直接 $Splay(x)$, 将答案存到根上.
+
+  - $y > x \rightarrow Count$
+
+    要找的元素在右子树. 在右子树中的名次是 $y - x \rightarrow Count$. 
+
+这时操作中唯一一个不按权值寻址的操作, 但是结构也不复杂, 很清晰的过程.
+
+```cpp
+void Rank_Value(register Node *x, unsigned &y) {
+  while (x) {
+    if(x->LS) {
+      if(x->LS->Size < y) {//Not in the Left
+        y -= x->LS->Size;
+      }
+      else {            // In Left Subtree
+        x = x->LS;
+        continue;
+      }
+    }
+    if(y > x->Count) {  // In Right Subtree 
+      y -= x->Count;
+      x = x->RS;
+      continue;
+    }
+    return Splay(x);    // Just Look for x 
+  }
+}
+```
+
+### `Before()`
+
+相当于 `<set>` 中的 `lower_bound()`, 求集合中权值严格小于 $y$ 的最大元素.
+
+仍然是寻址, 由于要求严格小于, 所以对于 $x \rightarrow Value \leq y$ 的情况都往左子树走.
+
+这个操作的分类讨论比较多
+
+- $y \leq x \rightarrow Value$
+
+  往左走, 根据左儿子情况再次分类
+
+  - 有左子树
+
+    走左子树
+
+  - 无左子树
+
+    本来要找比 $x$ 小的元素, 可是在 $x$ 的子树上已经不存在了, 所以只能在 $x$ 的祖先上找. 因为 $x$ 的深度最大的小于 $y$ 的祖先 $x'$ 一定是往右边走的. 然后接下来的每一步都往左走, 所以 $x$ 是 $x' \rightarrow RS$ 的子树上最小的元素. 由 BST 的性质得, $x' \rightarrow Value$ 和它右子树上的最小值 $x \rightarrow Value$ 中间没有其它元素. 又因为 $x \rightarrow Value \geq y > x' \rightarrow Value$, 所以 $x'$ 就是要找的元素.
+
+    所以做法是: 从 $x$ 往上跳, 跳到祖先 $x'$ (满足 $x' \rightarrow Value < y$) 为止, Splay(x'), 返回, 树根即为所求.
+
+- $y > x \rightarrow Value$
+
+  - 有右子树
+
+    走右子树
+  
+  - 无右子树
+
+    说明 $x$ 就是要找的点, $Splay(x)$, 返回, 答案就是根. 证明方式差不多, $x$ 一定是它的子树中最大的, 对于 $x$ 的深度最大的大于等于 $y$ 的祖先 $x'$, 一定是左转到 $x' \rightarrow LS$, 然后一连串右转到 $x$, 说明 $x$ 是 $x' \rightarrow LS$ 的子树中最大的节点, 同理, 有 $x$ 是小于 $x'$ 的最大元素. 又因为 $x \rightarrow Value < y \leq x' \rightarrow Value$, 所以 $Splay(x)$, 返回, 根即为所求.
+
+代码比文字更易懂, 分为三个方向, 左转, 右转和上转, 两种边界, 上边界 (往祖先跳而找到的答案) 和右边界 (往右子树走不通而达到的边界).
+
+```cpp
+void Before(register Node *x, unsigned &y) {
+  while (x) {
+    if(y <= x->Value) {   // Go left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      while (x) {         // Go Up
+        if(x->Value < y) {
+          return Splay(x);
+        }
+        x = x->Fa;
+      }
+    }
+    else {                // Go right
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      return Splay(x);    // Value[x] < Key
+    }
+  }
+}
+```
+
+### `After()`
+
+相当于 `<set>` 中的反向 `lower_bound()`, 是 `Before()` 的对应操作, 反过来理解就好了.
+
+```cpp
+void After(register Node *x, unsigned &y) {
+  while (x) {
+    if(y >= x->Value) {     // Go right
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      while (x) {           // Go Up
+        if(x->Value > y) {
+          return Splay(x);
+        }
+        x = x->Fa;
+      }
+    }
+    else {                  // Go left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      return Splay(x);
+    }
+  }
+}
+```
+
 ### `Build()`
 
 由于 Splay 树的常数非常大, 所以在初始化一个集合时, 一个一个 Insert 会非常不划算, 所以可以写一个初始化的程序, 快速建好这棵树.
 
-```cpp
+提前预处理两个数组, $a$ 存权值, $b$ 存出现个数, 必须保证 $a$ 升序.
 
+```cpp
+void Value_Rank(register Node *x, unsigned &y, unsigned &Rank) {
+  while (x->Value ^ y) {  // Go Down
+    if(y < x->Value) {    // Go Left
+      if(x->LS) {
+        x = x->LS;
+        continue;
+      }
+      return;             // No more numbers smaller than y, Rank is the rank
+    }
+    else {                // Go Right
+      if(x->LS) {
+        Rank += x->LS->Size;    // The Left Subtree numbers
+      }
+      Rank += x->Count;         // Mid Point numbers
+      if(x->RS) {
+        x = x->RS;
+        continue;
+      }
+      return;             // No more numbers bigger than y, Rank is the rank
+    }
+  }
+  if(x->LS) {             // now, x->Value == y
+    Rank += x->LS->Size;
+  }
+  return;
+}
 ```
 
 ## 哨兵
@@ -322,7 +522,7 @@ void Delete(register Node *x, unsigned &y) {
 
 ## 例题: [普通平衡树 (数据加强版)](https://www.luogu.com.cn/problem/P6136)
 
-题意: 维护一个给定的数集, 支持六种操作
+题意: 维护一个给定的数集, 支持六种操作, 这六种操作便是前面分析的 Splay 树支持的那六种操作
 
 1. Insert
 
@@ -342,7 +542,108 @@ void Delete(register Node *x, unsigned &y) {
 
 在普通平衡树的基础上, 写一个处理集合, 回答询问的接口即可.
 
-下面的代码省略了前面列举的函数
+下面的代码省略了前面列举的函数, 即 Splay 树对于本题的接口.
 
 ```cpp
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <vector>
+#define Wild_Donkey 0
+using namespace std;
+inline unsigned RD() {    // Fast Read
+  unsigned intmp = 0;
+  char rdch(getchar());
+  while (rdch < '0' || rdch > '9') {
+    rdch = getchar();
+  }
+  while (rdch >= '0' && rdch <= '9') {
+    intmp = intmp * 10 + rdch - '0';
+    rdch = getchar();
+  }
+  return intmp;
+}
+unsigned a[100005], b[100005], m, n, RealN(0), Cnt(0), C, D, t, Tmp(0);
+bool Flg(0);
+struct Node {
+  Node *Fa, *LS, *RS;
+  unsigned Value, Size, Count;
+}N[1100005], *CntN(N), *Root(N);
+signed main() {
+  register unsigned Ans(0);  // 记录 
+  n = RD();
+  m = RD();
+  a[0] = 0x7f3f3f3f;
+  for (register unsigned i(1); i <= n; ++i) { // 原集合 
+    a[i] = RD();
+  }
+  sort(a + 1, a + n + 1);                     // 排序 
+  for (register unsigned i(1); i <= n; ++i) { // 去重 
+    if(a[i] ^ a[i - 1]) { // A new number
+      b[++RealN] = 1;
+      a[RealN] = a[i];
+    }
+    else {                // Old number
+      ++b[RealN];
+    }
+  }
+  a[++RealN] = 0x7f3f3f3f;                    // 加入哨兵 
+  b[RealN] = 1;
+  Build(1, RealN, NULL);                      // 建树 
+  Root = N + 1;                               // 初始化根 (根是第一个点, 因为递归建树是 DFS, 根是 DFS 序最小的) 
+  for (register unsigned i(1), A, B, Last(0); i <= m; ++i) {
+    A = RD();
+    B = RD() ^ Last;  // 强制在线, 处理操作值 
+    switch(A) {       // 分别是对应的 6 个操作 
+      case 1:{
+        Insert(Root, B);
+        break;
+      }
+      case 2:{
+        Delete(Root, B);
+        break;
+      }
+      case 3:{
+        Last = 1;     // 初始化 Last, 答案直接累计在传入的 Last 中 
+        Value_Rank(Root, B, Last);
+        Ans ^= Last;
+        break;
+      }
+      case 4:{
+        Rank_Value(Root, B);
+        Last = Root->Value;   // 4, 5, 6 操作的答案都存在树根上, 作为根节点的权值存在 
+        Ans ^= Last;
+        break;
+      }
+      case 5:{
+        Before(Root, B);
+        Last = Root->Value;
+        Ans ^= Last;
+        break;
+      }
+      case 6:{
+        After(Root, B);
+        Last = Root->Value;
+        Ans ^= Last;
+        break;
+      }
+    }
+  }
+  printf("%u\n", Ans);// 输出异或和 
+  return Wild_Donkey;
+}
 ```
+
+## 小结
+
+Splay 虽然不是我学习的第一种平衡树, 但是却是我 AC 的第一棵平衡树 `Dec.1st 2020`, 当时感觉自己都明白了, 结果如今 `Apr.29th 2021` 还是调了几天. 果然, 算法这种东西, 不练习是记不住的, 接下来要加强练习.
+
+但是对于一个算法, 巩固它的更好方法貌似是以这个算法为前置知识去学习知识树上的后继节点. 所以, LCT, 我来了.
+
+最后: 话说我现在一篇博客字符数量 15k+ 已经变成常态了吗? 还记得 10k 字符的[后缀自动机](https://www.luogu.com.cn/blog/Wild-Donkey/hou-zhui-zi-dong-ji-suffix-automaton) 已经让当时的我震惊了, 随之而来的 [SA-IS](https://www.luogu.com.cn/blog/Wild-Donkey/xian-xing-qiu-hou-zhui-shuo-zu-sais-algorithm) 的 16k 字符更是让我刷新了对自己码字能力的评估, 这次更是直接干到了 17.5k. 果然学 OI 是能提升语文水平的 (貌似还有英语水平).
