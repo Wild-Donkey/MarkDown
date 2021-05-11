@@ -424,7 +424,7 @@ int main() {
 
 接着就是看原文, 因为是第一次看英文论文, 所以非常吃力, 打印了一份, 甚至在早读时都在研究.
 
-代码是 `Apr.21st` 才开始打的, 一晚上就写到 `8KB`, 然后第二晚调了一晚. 今天, `Apr.23rd`, AC 的时候长度来到了 `11KB`(很大一部分是注释和调试). 可以看看[初始代码](https://github.com/Wild-Donkey/Code/blob/main/Luogu/P3400-P3999/P3809_Suffix_Array_SA-IS_Origin.cpp)感受一下 (如果链接炸了, 这里是[提交记录](https://www.luogu.com.cn/record/49865967)).
+代码是 `Apr.21st` 才开始打的, 一晚上就写到 `8KB`, 然后第二晚调了一晚. 今天, `Apr.23rd`, AC 的时候长度来到了 `11KB`(很大一部分是注释和调试). 可以看看[初始代码](https://github.com/Wild-Donkey/Code/blob/main/Luogu/P3800-P3999/P3809_Suffix_Array_SA-IS_Origin.cpp)感受一下 (如果链接炸了, 这里是[提交记录](https://www.luogu.com.cn/record/49865967)).
 
 不过总算是写出来了, 虽然这种不看标程直接莽代码的行为非常愚蠢, 但是学一个新算法最好的方法就是在一点点摸索的过程中把问题都暴露出来了. 看一份代码, 想一个模型以至于提到它就想吐的地步, 为了一个细节推敲半天, 这就是工程精神.
 
