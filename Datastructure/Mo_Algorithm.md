@@ -96,4 +96,81 @@ $$
 
 因为莫队的前提是一次增量时间复杂度 O(1), 所以只要证明莫队对长度为 $n$ 的序列的 $m$ 次区间查询的复杂度是 $O(n \sqrt m)$.
 
-在 $n = O(m), m = O(n)$ 的前提下, 分块的块长选择 $\frac{n}{\sqrt m}$
+在分块的块长选择 $\frac{n}{\sqrt m}$ 的前提下, 块数就是 $\sqrt{m}$. 使用 `algorithm` 中自带的排序, 复杂度是 $O(logm)$.
+
+接下来对当前答案进行增量, 对于左端点和上一个询问同块的情况, 左端点最多增量 $\frac{n}{\sqrt m}$ 次. 对于左端点在新的块的询问, 最多增量 $\frac{2n}{\sqrt m}$ 次, 也是 $O(\frac{n}{\sqrt m})$. 所有左端点增量次数复杂度为 $O(\frac{nm}{\sqrt m}) = O(n \sqrt m)$. 左端点这个块内的所有询问, 右端点递增, 所以这些询问右端点总共增量最多 $n$ 次. 所以右端点总共的增量数应该是 $O(n \sqrt m)$. 综上, 左右端点增量数复杂度为 $O(n \sqrt m)$
+
+分析更一般的情况, 如果块长选 $x$, 块数就是 $\frac {n}{x}$. 用上面的方式分析, 左端点的增量数复杂度是 $O(xm)$, 右端点的增量数复杂度是 $O(\frac{n^2}{x})$, 总复杂度为 $O(xm + \frac{n^2}{x})$. 使用均值不等式, 最优复杂度为 $xm + \frac{n^2}{x} \geq 2\sqrt{mn^2} = 2n\sqrt m = O(n\sqrt{m})$, 当 $xm = \frac{n^2}{x}$ 时取到等号. 整理求块长:
+
+$$
+xm = \frac{n^2}{x}\\
+x^2m = n^2\\
+x^2 = \frac{n^2}{m}\\
+x = \frac{n}{\sqrt m}
+$$
+
+所以, 一般莫队的最优块长是 $n\sqrt m$
+
+## 代码实现
+
+细节不多, 码量短小, 把推的式子写成代码就好了, 是骗分的好工具.
+
+```cpp
+unsigned m, n, Cnt[50005], BlockLen, BlockCnt;
+long long a[50005], Ans[50005][2], Tmp0(0), Tmp1(1), TmpG, TmpSquare(1);
+struct Query{
+  unsigned L, R, Num, BelongToBlocks;
+  inline const char operator <(const Query &x) {  // 按左端点所在块排序 
+    return (this->BelongToBlocks ^ x.BelongToBlocks) ? this->BelongToBlocks < x.BelongToBlocks : this->R < x.R;
+  }
+}Q[50005];
+inline unsigned GCD(register unsigned x, register unsigned y) {
+  register unsigned tmp;
+  while(y) tmp = x, x = y, y = tmp % y;
+  return x;
+}
+int main() {
+  n = RD(), m = RD();
+  BlockLen = (m ^ 0) ? (n / sqrt(m)) + 1 : sqrt(n) + 1;
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD();
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    Q[i].L = RD(), Q[i].R = RD(), Q[i].Num = i, Q[i].BelongToBlocks = (Q[i].L + BlockLen - 1) / BlockLen;
+  }
+  sort(Q + 1, Q + m + 1);
+  Tmp0 = 0, Tmp1 = 1, Q[0].L = 1, Q[0].R = 1, Cnt[a[1]] = 1; // 初始化当前区间为 [1, 1] 
+  for (register unsigned i(1); i <= m; ++i) {
+    if(Q[i].L == Q[i].R) {      // 特判, 单点查询 
+      Ans[Q[i].Num][0] = 0, Ans[Q[i].Num][1] = 1;
+      continue;
+    }
+    register unsigned Col, Len(Q[i].R - Q[i].L + 1);
+    while (Q[0].L > Q[i].L) {   // 左端点左移 
+      ++Cnt[Col = a[--Q[0].L]];
+      TmpSquare += (Cnt[Col] << 1) - 1; // Cnt[Col] 增加, 维护方差, 下同 
+    }
+    while (Q[0].R < Q[i].R) {   // 右端点右移 
+      ++Cnt[Col = a[++Q[0].R]];
+      TmpSquare += (Cnt[Col] << 1) - 1;
+    }
+    while (Q[0].L < Q[i].L) {   // 左端点右移
+      --Cnt[Col = a[Q[0].L++]];
+      TmpSquare -= (Cnt[Col] << 1) + 1;
+    }
+    while (Q[0].R > Q[i].R) {   // 右端点左移
+      --Cnt[Col = a[Q[0].R--]];
+      TmpSquare -= (Cnt[Col] << 1) + 1;
+    }
+    Ans[Q[i].Num][0] = TmpSquare - Len;
+    Ans[Q[i].Num][1] = Len * Len - Len;
+    TmpG = GCD(Ans[Q[i].Num][0], Ans[Q[i].Num][1]);
+    Ans[Q[i].Num][0] /= TmpG;
+    Ans[Q[i].Num][1] /= TmpG;
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    printf("%u/%u\n", Ans[i][0], Ans[i][1]);
+  }
+  return Wild_Donkey;
+}
+```
