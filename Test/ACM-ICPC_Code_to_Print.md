@@ -11,7 +11,7 @@
 在编译选项中要打的所有命令为:
 
 ```
--Wl,--stack=1024000000 -Wall -Wconversion -Wextra
+-std=c++11 -Wl,--stack=512000000 -Wall -Wconversion -Wextra -O2 -Wsign-compare
 ```
 
 ## 缺省源相关
@@ -1036,16 +1036,11 @@ Node *Find_Root(Node *x) {  // Find the root
   return x;
 }
 int main() {
-  n = RD();
-  m = RD();
-  for (register unsigned i(1); i <= n; ++i) {
-    N[i].Value = RD();
-  }
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= n; ++i) N[i].Value = RD();
   register unsigned A, B, C;
   for (register unsigned i(1); i <= m; ++i) {
-    A = RD();
-    B = RD();
-    C = RD();
+    A = RD(), B = RD(), C = RD();
     switch (A) {
       case 0: { // Query
         Access(N + B), Splay(N + B), N[B].Tag ^= 1; // x 为根 
@@ -1105,16 +1100,10 @@ int main() {
   }
   Cst = S * M[n].SumC;  // 截距中的一项常数 
   for (register unsigned i(1); i <= n; ++i) {
-    while (l < r && ((H[l + 1].y - H[l].y) < M[i].SumT * (H[l + 1].x - H[l].x))) {
-      ++l; // 弹出过气决策点 
-    }
+    while (l < r && ((H[l + 1].y - H[l].y) < M[i].SumT * (H[l + 1].x - H[l].x))) ++l; // 弹出过气决策点 
     M[i].f = M[H[l].Ad].f + (M[i].SumC - M[H[l].Ad].SumC) * M[i].SumT + Cst - M[i].SumC * S; // 转移 
-    Then.Ad = i;
-    Then.x = M[i].SumC;
-    Then.y = M[i].f;    // 求新点坐标 
-    while (l < r && ((Then.y - H[r].y) * (H[r].x - H[r - 1].x) <= (H[r].y - H[r - 1].y) * (Then.x - H[r].x))) {
-      --r; // 维护下凸 
-    }
+    Then.Ad = i, Then.x = M[i].SumC, Then.y = M[i].f;    // 求新点坐标 
+    while (l < r && ((Then.y - H[r].y) * (H[r].x - H[r - 1].x) <= (H[r].y - H[r - 1].y) * (Then.x - H[r].x))) --r; // 维护下凸
     H[++r] = Then;      // 入队 
   }
   printf("%lld\n", M[n].f);
@@ -1122,7 +1111,7 @@ int main() {
 }
 ```
 
-### 斜率优化二分查找挂
+### 斜率优化二分查找外挂
 
 ```cpp
 Hull *Binary (unsigned L, unsigned R, const long long &key) { // 在普通斜优的基础上的外挂
@@ -1151,34 +1140,22 @@ inline void Clr() {
 }
 void Best(unsigned x) {
   while (He < Ta && Do(Li[Ta].Adre, Li[Ta].l) >= Do(x, Li[Ta].l)) --Ta; // 决策 x 对于区间起点表示的阶段更优, 整个区间无用                                  
-  if (Do(Li[Ta].Adre, Li[Ta].r) >= Do(x, Li[Ta].r)) {  // 决策 x 对于区间终点更优 (至少一个阶段给 x)
-    Bin(x, Li[Ta].l, Li[Ta].r);
-  } else if (Li[Ta].r != n) ++Ta, Li[Ta].l = Li[Ta - 1].r + 1, Li[Ta].r = n, Li[Ta].Adre = x;
-  while (He < Ta && Li[He].r <= x) {  // 过时决策
-    ++He;
-  }
+  if (Do(Li[Ta].Adre, Li[Ta].r) >= Do(x, Li[Ta].r)) Bin(x, Li[Ta].l, Li[Ta].r); // 决策 x 对于区间终点更优 (至少一个阶段给 x)
+  else if (Li[Ta].r != n) ++Ta, Li[Ta].l = Li[Ta - 1].r + 1, Li[Ta].r = n, Li[Ta].Adre = x;
+  while (He < Ta && Li[He].r <= x) ++He; // 过时决策
   Li[He].l = x + 1;
   return;
 }
 void Best(unsigned x) {
-  while (He < Ta && Do(Li[Ta].Adre, Li[Ta].l) >=
-                        Do(x, Li[Ta].l)) {  // 决策 x 对于区间起点表示的阶段更优
-    --Ta;                                   // 整个区间无用
+  while (He < Ta && Do(Li[Ta].Adre, Li[Ta].l) >= Do(x, Li[Ta].l)) --Ta; // 决策 x 对于区间起点表示的阶段更优, 整个区间无用
+  if (Do(Li[Ta].Adre, Li[Ta].r) >= Do(x, Li[Ta].r)) Bin(x, Li[Ta].l, Li[Ta].r); // 决策 x 对于区间终点更优 (至少一个阶段给 x)
+  else if (Li[Ta].r != n) {
+    ++Ta;
+    Li[Ta].l = Li[Ta - 1].r + 1;
+    Li[Ta].r = n;
+    Li[Ta].Adre = x;
   }
-  if (Do(Li[Ta].Adre, Li[Ta].r) >=
-      Do(x, Li[Ta].r)) {  // 决策 x 对于区间终点更优 (至少一个阶段给 x)
-    Bin(x, Li[Ta].l, Li[Ta].r);
-  } else {
-    if (Li[Ta].r != n) {
-      ++Ta;
-      Li[Ta].l = Li[Ta - 1].r + 1;
-      Li[Ta].r = n;
-      Li[Ta].Adre = x;
-    }
-  }
-  while (He < Ta && Li[He].r <= x) {  // 过时决策
-    ++He;
-  }
+  while (He < Ta && Li[He].r <= x) ++He; // 过时决策
   Li[He].l = x + 1;
   return;
 }
@@ -1189,15 +1166,10 @@ inline void Bin(unsigned x /*新决策下标*/, unsigned le,
     return;
   }
   unsigned m((le + ri) >> 1);
-  if (Do(x, m) <= Do(Li[Ta].Adre, m)) {  // x 作为阶段 mid 的决策更优
-    return Bin(x, le, m);
-  }
+  if (Do(x, m) <= Do(Li[Ta].Adre, m)) return Bin(x, le, m); // x 作为阶段 mid 的决策更优
   return Bin(x, m + 1, ri);
 }
-inline void Print() {
-  Cnt = 0, Prt[0] = 0, Back(n);
-  return;
-}
+inline void Print() {Cnt = 0, Prt[0] = 0, Back(n);return;}
 inline void Back(unsigned x) {
   if (Prt[x]) Back(Prt[x]);
   for (register unsigned i(Prt[x] + 1); i < x; ++i) {
@@ -1227,19 +1199,12 @@ int main() {
 ### 二维四边形不等式 (邮局)
 
 ```cpp
-for (register unsigned i(1); i <= n; ++i) {
-  a[i] = RD();
-}
-for (register unsigned i(1); i <= n; ++i) {
-  g[1][i] = 0;
-}
-for (register unsigned i(1); i <= n; ++i) {
-  for (register unsigned j(i + 1); j <= n; ++j) {
+for (register unsigned i(1); i <= n; ++i) a[i] = RD();
+for (register unsigned i(1); i <= n; ++i) g[1][i] = 0;
+for (register unsigned i(1); i <= n; ++i)
+  for (register unsigned j(i + 1); j <= n; ++j)
     g[i][j] = g[i][j - 1] + a[j] - a[(i + j) >> 1]; // 预处理 
-  }
-}
-memset(f, 0x3f, sizeof(f));
-f[0][0] = 0;
+memset(f, 0x3f, sizeof(f)), f[0][0] = 0;
 for (register unsigned i(1); i <= n; ++i) {
   Dec[i][min(i, m) + 1] = 0x3f3f3f3f; // 对于本轮DP, Dec[i][min(i, m) + 1] 是状态 (i, min(i, m)) 可行决策的右边界 
   for (register unsigned j(min(i, m)); j >= 1; --j) {
@@ -1279,9 +1244,7 @@ void DFS(Node *x) {
   x->DFSr = ++Dcnt;
   Edge *Sid(x->Fst);
   while (Sid) {
-    if(!Sid->To->DFSr) {
-      DFS(Sid->To);
-    }
+    if(!Sid->To->DFSr) DFS(Sid->To);
     Sid = Sid->Nxt;
   }
   return;
@@ -1319,9 +1282,7 @@ int LCA(int a,int b) {
 }
 int main() {
 	N=read(), M=read(), S=read(), Dp[S]=0;
-	memset(Sd,0,sizeof(Sd));
-	memset(Tr,0,sizeof(Tr));
-	memset(Dp,0,sizeof(Dp));
+	memset(Sd,0,sizeof(Sd)), memset(Tr,0,sizeof(Tr)), memset(Dp,0,sizeof(Dp));
 	Dp[0]=-1, LOG();
 	for(int i=1;i<N;i++) X=read(), Y=read(), BT(X,Y), BT(Y,X);
 	DFS(S,0);//预处理深度和倍增数组
@@ -1360,9 +1321,7 @@ void BFS() {
   Node *x;
   while (hd < tl) {
     x = Q[hd++];
-    if (x == T) {
-      continue;
-    }
+    if (x == T) continue;
     for (register unsigned int i(1); i <= x->Cntne; i++) {
       if (!Dep[x->Scd[i]->To - N] && x->Scd[i]->Nw < x->Scd[i]->Mx) {
         Dep[x->Scd[i]->To - N] = Dep[x - N] + 1;
@@ -1384,9 +1343,7 @@ long long DFS(Node *x, long long Cm) {
     }
     if (x->Scd[i]->Mx > x->Scd[i]->Nw &&
         Dep[x->Scd[i]->To - N] == Dep[x - N] + 1) {  //下一层的点
-      if (Cm == 0) {
-        return sum;
-      }
+      if (Cm == 0) return sum;
       tmp = min(x->Scd[i]->Mx - x->Scd[i]->Nw, Cm);
       if (tmp = DFS(x->Scd[i]->To, tmp)) {
         Cm -= tmp;
@@ -1400,12 +1357,8 @@ long long DFS(Node *x, long long Cm) {
 }
 void Dinic() {
   while (1) {
-    memset(Q, 0, sizeof(Q));
-    memset(Dep, 0, sizeof(Dep));
-    hd = 0;
-    tl = 1;
-    Q[hd] = S;
-    Dep[S - N] = 1;
+    memset(Q, 0, sizeof(Q)), memset(Dep, 0, sizeof(Dep));
+    hd = 0, tl = 1, Q[hd] = S, Dep[S - N] = 1;
     BFS();
     if (!Dep[T - N]) break;
     Ans += DFS(S, 0x3f3f3f3f3f3f3f3f);
@@ -1423,8 +1376,7 @@ int main() {
     N[i].Cntne = 0;
     for (register unsigned int j(1); j <= n; ++j) if (N[i].Fst[j]) N[i].Scd[++N[i].Cntne] = N[i].Fst[j];
   }
-  Dinic();
-  printf("%llu\n", Ans);
+  Dinic(), printf("%llu\n", Ans);
   return 0;
 }
 ```
@@ -1433,12 +1385,8 @@ int main() {
 
 ```cpp
 int n,m,fa[10005],s,e,l,k=0,ans=0;
-struct side{
-	int le,ri,len;
-}a[200005];
-bool cmp(side x,side y){
-	return(x.len<y.len);
-}
+struct side{int le,ri,len;}a[200005];
+bool cmp(side x,side y){return(x.len<y.len);}
 int find(int x){
 	if(fa[x]==x) return x;
 	fa[x]=find(fa[x]);
@@ -1571,9 +1519,7 @@ void DFS_(Node_ *x) {
   printf("To %d %d\n", x - N_, x->Tpr);
   Edge_ *Sid(x->Fst);
   while (Sid) {
-    if(!Sid->To->_ed) {
-      DFS_(Sid->To);
-    }
+    if(!Sid->To->_ed) DFS_(Sid->To);
     Sid = Sid->Nxt;
   }
  return;
@@ -1675,14 +1621,8 @@ int Gcd(int x, int y) {
 
 ```cpp
 inline void Exgcd(int a, int b, int &x, int &y) {
-  if(!b) {
-    x = 1;
-    y = 0;
-  }
-  else {
-    Exgcd(b, a % b, y, x);
-    y -= (a / b) * x;
-  }
+  if(!b) x = 1, y = 0;
+  else Exgcd(b, a % b, y, x), y -= (a / b) * x;
 }
 ```
 
@@ -1690,14 +1630,10 @@ inline void Exgcd(int a, int b, int &x, int &y) {
 
 ```cpp
 unsigned Power(unsigned x, unsigned y) {
-  if(!y) {
-    return 1;
-  }
+  if(!y) return 1;
   unsigned tmp(Power(x, y >> 1));
   tmp = ((long long)tmp * tmp) % D;
-  if(y & 1) {
-    return ((long long)tmp * x) % D;
-  }
+  if(y & 1) return ((long long)tmp * x) % D;
   return tmp;
 }
 ```
@@ -1709,45 +1645,27 @@ unsigned Phi(unsigned x) {
   unsigned tmp(x), anotherTmp(x), Sq(sqrt(x));
   for (register unsigned i(2); i <= Sq && i <= x; ++i) {
     if(!(x % i)) {
-      while (!(x % i)) {
-        x /= i;
-      }
-      tmp /= i;
-      tmp *= i - 1;
+      while (!(x % i)) x /= i;
+      tmp /= i, tmp *= i - 1;
     }
   }
-  if (x > 1) {//存在大于根号 x 的质因数 
-    tmp /= x;
-    tmp *= x - 1;
-  }
+  if (x > 1) tmp /= x, tmp *= x - 1;//存在大于根号 x 的质因数
   return tmp;
 }
 int main() {
-  A = RD();
-  D = RD();
-  C = Phi(D);
-  while (ch < '0' || ch > '9') {
-    ch = getchar();
-  }
+  A = RD(), D = RD(), C = Phi(D);
+  while (ch < '0' || ch > '9') ch = getchar();
   while (ch >= '0' && ch <= '9') {
-    B *= 10;
-    B += ch - '0';
-    if(B > C) {
-      flg = 1;
-      B %= C;
-    }
+    B *= 10, B += ch - '0';
+    if(B > C) flg = 1, B %= C;
     ch = getchar();
   }
   if(B == 1) {
     printf("%u\n", A % D);
     return Wild_Donkey;
   }
-  if(flg) {
-    printf("%u\n", Power(A, B + C));
-  }
-  else {
-    printf("%u\n", Power(A, B));
-  }
+  if(flg) printf("%u\n", Power(A, B + C));
+  else printf("%u\n", Power(A, B));
   return Wild_Donkey;
 }
 ```
@@ -1756,12 +1674,10 @@ int main() {
 
 ```cpp
 struct Matrix {long long a[105][105], siz;}mtx;
-long long k;
-bool flg;
+long long k;bool flg;
 Matrix operator*(Matrix x, Matrix y) {
   Matrix ans;
-  long long tmp;
-  ans.siz = x.siz;
+  long long tmp; ans.siz = x.siz;
   for (int i = 1; i <= ans.siz; i++) {
     for (int j = 1; j <= ans.siz; j++) {
       for (int k = 1; k <= ans.siz; k++) {
@@ -2045,65 +1961,37 @@ void RadixSort () {
   for (register unsigned i(1); i <= n; ++i) {
     b[++sumBucket[S[a[i]].RK]] = a[i];                // 由于 a[i] 是 b[i] 的拷贝, 表示第 i 小的后缀编号, 所以枚举 i 一定是从最小的后缀开始填入新意义下的 b 
   }
-  b[0] = 0;
-  Cnt = 0;                                            // 使 RK 不那么分散 
+  b[0] = 0, Cnt = 0;// 使 RK 不那么分散 
   for (register unsigned i(1); i <= n; ++i) {
-    if(S[b[i]].SubRK != S[b[i - 1]].SubRK || S[b[i]].RK != S[b[i - 1]].RK) {
-      a[b[i]] = ++Cnt;                                // 第 i 小的后缀和第 i - 1 小的后缀不等排名不等 
-    }
-    else {
-      a[b[i]] = Cnt;                                  // 第 i 小的后缀和第 i - 1 小的后缀相等排名也相等 
-    }
+    if(S[b[i]].SubRK != S[b[i - 1]].SubRK || S[b[i]].RK != S[b[i - 1]].RK) a[b[i]] = ++Cnt;// 第 i 小的后缀和第 i - 1 小的后缀不等排名不等 
+    else a[b[i]] = Cnt;// 第 i 小的后缀和第 i - 1 小的后缀相等排名也相等
   }
-  for (register unsigned i(1); i <= n; ++i) {
-    S[i].RK = a[i];                                   // 将 a 中暂存的新次序拷贝回来 
-  }
+  for (register unsigned i(1); i <= n; ++i) S[i].RK = a[i]// 将 a 中暂存的新次序拷贝回来
   return;
 }
 int main() {
   cin.getline(Inch, 1000001);
   n = strlen(Inch);
   for (register unsigned i(0); i < n; ++i) {
-    if(Inch[i] <= '9' && Inch[i] >= '0') {
-      Inch[i] -= 47;
-      continue;
-    }
-    if(Inch[i] <= 'Z' && Inch[i] >= 'A') {
-      Inch[i] -= 53;
-      continue;
-    }
-    if(Inch[i] <= 'z' && Inch[i] >= 'a') {
-      Inch[i] -= 59;
-      continue;
-    }
+    if(Inch[i] <= '9' && Inch[i] >= '0') {Inch[i] -= 47;continue;}
+    if(Inch[i] <= 'Z' && Inch[i] >= 'A') {Inch[i] -= 53;continue;}
+    if(Inch[i] <= 'z' && Inch[i] >= 'a') {Inch[i] -= 59;continue;}
   }
-  for (register unsigned i(0); i < n; ++i) {
-    Bucket[Inch[i]] = 1;
-  }
+  for (register unsigned i(0); i < n; ++i) Bucket[Inch[i]] = 1;
   for (register unsigned i(0); i < 64; ++i) {
     if(Bucket[i]) {
-      Tmpch[i] = ++Cnt;                               // 让桶从 1 开始, 空出 0 的位置
+      Tmpch[i] = ++Cnt; // 让桶从 1 开始, 空出 0 的位置
       Bucket[i] = 0;
     }
   }
-  for (register unsigned i(0); i < n; ++i) {          // 将字符串离散化成整数序列
-      S[i + 1].RK = Tmpch[Inch[i]];                   // 字符串读入是 [0, n) 的, 题意中字符串是 (0, n] 的 
-  }
+  for (register unsigned i(0); i < n; ++i) S[i + 1].RK = Tmpch[Inch[i]];// 将字符串离散化成整数序列, 字符串读入是 [0, n) 的, 题意中字符串是 (0, n] 的
   for (register unsigned i(1); i <= n; i <<= 1) {     // 当前按前 i 个字符排完了, 每次 i 倍增
-    for (register unsigned j(1); j + i <= n; ++j) {   // 针对第二关键字不为 0 的 
-      S[j].SubRK = S[j + i].RK;
-    }
-    for (register unsigned j(n - i + 1); j <= n; ++j) {  
-      S[j].SubRK = 0;                                 // 第二关键字为 0 
-    }
+    for (register unsigned j(1); j + i <= n; ++j) S[j].SubRK = S[j + i].RK;// 针对第二关键字不为 0 的 
+    for (register unsigned j(n - i + 1); j <= n; ++j) S[j].SubRK = 0;// 第二关键字为 0 
     RadixSort();
   }
-  for (register unsigned i(1); i <= n; ++i) {
-    b[S[i].RK] = i;
-  }
-  for (register unsigned i(1); i <= n; ++i) {
-    printf("%u ", b[i]);
-  }
+  for (register unsigned i(1); i <= n; ++i) b[S[i].RK] = i;
+  for (register unsigned i(1); i <= n; ++i) printf("%u ", b[i]);
   return Wild_Donkey;
 }
 ```
@@ -2167,7 +2055,6 @@ void Induced_Sort (unsigned *Address, char *Type, unsigned *SA, unsigned *S, uns
 void Induc (unsigned *Address, char *Type, unsigned *SA, unsigned *S, unsigned *S_S1, unsigned *Bucket, unsigned *SumBucket, unsigned N) {// 诱导 SA
   for (register unsigned i(1), j(1); i < N; ++i) {      // 定性 S/L 
     if(S[i] < S[i + 1]) while (j <= i) Type[j++] = 1;   // Suff[j~i] 是 S-Type 
-      
     if(S[i] > S[i + 1])                                 // Suff[j~i] 是 L-Type
       while (j <= i) Type[j++] = 0;
   }
@@ -2202,14 +2089,8 @@ void Induc (unsigned *Address, char *Type, unsigned *SA, unsigned *S, unsigned *
 int main() {
   fread(TypePool + 1, 1, 1000004, stdin);
   for (register unsigned i(1); ; ++i) {   // 尽量压缩字符集 
-    if(TypePool[i] <= '9' && TypePool[i] >= '0') {
-      SPool[i] = TypePool[i] - 47;
-      continue;
-    }
-    if(TypePool[i] <= 'Z' && TypePool[i] >= 'A') {
-      SPool[i] = TypePool[i] - 53;
-      continue;
-    }
+    if(TypePool[i] <= '9' && TypePool[i] >= '0') {SPool[i] = TypePool[i] - 47;continue;}
+    if(TypePool[i] <= 'Z' && TypePool[i] >= 'A') {SPool[i] = TypePool[i] - 53;continue;}
     if(TypePool[i] <= 'z' && TypePool[i] >= 'a') {
       SPool[i] = TypePool[i] - 59;
       continue;
@@ -2219,9 +2100,7 @@ int main() {
   }
   SPool[n] = 0;// 最后一位存空串, 作为哨兵 
   Induc (AddressPool, TypePool, SAPool, SPool, S_S1Pool, BucketPool, SumBucketPool, n);
-  for (register unsigned i(2); i <= n; ++i) { // SA[1] 是最小的后缀, 算法中将空串作为最小的后缀, 所以不输出 SA[1] 
-    printf("%u ", SAPool[i]);
-  }
+  for (register unsigned i(2); i <= n; ++i) printf("%u ", SAPool[i]);// SA[1] 是最小的后缀, 算法中将空串作为最小的后缀, 所以不输出 SA[1] 
   return Wild_Donkey;
 }
 ```
@@ -2242,19 +2121,11 @@ inline unsigned DFS(Node *x) {
   if(x->endNode) {      
     tmp = 1; 
   }
-  for (register unsigned i(0); i < 26; ++i) {
-    if(x->SAMEdge[i]) {               // 有转移 i 
-      if(x->SAMEdge[i]->Times > 0) {  // 被搜索过 
-        tmp += x->SAMEdge[i]->Times;  // 直接统计 
-      }
-      else {                          // 未曾搜索 
-        tmp += DFS(x->SAMEdge[i]);    // 搜索 
-      }
-    }
-  }
-  if (tmp > 1) {                      // 出现次数不为 1 
-    Ans = max(Ans, tmp * x->Length);  // 尝试更新答案 
-  }
+  for (register unsigned i(0); i < 26; ++i)
+    if(x->SAMEdge[i])                 // 有转移 i 
+      if(x->SAMEdge[i]->Times > 0) tmp += x->SAMEdge[i]->Times;// 被搜索过, 直接统计
+      else tmp += DFS(x->SAMEdge[i]); // 未曾搜索, 搜索
+  if (tmp > 1) Ans = max(Ans, tmp * x->Length);// 出现次数不为 1, 尝试更新答案
   x->Times = tmp;                     // 存储子树和 
   return tmp;                         // 子树和用于搜索树上的父亲的统计 
 }
@@ -2304,8 +2175,7 @@ int main() {
 
 ```cpp
 int main() {
-  n = RD();
-  N[0].Length = 0; 
+  n = RD(), N[0].Length = 0; 
   for (register unsigned i(1); i <= n; ++i) {         // 读入 + 建 Trie 
     scanf("%s", s);                                   // 字符转成自然数 
     len = strlen(s);
@@ -2337,10 +2207,7 @@ int main() {
       A->To[now->Character] = now;
       A = A->Link;
     }
-    if(!A) {                                          // 无对应字符转移 
-      now->Link = N;
-      continue;
-    }
+    if(!A){now->Link = N;continue;} // 无对应字符转移
     if((A->Length + 1) ^ (A->To[now->Character]->Length)) {
       C_c = A->To[now->Character];
       (++CntN)->Length = A->Length + 1;               // 调了好久的问题, 不要在重定向之前自作主张提前转移 A->c 
@@ -2372,18 +2239,14 @@ int main() {
   a[n + 1] = 'B';                     // 哨兵 
   for (register unsigned i(1); i <= n; ++i) {   // 先求 f1 
     if(i + 1 > Frontier + f1[Frontier]) {       // 朴素 
-      while (!(a[i - f1[i]] ^ a[i + f1[i]])) {
-        ++f1[i];
-      }
+      while (!(a[i - f1[i]] ^ a[i + f1[i]])) ++f1[i];
       Frontier = i;                             // 更新 Frontier 
     }
     else {
       register unsigned Reverse((Frontier << 1) - i), A(Reverse - f1[Reverse]), B(Frontier - f1[Frontier]);
       f1[i] = Reverse - ((A < B) ? B : A);                      // 确定 f1[i] 下界 
       if (!(Reverse - f1[Reverse] ^ Frontier - f1[Frontier])) { // 特殊情况 
-        while (!(a[i - f1[i]] ^ a[i + f1[i]])) {
-          ++f1[i];
-        }
+        while (!(a[i - f1[i]] ^ a[i + f1[i]])) ++f1[i];
         Frontier = i;                                           // 更新 Frontier 
       }
     }
@@ -2393,9 +2256,7 @@ int main() {
   Frontier = 0;
   for (register unsigned i(1); i <= n; ++i) {
     if(i + 1 > Frontier + f2[Frontier]) {           // 朴素 
-      while (!(a[i - f2[i] - 1] ^ a[i + f2[i]])) {
-        ++f2[i];
-      }
+      while (!(a[i - f2[i] - 1] ^ a[i + f2[i]])) ++f2[i];
       Frontier = i;                                 // 更新 Frontier 
     }
     else {
@@ -2475,9 +2336,7 @@ int main() {
         Order[i]->LinkLength = 1;
       }
     }
-    else {
-      flg = 0;
-    }
+    else flg = 0;
     Key = Order[i]->LinkLength;
     printf("%d ", Key);
   }
