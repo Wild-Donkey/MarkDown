@@ -1,7 +1,8 @@
 # 树上带修莫队
 
+前置当然是[莫队算法](https://www.luogu.com.cn/blog/Wild-Donkey/pian-fen-dai-shi-mu-dui), [带修莫队](https://www.luogu.com.cn/blog/Wild-Donkey/dai-xiu-pian-fen-mu-dui-post), [树上莫队](https://www.luogu.com.cn/blog/Wild-Donkey/shu-shang-pian-fen-mu-dui-post). 树上带修莫队是这三者的结合体.
 
-结合经典题[糖果公园](https://www.luogu.com.cn/problem/P4074)分析该算法.
+因为已经掌握了带修莫队和树上莫队, 所以需要阐述的东西不多, 直接结合经典题[糖果公园](https://www.luogu.com.cn/problem/P4074)分析该算法.
 
 ## 题面简述
 
@@ -11,3 +12,17 @@ $$
 \sum_{i = 1}^{m}(V_i\sum_{j = 1}^{Cnt_i}(W_j))
 $$
 
+## 思路
+
+首先考虑不带修改的做法: 把树拍扁成一个 $2n$ 长度的括号序列, 然后对序列上的颜色出现的数量进行查询, 同时维护 $Ans$.
+
+然后考虑加上修改, 保存修改序列, 然后对欧拉序跑带修莫队即可.
+
+分析块长, 我们知道对于一个序列长为 $n$, 查询 $m$ 次, 修改 $t$ 次的问题, 最佳块长是 $\sqrt [3]{\frac{n^2t}{2m}}$, 但是我们的序列长度是 $2n$, 所以带修莫队的最优块长是 $\sqrt [3]{\frac{2n^2t}{m}}$, 考虑代码写完之后修正一下对时间增量的常数和对端点增量的常数差距, 所以将块长暂时规定为 $2\sqrt [3]{\frac{n^2t}{m}}$.
+
+值得一提的是, 这个题不需要离散化.
+
+接下来放出主体代码:
+
+```cpp
+```
