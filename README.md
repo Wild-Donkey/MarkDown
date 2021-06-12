@@ -68,16 +68,20 @@ ___
 | [P5496](https://www.luogu.com.cn/problem/P5496) | 回文自动机 (回文树)   | 回文自动机                        |
 
 * 第 $5-8$ 周
-数据结构进阶, 包括数据结构持久化, 轻重链链剖分, LCT, 边带权/扩展域并查集, CDQ 分治, 莫队 (基础莫队, 树上莫队), 二维线段树, 长链剖分, 左偏树(可并堆), KD-Tree, 树套树.
+数据结构进阶, 包括数据结构持久化, 轻重链树链剖分, LCT, 边带权/扩展域并查集, CDQ 分治, 莫队 (基础莫队, 树上莫队), 二维线段树, 长链剖分, 左偏树(可并堆), KD-Tree, 树套树.
 
-| 出处                                                     | 题目                       | 知识点                   |
-| -------------------------------------------------------- | -------------------------- | ------------------------ |
-| [P6136](https://www.luogu.com.cn/problem/P6136)          | 普通平衡树 (数据加强版)    | Splay                    |
-| [P3690](https://www.luogu.com.cn/problem/P3690)          | 动态树 Link/Cut Tree (LCT) | Splay, LCT, 文艺平衡树   |
-| [P1494](https://www.luogu.com.cn/problem/P1494)          | 小 Z 的袜子                | 莫队, GCD                |
-| [P1903](https://www.luogu.com.cn/problem/P1903)          | 数颜色 / 维护队列          | 莫队, 带修莫队, 离散化   |
-| [SP10707 COT2](https://www.luogu.com.cn/problem/SP10707) | Count on a tree Ⅱ          | 莫队, 树上莫队, 离散化   |
-| [P4074](https://www.luogu.com.cn/problem/P4074)          | 糖果公园                   | 莫队, 带修莫队, 树上莫队 |
+| 出处                                                     | 题目                       | 知识点                             |
+| -------------------------------------------------------- | -------------------------- | ---------------------------------- |
+| [P6136](https://www.luogu.com.cn/problem/P6136)          | 普通平衡树 (数据加强版)    | Splay                              |
+| [P3690](https://www.luogu.com.cn/problem/P3690)          | 动态树 Link/Cut Tree (LCT) | Splay, LCT, 文艺平衡树             |
+| [P1494](https://www.luogu.com.cn/problem/P1494)          | 小 Z 的袜子                | 莫队, GCD                          |
+| [P1903](https://www.luogu.com.cn/problem/P1903)          | 数颜色 / 维护队列          | 莫队, 带修莫队, 离散化             |
+| [SP10707 COT2](https://www.luogu.com.cn/problem/SP10707) | Count on a tree Ⅱ          | 莫队, 树上莫队, 离散化             |
+| [P4074](https://www.luogu.com.cn/problem/P4074)          | 糖果公园                   | 莫队, 带修莫队, 树上莫队           |
+| [CF793F](https://www.luogu.com.cn/problem/CF793F)        | Julia the Snail            | 分块                               |
+| [P2024](https://www.luogu.com.cn/problem/P2024)          | 食物链                     | 并查集, 边带权并查集, 扩展域并查集 |
+| [SP3377](https://www.luogu.com.cn/problem/SP3377)        | A Bug's Life               | 并查集, 扩展域并查集               |
+| [P3377](https://www.luogu.com.cn/problem/P3377)          | 可并堆                     | 并查集, 左偏树                     |
 
 * 六月
 
