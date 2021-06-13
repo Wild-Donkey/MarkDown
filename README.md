@@ -82,6 +82,7 @@ ___
 | [P2024](https://www.luogu.com.cn/problem/P2024)          | 食物链                     | 并查集, 边带权并查集, 扩展域并查集 |
 | [SP3377](https://www.luogu.com.cn/problem/SP3377)        | A Bug's Life               | 并查集, 扩展域并查集               |
 | [P3377](https://www.luogu.com.cn/problem/P3377)          | 可并堆                     | 并查集, 左偏树                     |
+| [P3810](https://www.luogu.com.cn/problem/P3810)          | 三维偏序                   | CDQ分治, 树状数组, 序理论          |
 
 * 六月
 
