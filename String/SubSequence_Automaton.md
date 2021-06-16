@@ -54,7 +54,6 @@ void Chg(Node *x, unsigned L, unsigned R) {
     Chg(x->RS, Mid + 1, R);
   }
 }
-#define SB_fys  0
 Node *Qry(Node *x, unsigned L, unsigned R) {
   if(L == R) {return x->Val;}
   unsigned Mid((L + R) >> 1);
@@ -83,7 +82,7 @@ int main() {
     }
     printf(Flg ? "No\n" : "Yes\n");
   }
-  return SB_fys;
+  return Wild_Donkey;
 }
 ```
 
