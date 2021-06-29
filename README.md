@@ -107,6 +107,7 @@ ___
 | [P5903](https://www.luogu.com.cn/problem/P5903) | 树上 k 级祖先      | 长链剖分, 倍增                   |
 | [P3376](https://www.luogu.com.cn/problem/P3376) | 网络最大流         | ISAP                             |
 | [P4722](https://www.luogu.com.cn/problem/P4722) | 最大流 加强版      | HLPP                             |
+| [P3381](https://www.luogu.com.cn/problem/P3381) | 最小费用最大流     | SPFA, Dinic, Dijkstra            |
 
 * 七月: 数据结构 + 字符串 + DP + 图论
 
