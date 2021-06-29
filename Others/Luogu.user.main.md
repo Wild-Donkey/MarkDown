@@ -3,7 +3,7 @@ freopen("julian3.in", "r", stdin);
 ```
 
 $$
-\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459317}}
+\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459325}}
 $$
 
 # "你学OI $3.5$ 年"
@@ -23,8 +23,6 @@ $$
 > Wild_Donkey[@Bilibili](https://space.bilibili.com/179337056)
 
 ![](https://luogu.vercel.app/practice?id=143771)
-
-![](https://luogu.vercel.app/practice?id=171851)
 
 ![](https://luogu.vercel.app/practice?id=306957)
 
@@ -69,6 +67,12 @@ $Julian~2459314$ `2021.4.9` **SDOI-2021** 场外选手报道
 $Julian~2459314$ `2021.4.9` 肝了一周后, 首篇[紫题题解](https://www.luogu.com.cn/blog/Wild-Donkey/hou-zhui-zi-dong-ji-suffix-automaton)
 
 $Julian~2459317$ `2021.4.12` 首次喜提红名
+
+$Julian~2459338$ `2021.5.3` 凌晨 `3:00` 紫题 $20$, 因为 AC 了 LCT
+
+$Julian~2459393$ `2021.6.27` 返校忽停文化课, 初闻下颚惊脱臼. 却看队友愁何在, 乱丢课本YX狂
+
+$Julian~2459395$ `2021.6.29` 蓝题 AC $50$
 
 $$
 \boldsymbol{Wild\_Donkey}\\
