@@ -3,7 +3,7 @@ freopen("julian3.in", "r", stdin);
 ```
 
 $$
-\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459325}}
+\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459396}}
 $$
 
 # "你学OI $3.5$ 年"
@@ -72,7 +72,9 @@ $Julian~2459338$ `2021.5.3` 凌晨 `3:00` 紫题 $20$, 因为 AC 了 LCT
 
 $Julian~2459393$ `2021.6.27` 返校忽停文化课, 初闻下颚惊脱臼. 却看队友愁何在, 乱丢课本YX狂
 
-$Julian~2459395$ `2021.6.29` 蓝题 AC $50$
+$Julian~2459396$ `2021.6.30` 尝试过的题目清零!!!!!
+
+$Julian~2459396$ `2021.6.30` 蓝题 AC $50$
 
 $$
 \boldsymbol{Wild\_Donkey}\\
