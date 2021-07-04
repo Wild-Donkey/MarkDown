@@ -86,38 +86,49 @@ ___
 
 * 六月
 
-  由于期末考试, 所以时间相对较短. 所以对非常规题型进行适应性学习, 如: 提交答案题, 交互题, 通信题, 构造题, 大模拟. 附加 `C++` 语法相关 (容器, 迭代器, 空间配置器, 配接器, 算法, 仿函数, 面向对象)
+  数据结构: CDQ 分治, KD-Tree, 树套树, 左偏树(可并堆), 长链剖分, 宗法树, 替罪羊树.
 
-  算法方面:
+  网络流: ISAP, HLPP, 最小费用最大流
 
-  数据结构: CDQ 分治, KD-Tree, 树套树, 左偏树(可并堆), 长链剖分.
-
-  网络流: ISAP, HLPP, 上下界最大流, 可行流, 费用流 (最小费用可行流, 最短路增广费用流)
-
-  图论: $k$ 短路, 二分图, 差分约束, 负环(SPFA), 双连通分量, 求 LCA 的 Tarjan.
-
-| 出处                                            | 题目               | 知识点                           |
-| ----------------------------------------------- | ------------------ | -------------------------------- |
-| [P3377](https://www.luogu.com.cn/problem/P3377) | 可并堆             | 并查集, 左偏树                   |
-| [P3810](https://www.luogu.com.cn/problem/P3810) | 三维偏序           | CDQ分治, 树状数组, 序理论        |
-| [P3369](https://www.luogu.com.cn/problem/P3369) | 普通平衡树         | 宗法树                           |
-| [P3380](https://www.luogu.com.cn/problem/P3380) | 二逼平衡树(树套树) | 线段树, 宗法树, 树套树, 二分答案 |
-| [P3369](https://www.luogu.com.cn/problem/P3369) | 普通平衡树         | 替罪羊树                         |
-| [P4148](https://www.luogu.com.cn/problem/P4148) | 简单题             | K-D Tree, 替罪羊树               |
-| [P5903](https://www.luogu.com.cn/problem/P5903) | 树上 k 级祖先      | 长链剖分, 倍增                   |
-| [P3376](https://www.luogu.com.cn/problem/P3376) | 网络最大流         | ISAP                             |
-| [P4722](https://www.luogu.com.cn/problem/P4722) | 最大流 加强版      | HLPP                             |
-| [P3381](https://www.luogu.com.cn/problem/P3381) | 最小费用最大流     | SPFA, Dinic, Dijkstra            |
+| 出处                                                  | 题目               | 知识点                           |
+| ----------------------------------------------------- | ------------------ | -------------------------------- |
+| [P3377](https://www.luogu.com.cn/problem/P3377)       | 可并堆             | 并查集, 左偏树                   |
+| [P3810](https://www.luogu.com.cn/problem/P3810)       | 三维偏序           | CDQ分治, 树状数组, 序理论        |
+| [P3369](https://www.luogu.com.cn/problem/P3369)       | 普通平衡树         | 宗法树                           |
+| [P3380](https://www.luogu.com.cn/problem/P3380)       | 二逼平衡树(树套树) | 线段树, 宗法树, 树套树, 二分答案 |
+| [P3369](https://www.luogu.com.cn/problem/P3369)       | 普通平衡树         | 替罪羊树                         |
+| [P4148](https://www.luogu.com.cn/problem/P4148)       | 简单题             | K-D Tree, 替罪羊树               |
+| [P5903](https://www.luogu.com.cn/problem/P5903)       | 树上 k 级祖先      | 长链剖分, 倍增                   |
+| [P3376](https://www.luogu.com.cn/problem/P3376)       | 网络最大流         | ISAP                             |
+| [P4722](https://www.luogu.com.cn/problem/P4722)       | 最大流 加强版      | HLPP                             |
+| [P3381](https://www.luogu.com.cn/problem/P3381)       | 最小费用最大流     | SPFA, Dinic, Dijkstra            |
+| [P5522](https://www.luogu.com.cn/problem/P5522)       | 棠梨煎雪           | 线段树, 位运算                   |
+| [UVA12716](https://www.luogu.com.cn/problem/UVA12716) | GCD = XOR          | 数学, 数论                       |
+| [P6189](https://www.luogu.com.cn/problem/P6189)       | 跑步               | 根号分块, DP                     |
+| [P1967](https://www.luogu.com.cn/problem/P1967)       | 货车运输           | 最大生成树, LCA, 并查集          |
 
 * 七月: 数据结构 + 字符串 + DP + 图论
 
-  数据结构: 跳跃表, 斐波那契堆, 二项堆, 红黑树, AVL, 宗法树, FHQ, SBT, 珂朵莉树, zkw线段树, 笛卡尔树, 李超线段树, 树上启发式合并, 点分治, 析合树, 哈夫曼树
+  数据结构: 跳跃表, 斐波那契堆, 二项堆, 红黑树, AVL, FHQ, SBT, 珂朵莉树, zkw线段树, 笛卡尔树, 李超线段树, 树上启发式合并, 点分治, 析合树, 哈夫曼树
   
-  字符串: 最小表示, Lyndon 分解, EXKMP, Boyer-Moore 算法, DFA, NFA. 
+  字符串: 最小表示, Lyndon 分解, EXKMP, Boyer-Moore 算法, DFA, NFA
 
-  泛图论: 一般图匹配, 二分图 KM, 支配集, 独立集, 覆盖集, 斯坦纳树, 虚树, 矩阵树定理, 最小树形图, 生成树相关 (次小生成树, 最短路径生成树, 最小直径生成树, 最优比率生成树), 最短路相关 (乘积最短路, 加和最短路, 同余最短路), 圆方树, Prufer 序列, LGV 引理, 弦图
+  网络流: 上下界最大流, 可行流, 最小费用可行流, 最短路增广费用流
+
+  泛图论: $k$ 短路, 二分图最佳带权匹配, 双连通分量, 求 LCA 的 Tarjan, 一般图匹配, 支配集, 独立集, 覆盖集, 斯坦纳树, 虚树, 矩阵树定理, 最小树形图, 圆方树, Prufer 序列, LGV 引理, 弦图
+
+  生成树: 次小生成树, 最短路径生成树, 最小直径生成树, 最优比率生成树
+  
+  最短路: 乘积最短路, 加和最短路, 同余最短路, 差分约束, 负环 (SPFA)
   
   动态规划: 动态动态规划 (DDP), 插头 DP, WQS 优化, CDQ 分治优化 (DP重在练习).
+
+| 出处                                              | 题目       | 知识点                     |
+| ------------------------------------------------- | ---------- | -------------------------- |
+| [P3378](https://www.luogu.com.cn/problem/P3378)   | 堆         | 动态开点堆                 |
+| [P7361](https://www.luogu.com.cn/problem/P7361)   | 春节十二响 | 树上启发式合并, 动态开点堆 |
+| [P4158](https://www.luogu.com.cn/problem/P4158)   | 粉刷匠     | DP (背包问题), 双层 DP     |
+| [SP9070](https://www.luogu.com.cn/problem/SP9070) | 避雷针     | 决策单调性, 分治优化 DP    |
 
 * 八月: 数学
   
