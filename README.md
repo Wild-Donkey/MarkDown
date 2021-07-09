@@ -129,6 +129,10 @@ ___
 | [P7361](https://www.luogu.com.cn/problem/P7361)   | 春节十二响 | 树上启发式合并, 动态开点堆 |
 | [P4158](https://www.luogu.com.cn/problem/P4158)   | 粉刷匠     | DP (背包问题), 双层 DP     |
 | [SP9070](https://www.luogu.com.cn/problem/SP9070) | 避雷针     | 决策单调性, 分治优化 DP    |
+| [P4051](https://www.luogu.com.cn/problem/P4051)   | 字符加密   | SA-IS, 后缀数组            |
+| [P5490](https://www.luogu.com.cn/problem/P5490)   | 矩形的并   | 扫描线, 标记永久化线段树   |
+| [P1772](https://www.luogu.com.cn/problem/P1772)   | 物流运输   | Dijkstra, 状压 DP          |
+
 
 * 八月: 数学
   
