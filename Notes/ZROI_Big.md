@@ -172,7 +172,7 @@ $O(n)$ 处理数组 $Pre_i$ 表示 $a_i$ 前面第一个和 $a_i$ 相同的元�
 
 这样, $g_{i, j}$ 可以递推地 $O(n^2)$ 求出, 状态 $O(nm)$, 转移 $O(n)$, 复杂度 $O(n^2m)$.
 
-### 例5: 
+### 例5
 
 维护一个长度为 $n$ 的数组 $a$, 支持:
 
@@ -624,7 +624,7 @@ $$
 权值线段树一般伴随着离散化, 如果强制在线, 还可以结合动态开点.
 
 复杂度 $O(n\log n)$.
-
+<!-- 
 ### Nowcoder-2019-MU-Day1-I
 
 平面上的点分成两部分 $A$, $B$, 每个点 $i \in A$ 的权值是 $a_i$, $i \in B$ 的权值是 $b_i$. 对于任意 $i \in A$, $j \in B$, 一定不存在 $x_i \geq x_j$ 并且 $y_i \leq y_j$. 也就是说 $A$ 中的点一定不会在 $B$ 中的点的右下方.
@@ -643,7 +643,7 @@ $$
 
 首先滚动数组, 因为 $f_{i, j}$ 只能由 $k \leq j$ 的状态 $f_{i - 1, k}$ 转移而来.
 
-接下来考虑优化, 用线段树维护以 $j$ 为序的 $f_{j}$ 最大值, 每次转移时, 查询 $[1, j]$ 的最大值尝试更新 $f_{i}$.
+接下来考虑优化, 用线段树维护以 $j$ 为序的 $f_{j}$ 最大值, 每次转移时, 查询 $[1, j]$ 的最大值尝试更新 $f_{i}$. -->
 
 ### [P1486](https://www.luogu.com.cn/problem/P1486)
 
@@ -697,9 +697,294 @@ $n$ 个点的树, 每个点有颜色, 求每个节点的子树的出现最多的
 
 也可以用数组 + 树上启发式合并来操作, 能达到 $O(n \log n)$ 的复杂度.
 
-### [POI2011](https://www.luogu.com.cn/problem/P3521)
+注意开 `long long`.
 
-一棵 $n$ 个叶节点的二叉树, 每个叶节点有一个权值 $p_i$, 权值是 $[1, n]$ 的全排列, 保证一个节点不是叶节点就包含两个儿子.
+```cpp
+unsigned m, n, Cnt(0), A, B, t, Tmp(0);
+struct Tr; 
+struct Edge {
+  Tr *To;
+  Edge *Nxt;
+}E[200005], *CntE(E);
+struct Node {
+  Node *LS, *RS;
+  unsigned Val;
+  unsigned long long Pos;
+}N[4000005], *CntN(N);
+struct Tr {
+  Node *Seg;
+  Edge *Fst;
+  Tr *Fa;
+}T[100005], *C, *D;
+void Link(Tr *x, Tr *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+}
+void Insert (Node *x, unsigned L, unsigned R) {
+  x->Val = 1, x->Pos = A;
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  if(A <= Mid) Insert(x->LS = ++CntN, L, Mid);
+  else Insert(x->RS = ++CntN, Mid + 1, R);
+}
+void AddUp(Node *x, Node *y) {
+  if(!((x->LS)||(x->RS)||(y->LS)||(y->RS))) {
+    x->Val += y->Val;
+    return;
+  }
+  if(x->LS && y->LS) {
+    AddUp(x->LS, y->LS);
+  } else {
+    if(y->LS) {
+      x->LS = y->LS;
+    }
+  }
+  if(x->RS && y->RS) {
+    AddUp(x->RS, y->RS);
+  } else {
+    if(y->RS) {
+      x->RS = y->RS;
+    }
+  }
+  if(x->LS && x->RS) {
+    if(x->LS->Val == x->RS->Val) {
+      x->Pos = x->LS->Pos + x->RS->Pos;
+      x->Val = x->LS->Val;
+    } else {
+      if(x->LS->Val < x->RS->Val) {
+        x->Val = x->RS->Val, x->Pos = x->RS->Pos;
+      } else {
+        x->Val = x->LS->Val, x->Pos = x->LS->Pos;
+      }
+    }
+  } else {
+    if(x->LS) {
+      x->Val = x->LS->Val, x->Pos = x->LS->Pos;
+    } else {
+      x->Val = x->RS->Val, x->Pos = x->RS->Pos;
+    }
+  }
+}
+void DFS(Tr *x) {
+  Edge *Sid(x->Fst);
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      Sid->To->Fa = x;
+      DFS(Sid->To);
+      AddUp(x->Seg, Sid->To->Seg);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+int main() {
+  n = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    A = RD();
+    Insert(T[i].Seg = ++CntN, 1, n);
+  }
+  for (register unsigned i(1); i < n; ++i) {
+    C = T + RD(), D = T + RD();
+    Link(C, D), Link(D, C);
+  }
+  DFS(T + 1);
+  for (register unsigned i(1); i <= n; ++i) {
+    printf("%llu ", T[i].Seg->Pos);
+  }
+  putchar('\n');
+  return Wild_Donkey;
+}
+```
 
-选择一些节点, 交换它们的左右子树, 使得操作之后, 叶节点的权值从左到右的逆序对最少.
+## Day5
+
+### String-Hash
+
+字符串哈希, 一般用于 $O(n)$ 预处理后 $O(1)$ 地询问两个 (子) 串是否相同.
+
+处理一个数组 $Hash$, 作为字符串的前缀哈希值. 在查询一个子串 $[L, R]$ 的哈希值的时候, 需要使得 $Hash_R$ 减去 $Hash_L * Base^{R - L + 1}$, 模意义下就是加上它的减法逆元, 一个数 $x$ 在模 $p$ 意义下的减法逆元是 $p - x$.
+
+用区间哈希值匹配子串可以做到 $O(n)$ 预处理, $O(1)$ 查询.
+
+### [CF955D](https://www.luogu.com.cn/problem/CF955D)
+
+给两个字符串 $A$, $B$, 长度分别是 $n$, $m$. 试图找出 $A$ 中两个长度为 $q$ 的不相交子串, 使得两个字串按顺序拼起来之后包含 $B$ 作为子串. 
+
+正反跑两遍 kmp, 求出 $Pos1_i$ 表示字符串 $B$ 的前缀 $[1, i]$ 在 $A$ 中最早出现的, 不小于 $q$ 的位置的末尾下标, $Pos2_i$ 表示字符串 $B$ 的后缀 $[i, m]$ 在 $A$ 中最后出现的, 不大于 $n - q + 1$ 的开头下标.
+
+过程中保存两个量, $L$ 表示 $B$ 在 $A$ 中第一次出现位置的末尾, $R$ 表示 $B$ 在 $A$ 中最后一次出现的开头下标, 注意, 这两个量不受 $q$ 的约束.
+
+首先特判 $m \leq q$, $B$ 被选取的两个子串之一单独包含的情况, 利用 $L$, $R$ 处理. 
+
+剩下的情况只能是 $B$ 被分成左右两部分, 左部分作为 $A$ 的左边子串的后缀, 右部分作为右边子串的前缀. 枚举 $[1, m]$ 作为 $B$ 的分界点, 然后判断是否可行即可.
+
+代码:
+
+```cpp
+unsigned Bd[500005], Pos1[500005], Pos2[500005], m, n, q, Cnt(0), A, B, C, D, t, Ans(0);
+char a[500005], b[500005];
+inline void Clr() {}
+int main() {
+  n = RD(), m = RD(), q = RD();
+  scanf("%s%s", a + 1, b + 1);
+  Bd[0] = -1;
+  for (register unsigned i(2), Tmp; i <= m; ++i) {
+    Tmp = Bd[i - 1];
+    while ((b[i] ^ b[Tmp + 1]) &&(Tmp < 0x3f3f3f3f)) {
+      Tmp = Bd[Tmp]; 
+    }
+    Bd[i] = Tmp + 1;
+  }
+  for (register unsigned i(1), j(0); i <= n; ++i) {
+    while ((a[i] ^ b[j + 1]) && (j < 0x3f3f3f3f)) {
+      j = Bd[j];
+    }
+    if(j > 0x3f3f3f3f) {
+      j = 0;
+      continue;
+    } else {
+      ++j;
+      if(Pos1[j] < q){
+        Pos1[j] = i;
+      }
+      if((j == m) && (!A)) {
+        A = i;
+      }
+    }
+  }
+  for (register unsigned i(m - 1); i; --i) {
+    if((Pos1[i + 1] > q) && Pos1[i + 1]) {
+      Pos1[i] = min(Pos1[i], Pos1[i + 1] - 1);
+    }
+  }
+  for (register unsigned i(m); i; --i) {
+    if(Pos1[i] < q) {Pos1[i] = 0; continue;}
+    if(Pos1[Bd[i]] < q) Pos1[Bd[i]] = Pos1[i];
+    else Pos1[Bd[i]] = min(Pos1[Bd[i]], Pos1[i]);
+  }
+  Bd[m + 1] = -1;
+  Bd[m] = 0;
+  for (register unsigned i(m - 1), Tmp; i; --i) {
+    Tmp = Bd[i + 1];
+    while ((b[i] ^ b[m - Tmp]) && (Tmp < 0x3f3f3f3f)) {
+      Tmp = Bd[m - Tmp + 1];
+    }
+    Bd[i] = Tmp + 1;
+  }
+  for (register unsigned i(n), j(0); i; --i) {
+    while ((j < 0x3f3f3f3f) && (a[i] ^ b[m - j])) {
+      j = Bd[m - j + 1];
+    }
+    if(j > 0x3f3f3f3f) {
+      j = 0;
+      continue;
+    } else {
+      if((n - Pos2[m - j] + 1 < q) || (!Pos2[m - j])) {
+        Pos2[m - j] = i;
+      }
+      ++j;
+      if((j == m) && (!B)) {
+        B = i;
+      }
+    }
+  }
+  for (register unsigned i(2); i <= m; ++i) {
+    if((n - Pos2[i - 1] + 1 > q) && (Pos2[i - 1])) {
+      Pos2[i] = max(Pos2[i], Pos2[i - 1] + 1);
+    }
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    if(n - Pos2[i] + 1 < q) {Pos2[i] = 0; continue;}
+    if(n - Pos2[m - Bd[i] + 1] + 1 < q) Pos2[m - Bd[i] + 1] = Pos2[i];
+    else Pos2[m - Bd[i] + 1] = max(Pos2[i], Pos2[m - Bd[i] + 1]); 
+  }
+  if(q >= m) {
+    if(A && (n >= q + max(A, q))) {
+      printf("Yes\n%u %u\n", max(A, q) - q + 1, max(A, q) + 1);
+      return 0;
+    }
+    if(B && (min(B, n - q + 1) > q)) {
+      printf("Yes\n%u %u\n", min(B, n - q + 1) - q, min(B, n - q + 1));
+      return 0; 
+    }
+  }
+  for (register unsigned i(m - min(m - 1, q)); i <= min(m - 1, q); ++i) {
+    if(Pos1[i] && Pos2[i + 1] && (Pos1[i] < Pos2[i + 1])) {
+      printf("Yes\n%u %u\n", Pos1[i] - q + 1, Pos2[i + 1]);
+      return 0;
+    }
+  }
+  printf("No\n");
+  return Wild_Donkey;
+}
+```
+
+### [CF985F](https://www.luogu.com.cn/problem/CF985F)
+
+给一个 $26$ 个小写字母字符串 $A$, 有 $m$ 个询问, 每个询问给出两个位置 $a$, $b$, 和一个长度 $Len$, 表示询问 $A$ 的两个子串 $[a, a + Len - 1]$ 和 $[b, b + Len - 1]$ 的信息.
+
+对于查询中的两个子串, 判断两个子串是否同构.
+
+同构定义为两个字符串的字符可以互相单射, 如 `aacbbbc` 和 `uuklllk` 同构.
+
+将开 $26$ 个长度相同的 `0/1` 串, 分别存储每个字母的出现情况, 分别计算前缀哈希值, 对于每个询问查询区间哈希值, 然后排序后匹配两个哈希值数组.
+
+### Aho_Corasick_Algorithm
+
+过水已隐藏
+
+### [JSOI2007](https://www.luogu.com.cn/problem/P4052)
+
+一个未知字符串 $A$, 我们知道它的长度 $m$, 由 $26$ 个大写字母组成, 有 $n$ 个模式串.
+
+$A$ 一个情况是合法的, 定义为它有至少一个模式串作为子串. 输出在 $26^m$ 种情况中所有合法的情况数对 $10007$ 取模的结果.
+
+对模式串建立 ACAM, 然后从 ACAM 每个节点上建一个数组 $f_{i, j}$ 表示走到第 $i$ 个点时还剩 $j$ 步时的可行情况数, 用记忆化搜索, 每次遇到有结尾标记的点就走 $Fail$ 边, 最后统计根节点的 $f_{0, 100}$. 状态数 $O(nm)$, 转移 $O(1)$, 总复杂度 $O(nm)$.
+
+### [HEOI2021](https://www.luogu.com.cn/problem/P4600)
+
+给 $n$ 个字符串, 由 $26$ 个小写字母组成.
+
+给出 $m$ 个询问, 每个询问给出 $a$, $b$ 表示两个字符串的编号, $Posa$, $Posb$ 是两个字符串的下标, 描述了 $a$ 的前缀 $[1, Posa]$, $b$ 的前缀 $[1, Posb]$. 回答这两个前缀最长的公共后缀的权值.
+
+规定一个字符串的权值是将它看成 $26$ 进制数后转化为 $10$ 进制后对 $10^9 + 7$ 取模的结果.
+
+解法比较简单, 可以说是 ACAM 裸题, 对输入的字符串构造 ACAM, 每次取前缀对应的节点, 两个节点在后缀链接树上的 LCA 就是答案.
+
+实现上略有难度, 因为据说卡倍增 ($n \approx 2*10^7$, 倍增所需空间大约 $2GB$), 所以需要树剖实现. 求前缀所在节点的时候, 需要求树上第 $k$ 级祖先, 我们可以同样使用轻重链剖分, 也可以用长链剖分实现 $O(1)$ 查询.
+
+## Day6
+
+### KMP
+
+过水已隐藏
+
+### HDU3336
+
+求一个字符串的前缀出现的次数之和对 $10007$ 取模的结果.
+
+建立 KMP $Next$ 数组, 处理 $Next$ 链长度 $Len$, 对于所有不为 $0$ 的位置都给答案增加当前 $Next$ 链长度.
+
+### ZOJ1905
+
+求一个字符串最小循环节, $S$ 的循环节 $A$ 定义为 $S$ 可以表示为 $AA...A$.
+
+一个合法循环节的长度 $x$ 一定能整除字符串长度 $n$. 所以我们可以枚举 $O(\sqrt n)$ 个长度的前缀, 和整个字符串进行匹配, 复杂度 $O(n \sqrt n)$.
+
+然后发现可以 $O(n)$ 解决, 建立 KMP $Next$ 数组, 如果 $n - Next_n$ 整除 $n$, 则 $n - Next_n$ 即为所求; 否则最短循环节是 $n$.
+
+### ZOJ_Pro
+
+求一个字符串最小循环节, $S$ 的循环节 $A$ 定义为 $S$ 是 $AAAA...AAA$ 的子串.
+
+在前面的基础上, 省略判断整除的部分即可.
+
+### POI2006
+
+求字符串的每个前缀的, 除本身之外的最长循环节之和 (如果除本身之外无无循环节, 则按 $0$ 统计答案).
+
+
+
+
+
 
