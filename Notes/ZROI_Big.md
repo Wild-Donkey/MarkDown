@@ -296,7 +296,7 @@ $3 \leq n \leq 10^5$, $1 \leq q \leq 10^5$
 
 这些值不是可以直接 $O(1)$ 推出, 就是可以直接用线段树维护, 所以总复杂度是 $O(m \log n)$, 代码也很简单, 因为查询区间都是 $[1, n]$, 所以无需写查询函数. 并且只需要单点修改即可, 所以无需使用 $Tag$.
 
-## Day3: 模拟赛
+## Day3: 模拟赛: Ⅰ
 
 ### T1: 模拟
 
@@ -796,7 +796,7 @@ int main() {
 }
 ```
 
-## Day5
+## Day5: 字符串哈希 & ACAM
 
 ### String-Hash
 
@@ -953,17 +953,51 @@ $A$ 一个情况是合法的, 定义为它有至少一个模式串作为子串. 
 
 实现上略有难度, 因为据说卡倍增 ($n \approx 2*10^7$, 倍增所需空间大约 $2GB$), 所以需要树剖实现. 求前缀所在节点的时候, 需要求树上第 $k$ 级祖先, 我们可以同样使用轻重链剖分, 也可以用长链剖分实现 $O(1)$ 查询.
 
-## Day6
+## Day6: KMP & ExKMP & Manacher
 
 ### KMP
 
 过水已隐藏
 
-### HDU3336
+### [HDU3336](https://acm.hdu.edu.cn/showproblem.php?pid=3336)
 
 求一个字符串的前缀出现的次数之和对 $10007$ 取模的结果.
 
 建立 KMP $Next$ 数组, 处理 $Next$ 链长度 $Len$, 对于所有不为 $0$ 的位置都给答案增加当前 $Next$ 链长度.
+
+代码非常简单:
+
+```cpp
+unsigned Nxt[200005], Dep[200005], n, Ans(0), t;
+const unsigned MOD(10007);
+char A[200005];
+inline void Clr() {
+  memset(A, 0, n + 2);
+  memset(Nxt, 0, ((n + 2) << 2));
+  memset(Dep, 0, ((n + 2) << 2));
+  n = RD(), Ans = n % MOD;
+  scanf("%s", A + 1);
+}
+int main() {
+  t = RD();
+  for (register unsigned T(1); T <= t; ++T){
+    Clr();
+    for (register unsigned i(2), k(1); i <= n; ++i)  { // Origin_Len
+      while (((A[k] ^ A[i]) && k > 1) || k > i) {
+        k = Nxt[k - 1] + 1;
+      }
+      if(A[k] == A[i]) {
+        Nxt[i] = k;
+        Dep[i] = Dep[k] + 1;
+        Ans = (Ans + Dep[i]) % MOD;
+        ++k;
+      }
+    }
+    printf("%u\n", Ans);
+  }
+  return Wild_Donkey;
+}
+```
 
 ### ZOJ1905
 
@@ -975,16 +1009,542 @@ $A$ 一个情况是合法的, 定义为它有至少一个模式串作为子串. 
 
 ### ZOJ_Pro
 
-求一个字符串最小循环节, $S$ 的循环节 $A$ 定义为 $S$ 是 $AAAA...AAA$ 的子串.
+求一个字符串最小周期, $S$ 的周期 $A$ 定义为 $S$ 是 $AAAA...AAA$ 的子串.
 
 在前面的基础上, 省略判断整除的部分即可.
 
-### POI2006
+### [POI2006](https://www.luogu.com.cn/problem/P3435)
 
-求字符串的每个前缀的, 除本身之外的最长循环节之和 (如果除本身之外无无循环节, 则按 $0$ 统计答案).
+求字符串的每个前缀的, 除本身之外的最大周期之和, 周期定义和上一题相同, 即 `aaaaaa` 的最大周期是 `aaaaa` (如果除本身之外无周期, 则按 $0$ 统计答案).
+
+对于每个前缀 $[1, i]$ 判断 $i - Next_i$ 是否整除 $i$, 如果整除, 则将 $Next_i$ 计入答案.
+
+### [POJ2752](Seek the Name, Seek the Fame)
+
+求一个字符串前缀和后缀相匹配的数量.
+
+求 $Next_n$ 的 $Next$ 链长度即可.
+
+### [EXKMP](https://www.luogu.com.cn/problem/P5410)
+
+$ZT_i$ 定义为模式串 $T$ 第 $i$ 位后面的子串 $[i, i + ZT_i)$ 和前缀 $[1, ZT_i]$ 匹配.
+
+假设我们求出了 $ZT$, 在母串 $S$ 上定义一个数组 $ZS_i$ 表示 $S[i, i + ZS_i) = T[1, ZS_i]$ 匹配. 
+
+首先仍然是像 KMP 一样从左往右匹配 $S$ 和 $T$, 假设这时 $S[a, p) = T[1, p - a + 1)$, $S_p \neq T_{p - a + 1}$, 
+
+接下来求 $i \in [a, p)$ 中的 $ZS_i$ 数组需要分类讨论.
+
+- $i + ZT_{i - a + 1} < p$
+
+  这时, 知道 $S[a, p) = T[1, p - a + 1)$, $T[1, ZT_{i - a + 1}) = T[i - a + 1, i - a + 1 + ZT_{i - a + 1})$, 所以 $T[1, ZT_{i - a + 1}) = T[i - a + 1, i - a + 1 + ZT_{i - a + 1}) = S[i, i + ZT_{i - a + 1})$ 所以 $ZS_i \geq ZT_{i - a + 1}$. 
+  
+  接下来, 证明 $ZS_i \leq ZT_{i - a + 1}$. 我们知道 $S_{i + ZT_{i - a + 1}} = T_{i - a + 1 + ZT_{i - a + 1}} \neq T_{ZT_{i - a + 1}}$, 所以 $ZS_i \leq ZT_{i - a + 1}$.
+
+  综上 $ZT_{i - a + 1} \leq ZS_i \leq ZT_{i - a + 1}$, 也就是 $ZT_{i - a + 1} = ZS_i$
+
+- $i + ZT_{i - a + 1} = p$
+
+  其实证明 $ZS_i \geq ZT_{i - a + 1}$ 的过程和上一种情况一样, 但是这时不一定保证 $ZS_i \leq ZT_{i - a + 1}$.
+  
+  这是因为我们不知道 $S_{i + ZT_{i - a + 1}} = T_{i - a + 1 + ZT_{i - a + 1}}$ 是否成立, 所以既然 $T[1, ZT_{i - a + 1}) = T[i - a + 1, i - a + 1 + ZT_{i - a + 1})$, 不如直接将 $a$ 右移至 $i$ 的位置, 继续匹配, 找出新的 $p$, 重复之前的步骤即可.
+
+- $i + ZT_{i - a + 1} > p$
+
+  类似地, 我们知道 $T[1, p - a + 1) = S[a, p)$, 而且 $T[1, ZT_{i - a + 1}) = T[i - a + 1, i - a + 1 + ZT_{i - a + 1})$, 所以 $T[1, p - a + 1) = S[i, p)$, 所以 $ZS_i \geq p - i$.
+
+  这时有 $S_p \neq T_{p - a + 1} = T_{ZT_{i - 1 + 1}}$, 因此 $ZS_i \leq p - i$, 所以 $ZS_i = p - i$.
+
+求 $ZT$ 的时候, 边界条件是 $ZT_1 = LenT$, 因为 $T$ 和 $T$ 自己的 LCP 一定是它本身.
+
+接下来, 将 $T$ 作为母串, $a = 2$, 用模板串 $T$ 对它本身进行匹配. 假设我们知道 $ZT_{i}$ 前面所有 $ZT$ 值, 也就是我们求 $ZT_{i}$ 所需的所有 $ZT$ 值, 这样就可以用相同的方法求出 $ZT$ 了.
+
+代码实现:
+
+```cpp
+using namespace std;
+unsigned ZS[20000005], ZT[20000005], m, n, Cnt(0);
+unsigned long long Ans1(0), Ans2(0);
+char S[20000005], T[20000005];
+void ExKMP(char *Mot, char *Mod, unsigned *Zot, unsigned *Zod, unsigned Lenot) {
+  register unsigned i(1), a(1), p(1);
+  while (i <= Lenot) {
+    while (Mot[p] == Mod[p - a + 1]) ++p;
+    if (p == a) {
+      Zot[i] = 0, ++i, ++a, ++p;
+      continue;
+    }
+    if(i >= p) {
+      a = i;
+      continue;
+    }
+    if (i + Zod[i - a + 1] == p) {
+      if(p - i == m) Zot[i] = m, ++i, p = i;
+      a = i;
+      continue;
+    }
+    if(i + Zod[i - a + 1] < p) {
+      Zot[i] = Zod[i - a + 1];
+    } else {
+      Zot[i] = p - i;
+    }
+    ++i;
+  }
+  return;
+}
+int main() {
+  scanf("%s%s", S + 1, T + 1);
+  n = strlen(S + 1), m = strlen(T + 1); 
+  ZT[1] = m;
+  ExKMP(T + 1, T, ZT + 1, ZT, m - 1);
+  for (register unsigned long long i(1); i <= m; ++i) {
+    Ans1 ^= i * (ZT[i] + 1);
+  }
+  ExKMP(S, T, ZS, ZT, n);
+  for (register unsigned long long i(1); i <= n; ++i) {
+    Ans2 ^= i * (ZS[i] + 1);
+  }
+  printf("%llu\n%llu\n", Ans1, Ans2); 
+  return Wild_Donkey;
+}
+```
+
+<!-- ### [HDU2594](https://acm.hdu.edu.cn/showproblem.php?pid=2594)
+
+每个测试数据给两个字符串 $S$, $T$.
+
+求 $S$ 的最长的作为 $T$ 的子串的前缀.
+
+### HDU 2019-MU-Day5-D
+
+给一个字符串 $S$, 用如下代码求每个后缀和 $S$ 本身的 LCP (Longest Common Prefix), 求比较语句执行次数.
+
+```pascal
+for i from 1 to len - 1
+  k = 0
+  while i + k < len
+    if s[k] = tos[i+ k]
+      k is increased by 1
+    otherwise
+      exit while loop
+  an[i] = k
+```
+
+容易发现, 比较次数是所求的 $LCP$ 长度 $+1$ 之和. -->
+
+### ManacherehcanaM
+
+过水已隐藏
+
+### PAM
+
+过水已隐藏
+
+### SAM
+
+过水已隐藏
+
+### GSAM
+
+过水已隐藏
+
+### SGAM
+
+过水已隐藏
+
+<!-- ### ICPC2018-Nanjing-Regional-Contest-M
+
+给两个字符串 $S$, $T$, 有多少有序 $(i, j, k)$ 满足 $S_i,..., S_j, T_1,..., T_k$ 是回文串.
+
+用 $T$ 的前缀倒序匹配 $S$, 然后对 $S$ 求 Manacher $P$ 数组.
+
+设 $T'$ 是倒序的 $T$.
+
+枚举 $T'$ 的每个后缀和 $S$ 的每个后缀的 LCP, 然后求以 $LCP$ 末尾为起始的 $S$ 的回文子串, 统计入答案 $O(n^3)$. -->
+
+<!-- ### Nowcoder14894
+
+从字符串 $A$ 中取可空子串 $[l1, r1]$, 从 $B$ 中取 $[l2, r2]$ 要求 $r1 = l2$. -->
+
+### POI2007
+
+给一个多边形, 求有多少对称轴.
+
+每个点求两个临边夹角, 按顺序破环为链跑 Manacher, 只要存在对于某个中心的回文串长度为 $n$, 则找到一个对称轴.
+
+## Day7: 模拟赛 Ⅱ
+
+模拟赛!
+
+### A
+
+给 $n$ 个点, 用长为 $k$ 的窗口覆盖, 求最少窗口数.
+
+红题中的红题, 简称红中红.
+
+```cpp
+unsigned a[100005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char b[10005];
+int main() {
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD();
+  }
+  sort(a + 1, a + n + 1);
+  for (register unsigned i(1), j(0); i <= n; ++i) {
+    if(j < a[i]) {
+      ++Ans, j = a[i] + m;
+    }
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### B
+
+给一个山谷, 谷底之前高度递减, 谷底之后高度递增. 现在下雨, 水会优先往下流, 求最后的水位高度.
+
+将山谷片成 $n$ 片. 然后按高度为第一关键字, 以位置为第二关键字排序. 扫一遍排序后的数组处理出 $Width_i$ 表示高度 $i$ 的山谷宽度.
+
+我们可以从低到高枚举高度, 每次减去宽度, 直到水量不足填满一层, 然后约分即可.
+
+不要忘记判断整数部分为 $0$ 的情况!!! (不要问我为什么知道, $100' \rightarrow 99'$)
+
+```cpp
+unsigned Width[1005], Min, m, n, Cnt(0), C, D, t, Ans(-1), Tmp(0), W;
+char Exist[1005];
+struct Hill {
+  unsigned Hight, Pos;
+  inline const char operator<(const Hill &x) const{
+    return (this->Hight ^ x.Hight) ? (this->Hight < x.Hight) : (this->Pos < x.Pos);
+  }
+}H[1005], A, B;
+int main() {
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    Exist[H[i].Hight = RD()] = 1, H[i].Pos = i;
+  }
+  H[++n].Hight = 0x3f3f3f3f, H[n].Pos = 0;
+  H[++n].Hight = 0x3f3f3f3f, H[n].Pos = n - 1;
+  sort(H + 1, H + n + 1);
+  Min = H[1].Hight; 
+  for (register unsigned i(Min), L(0x3f3f3f3f), R(0); i <= 1000; ++i) {
+    if(Exist[i]) {
+      A.Hight = i;
+      B.Hight = i + 1;
+      L = min(L, upper_bound(H + 1, H + n + 1, A)->Pos);
+      R = max(R, (lower_bound(H + 1, H + n + 1, B) - 1)->Pos);
+      Width[i] = R - L + 1;
+    } else {
+      Width[i] = Width[i - 1];
+    }
+  }
+  for (register unsigned i(Min); i <= 1000; ++i) {
+    if(m < Width[i]) {
+      W = Width[i];
+      break;
+    }
+    m -= Width[i];
+    Ans = i, W = Width[i];
+  }
+  ++Ans;
+  if(m >= (n - 2)) {
+    W = n - 2;
+    Ans += m / W;
+    m %= W;
+  }
+  Tmp = __gcd(W, m);
+  if(!Ans) {
+    printf("%u/%u\n", m / Tmp, W / Tmp);
+    return 0;
+  }
+  if(!m) {
+    printf("%u\n", Ans);
+    return 0;
+  }
+  printf("%u+%u/%u\n", Ans, m / Tmp, W / Tmp);
+  return Wild_Donkey;
+}
+```
+
+### C
+
+给两个序列 $A$, $B$, 每次选择一个数列整体修改, 然后查询两个数列所有数的中位数.
+
+其实考场上用的是复杂度错误的算法 $O(n + m + q\log n \log m)$, 但是因为 $\color{red}传统艺能$, 仍然过掉了此题.
+
+因为是全局修改, 所以可以打一个 $Tag$, 然后在询问的.
+
+二分答案 $a_i$, 然后二分查找 $a_i$ 在 $b$ 中的排名, 判断它们的和, 每次询问是 $O(\log n \log m)$.
+
+```cpp
+long long a[100005], b[100005], A, B, C, D, Ans(0);
+unsigned m, n, q, Tmp(0), Dest(0);
+unsigned Judge (unsigned x) {
+  return x + upper_bound(b + 1, b + m + 1, a[x] + C - D) - 1 - b < Dest;
+}
+unsigned Judge2 (unsigned x) {
+  return x + upper_bound(a + 1, a + n + 1, b[x] + D - C) - 1 - a < Dest;
+}
+int main() {
+  n = RD(), m = RD(), q = RD();
+  Dest = ((m + n + 1) >> 1);
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD() - a[1];
+  }
+  a[0] = -1000000000000000, A = a[1] + 1000000000000000, a[1] = 0, a[n + 1] = 0x3f3f3f3f3f3f3f3f;
+  for (register unsigned i(1); i <= m; ++i) {
+    b[i] = RD() - b[1];
+  }
+  b[0] = -1000000000000000, B = b[1] + 1000000000000000, b[1] = 0, b[m + 1] = 0x3f3f3f3f3f3f3f3f;
+  for (register unsigned i(1); i <= q; ++i) {
+    if(RD() & 1) {
+      C = A + RDsg();
+      D = B;
+    } else {
+      D = B + RDsg();
+      C = A; 
+    }
+    register unsigned L(0), R(n), Mid;
+    while (L ^ R) {
+      Mid = ((L + R + 1) >> 1);
+      if(Judge(Mid)) {
+        L = Mid;
+      } else {
+        R = Mid - 1;
+      }
+    }
+    Tmp = L;
+    L = upper_bound(b + 1, b + m + 1, a[Tmp] + C - D) - 1 - b, R = upper_bound(b + 1, b + m + 1, a[Tmp + 1] + C - D) - 1 - b;
+    while (L ^ R) {
+      Mid = ((L + R + 1) >> 1);
+      if(Judge2(Mid)) {
+        L = Mid;
+      } else {
+        R = Mid - 1;
+      }
+    }
+    while (Tmp + L >= Dest) {
+      if(a[Tmp - 1] + C > b[L - 1] + D) {
+        --Tmp;
+      } else {
+        --L;
+      }
+    }
+    while (Tmp + L + 1 < Dest) {
+      if(a[Tmp + 1] + C < b[L + 1] + D) {
+        ++Tmp;
+      } else {
+        ++L;
+      }
+    }
+    Ans = min(a[Tmp + 1] + C, b[L + 1] + D);
+    if (!((n + m) & 1)) {
+      if(a[Tmp + 1] + C < b[L + 1] + D) {
+        Ans += min(a[Tmp + 2] + C, b[L + 1] + D); 
+      } else {
+        Ans += min(a[Tmp + 1] + C, b[L + 2] + D);
+      }
+      if(Ans & 1) {
+        printf("%lld.5\n", (Ans >> 1) - 1000000000000000);
+      } else {
+        printf("%lld\n", (Ans >> 1) - 1000000000000000);
+      }
+      continue;
+    }
+    printf("%lld\n", Ans - 1000000000000000);
+  }
+  return Wild_Donkey;
+}
+```
+
+事实上, $O(n + m + q \log n)$ 的算法很容易实现. 只要在二分一个 $a_i$ 的时候, 直接判断 $b_{\frac{n + m}2 - i}$ 的大小是否紧贴 $a_i$ 即可.
+
+```cpp
+long long a[100005], b[100005], A, B, C, D, Ans(0);
+unsigned m, n, q, Tmp(0), Dest(0);
+unsigned Judge (unsigned x) {
+  if(a[x] + C < b[Dest - x + 1] + D) return 1;
+  return 0;
+}
+int main() {
+  n = RD(), m = RD(), q = RD();
+  Dest = ((m + n + 1) >> 1);
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD() - a[1];
+  }
+  a[0] = -1000000000000000, A = a[1] + 1000000000000000, a[1] = 0, a[n + 1] = 0x3f3f3f3f3f3f3f3f;
+  for (register unsigned i(1); i <= m; ++i) {
+    b[i] = RD() - b[1];
+  }
+  b[0] = -1000000000000000, B = b[1] + 1000000000000000, b[1] = 0, b[m + 1] = 0x3f3f3f3f3f3f3f3f;
+  for (register unsigned i(1); i <= q; ++i) {
+    if(RD() & 1) {
+      C = A + RDsg();
+      D = B;
+    } else {
+      D = B + RDsg();
+      C = A; 
+    }
+    register unsigned L((Dest >= m) ? (Dest - m) : 0), R(min(n, Dest)), Mid;
+    while (L ^ R) {
+      Mid = ((L + R + 1) >> 1);
+      if(Judge(Mid)) {
+        L = Mid;
+      } else {
+        R = Mid - 1;
+      }
+    }
+    Ans = max(a[L] + C, b[Dest - L] + D);
+    if (!((n + m) & 1)) {
+      Ans += min(a[L + 1] + C, b[Dest - L + 1] + D); 
+      if(Ans & 1) {
+        printf("%lld.5\n", (Ans >> 1) - 1000000000000000);
+      } else {
+        printf("%lld\n", (Ans >> 1) - 1000000000000000);
+      }
+      continue;
+    }
+    printf("%lld\n", Ans - 1000000000000000);
+  }
+  return Wild_Donkey;
+}
+```
+
+### D
+
+给两个 $10^{100}$ 以内的十进制数 $L$, $R$, 给出 $n$ 个位数总和在 $100$ 以内的十进制数, 求 $[L, R]$ 中满足包含所有 $n$ 个数作为子串的整数的数量.
+
+"ACAM + 状压DP + 数位DP" 大杂烩
+
+建立 $n$ 个数的 ACAM, 然后在 ACAM 上跑 DP, 每个节点 $i$ 存一个数组 $f_{j, pos, 0/1}$, 表示走到第 $Pos$ 位的时候, 包含了状压状态为 $j$ 表示的子串的, 是否顶着上界的情况数, 记忆化搜索即可.
+
+## Day8
+
+<!-- ### 例题
+
+一张无向图, 每次询问 $a$, $b$ 不经过 $c$ 的最短路, $n \leq 200$, $q \leq 10^5$.
+
+数据范围提示了 $Floyd$,  -->
+
+### ZJOI2016
+
+给一个正边权的网格图和若干询问, 每次询问两点间最短路.
+
+$nm \leq 2*10^4$, $q \leq 10^5$
+
+网格图的边权为正, 则答案路径保证经过边数是两点曼哈顿距离, 即为一个单调不上升或不下降的折线. 而这条折线一定在以这两点为顶点的矩形内部.
+
+所以我们只要询问这个矩形的最短路即可, 我们将矩形分割成两个矩形, 分别求两个矩形的最短路, 然后 $O(n)$ 合并即可.
+
+### 例题
+
+给 $n$ 个物品, 每个物品 $c_i$ 个, 定义 $\displaystyle{m = \sum_i^n c_i}$, 初始代价是 $a_i$, 每次选代价会减少 $b_i$, 对于不同的 $k$, 选择 $k$ 件物品的最小价值是多少.
+
+固定一个 $k$, 在选了的物品中, 至多有一种物品没有选完, 所以每种物品一旦选就选完 $c_i$ 或 $k$ 为止. 但是 $k$ 的方案一定不是从 $k - 1$ 的方案的基础上转移而来的.
+
+$O(n)$ 枚举选了, 但没完全选的物品, $O(nm)$ 剩下的 $n - 1$ 的物品跑 0/1 背包求出全部选了的物品, 背包所需总复杂度 $O(n^2m)$.
+
+分治加物品, 每个物品加入背包需要 $O(m)$, 总的问题需要每个物品执行 $O(\log n)$ 次加入操作. 因此背包总的复杂度是 $O(nm\log n)$.
+
+### 例题
+
+给长为 $n$ 的序列, 再给单调不增的数组 $f$, 求最长的 $[l, r]$, 使得区间中数字出现次数 $\geq f_{r - l + 1}$, $n \leq 10^6$.
+
+$O(n)$ 预处理每个数字出现次数, 扫描出整个数列任意一个出现次数小于 $f_n$ 的数字 $Mid$, 那么它不可能再答案中出现, 因为随着长度缩小, $f$ 不会缩小, 而 $Mid$ 出现数量不会增大, 所以我们可以将 $Mid$ 从数列中删除, $Cnt_Mid = Cnt_Mid - 1$, 也就是将数列分成两段.
+
+从左右两端双指针同时扫描, 这样可以在两段中较小的一段的长度 $l$ 的复杂度下找到任意一个不合法的数字, 而我们只要求出了较小的一段的出现次数 $CntMin_i$, 就可以结合 $Cnt_i$ 求出较长的一段的出现次数 $Cnt_i - CntMin_i$.
+
+### 例题 (交互)
+
+给 $2n$ 个, $n$ 种糖果, 每种糖果出现 $2$ 次, 排成一行. 有两种操作:
+
+- 往序列中放一颗糖
+
+- 从序列里拿一颗糖
+
+每次操作后可以知道有多少不同种类的糖在序列中.
+
+我们可以从左往右拿, 如果糖还在, 则拿走它, 如果有一个种类的不见了, 那我们就放回去, 然后继续扫描整个序列, 这时整个序列每个种类都出现了 $1$ 次.
+
+然后分段
+
+### 例题
+
+给 $n$ 个二元组 $(a_i, b_i)$, 需要对每个 $k$ 选出 $k$ 个二元组使得 $(\sum a_i) * (\sum b_i)$ 最小.
+
+$n \leq 200$
+
+我们将所有选择 $k$ 个二元组的方案中 $\sum a_i$ 最小的情况
+
+### CDQ 分治解决三维偏序问题
+
+第一维排序, 第二维分治, 第三维树状数组, 细节过水已隐藏
+
+### 最长偏序链
+
+就是多了一维的 LIS.
+
+一个三元组定义一个值 $f$, 表示它为结尾的最长偏序链长度.
+
+按 $a$ 排序.
+
+将序列分成两半, 左右两边分别按 $b$ 排序, 假设左边的 $f$ 已经求出, 我们用双指针扫描.
+
+### 例题
+
+一个长度为 $n$ 的排列, 有些位置上的数字已经确定了, 剩下位置上的数字不确定. 你要确定剩下位置上的数字, 让得到的排列的最长上升子序列长度尽量长. $n \leq 10^5$
+
+第 $Nxt_i$ 位是 $i$ 后面的第一个确定的数字, 我们用一个数组 $g_i$ 表示确定的位置 $i$ 到 $Nxt_i$ 的, 能填入 $(i, Nxt_i)$ 的在 $(a_i, a_{Nxt_i})$ 区间内的数字个数.
+
+$f_i$ 表示以位置 $i$ 为结尾的最长上升子序列的长度, 则它是由
+
+### 例题
+
+一个二维点序列 $(a_i,b_i)$, 你需要把它拆成两个子序列, 使得两个子序列中相邻两项的曼哈顿距离之和最小. $n\leq 10^5$
+
+设 $f_{i, j}$ 为 $[1, i]$ 的序列, $i$ 在一个子序列, $j$ 是另一个子序列的末尾的最小距离和, 这时 $f_{i, j}$ 可以转移到 $f_{i + 1, j}$ 和 $f_{i + 1, i}$ 上.
+
+如果看 $f_{i, j}$ 的转移, 它可以由 $f_{i - 1, j}$ 转移而来或 $f_{}$
+
+$$
+f_{i, j} = min (f_{i - 1, k} + Dis_{i - 1, i}) (j = i - 1)\\
+f_{i, j} = f_{i - 1, j} + Dis_{j, i} (j < i - 1)\\
+$$
+
+设 $g_{i} = f_{i, i - 1}$, 则 
+
+$$
+g_{i} = min (g_{j} + Dis_{j, j + 1} + Dis_{j + 1, j + 2} + ... + Dis_{i - 2, i - 1} + Dis_{j - 1, i})
+$$
+
+发现可以用 $Dis_{i, i + 1}$ 的前缀和进行优化, 
+
+### 线段树分治
+
+将询问离线, 每个询问给 $O(\log n)$ 个节点打标记, 然后对线段树进行 DFS, 过程中将每个节点对它们所对应的询问计算贡献, 最后统一回答询问.
 
 
 
+### 例题
 
+有 $n$ 种物品, 第 $i$ 种物品第一次选择的收益是 $a_i$, 之后每次选择的收益都是 $b_i$, 代价始终为 $c_i$. 你需要求出在总代价不超过 $m$ 下收益的最大值.
 
+有 $Q$ 次修改, 第 $j$ 次修改会在第 $i$ 次修改 $(i < j)$ 的基础上修改一个物品的两类收益. 你需要对于每次修改后输出答案.
 
+$n, m, Q \leq 2000$
+
+修改构成一个树形结构, 对于每个修改相当于在树的 DFS 序的区间上修改, 而这个区间可以用线段树维护.
+
+背包 DP 可以考虑新建一个数组 $g_{i, j}$ 表示第 $i$ 个物品强制选一次, 花费 $j$ 的代价, 然后用它跑完全背包.
+
+### 例题
+
+有 $n$ 个物品, 每个物品有大小和权值, 每次查询一个区间中的物品拿出来做大小为 $W$ 的背包得到的结果. $n, m \leq 10^4, W \leq 100$, 区间不存在包含关系.
+
+离线查询, 排序, 发现每个物品有贡献的询问一定是一个连续区间, 用线段树维护这个区间, 于是将每个物品插入对应节点上, 在线段树上 DFS, 过程中统计路径贡献, 每次到叶子就回答对应位置的询问.
+
+## Day9
+
+### 
