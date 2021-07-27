@@ -1420,15 +1420,15 @@ int main() {
 
 建立 $n$ 个数的 ACAM, 然后在 ACAM 上跑 DP, 每个节点 $i$ 存一个数组 $f_{j, pos, 0/1}$, 表示走到第 $Pos$ 位的时候, 包含了状压状态为 $j$ 表示的子串的, 是否顶着上界的情况数, 记忆化搜索即可.
 
-## Day8
+## Day8: 分治 & CDQ & 线段树分治
 
-<!-- ### 例题
+### 例题
 
 一张无向图, 每次询问 $a$, $b$ 不经过 $c$ 的最短路, $n \leq 200$, $q \leq 10^5$.
 
-数据范围提示了 $Floyd$,  -->
+数据范围提示了 Floyd, 但是这个 Floyd 是排除了某个点的 Floyd, 我们只要发现将点插入 $Floyd$ 容易维护, 所以考虑加点 + 撤销, 采用分治, 先将左边的插入, 然后对右边分治, 右边结束之后, 撤销左边点的加入, 继续递归左边. 递归到边界就可以直接回答没有 $c_i$ 存在的最短路.
 
-### ZJOI2016
+<!-- ### [ZJOI2016](https://www.luogu.com.cn/problem/P3350)
 
 给一个正边权的网格图和若干询问, 每次询问两点间最短路.
 
@@ -1436,7 +1436,7 @@ $nm \leq 2*10^4$, $q \leq 10^5$
 
 网格图的边权为正, 则答案路径保证经过边数是两点曼哈顿距离, 即为一个单调不上升或不下降的折线. 而这条折线一定在以这两点为顶点的矩形内部.
 
-所以我们只要询问这个矩形的最短路即可, 我们将矩形分割成两个矩形, 分别求两个矩形的最短路, 然后 $O(n)$ 合并即可.
+所以我们只要询问这个矩形的最短路即可, 我们将矩形分割成两个矩形, 分别求两个矩形的边界的所有点的全源最短路, 然后合并四个边界的最短路即可得到当前矩形两个边界的所有点的最短路, 每一层递归点是 $O(n)$, 全源最短路是 $O(n^3)$, 一共是 $log_n$ 层, 所以复杂度是 $O(n^3\log n)$, $n$ 可以认为是 $\sqrt{20000}$. -->
 
 ### 例题
 
@@ -1456,7 +1456,7 @@ $O(n)$ 预处理每个数字出现次数, 扫描出整个数列任意一个出�
 
 从左右两端双指针同时扫描, 这样可以在两段中较小的一段的长度 $l$ 的复杂度下找到任意一个不合法的数字, 而我们只要求出了较小的一段的出现次数 $CntMin_i$, 就可以结合 $Cnt_i$ 求出较长的一段的出现次数 $Cnt_i - CntMin_i$.
 
-### 例题 (交互)
+<!-- ### 例题 (交互)
 
 给 $2n$ 个, $n$ 种糖果, 每种糖果出现 $2$ 次, 排成一行. 有两种操作:
 
@@ -1468,15 +1468,7 @@ $O(n)$ 预处理每个数字出现次数, 扫描出整个数列任意一个出�
 
 我们可以从左往右拿, 如果糖还在, 则拿走它, 如果有一个种类的不见了, 那我们就放回去, 然后继续扫描整个序列, 这时整个序列每个种类都出现了 $1$ 次.
 
-然后分段
-
-### 例题
-
-给 $n$ 个二元组 $(a_i, b_i)$, 需要对每个 $k$ 选出 $k$ 个二元组使得 $(\sum a_i) * (\sum b_i)$ 最小.
-
-$n \leq 200$
-
-我们将所有选择 $k$ 个二元组的方案中 $\sum a_i$ 最小的情况
+然后分段 -->
 
 ### CDQ 分治解决三维偏序问题
 
@@ -1490,17 +1482,17 @@ $n \leq 200$
 
 按 $a$ 排序.
 
-将序列分成两半, 左右两边分别按 $b$ 排序, 假设左边的 $f$ 已经求出, 我们用双指针扫描.
+将序列分成两半, 左右两边分别按 $b$ 排序, 假设左边的 $f$ 已经求出, 我们用双指针扫描, 不断将左边的 $f_i$ 按 $c_i$ 为序插入权值线段树, 维护最大值, 查询右边 $c_i$ 的 $[1, c_i)$ 的最大值, 更新 $f_i$, 然后递归右边.
 
-### 例题
+<!-- ### 例题
 
 一个长度为 $n$ 的排列, 有些位置上的数字已经确定了, 剩下位置上的数字不确定. 你要确定剩下位置上的数字, 让得到的排列的最长上升子序列长度尽量长. $n \leq 10^5$
 
 第 $Nxt_i$ 位是 $i$ 后面的第一个确定的数字, 我们用一个数组 $g_i$ 表示确定的位置 $i$ 到 $Nxt_i$ 的, 能填入 $(i, Nxt_i)$ 的在 $(a_i, a_{Nxt_i})$ 区间内的数字个数.
 
-$f_i$ 表示以位置 $i$ 为结尾的最长上升子序列的长度, 则它是由
+$f_i$ 表示以位置 $i$ 为结尾的最长上升子序列的长度, 则它是由 -->
 
-### 例题
+<!-- ### 例题
 
 一个二维点序列 $(a_i,b_i)$, 你需要把它拆成两个子序列, 使得两个子序列中相邻两项的曼哈顿距离之和最小. $n\leq 10^5$
 
@@ -1519,13 +1511,23 @@ $$
 g_{i} = min (g_{j} + Dis_{j, j + 1} + Dis_{j + 1, j + 2} + ... + Dis_{i - 2, i - 1} + Dis_{j - 1, i})
 $$
 
-发现可以用 $Dis_{i, i + 1}$ 的前缀和进行优化, 
+发现可以用 $Dis_{i, i + 1}$ 的前缀和进行优化,  -->
 
-### 线段树分治
+<!-- ### [CF1365G](https://codeforces.com/contest/1365/problem/G)
 
-将询问离线, 每个询问给 $O(\log n)$ 个节点打标记, 然后对线段树进行 DFS, 过程中将每个节点对它们所对应的询问计算贡献, 最后统一回答询问.
+有 $1000$ 个数字 $a_1$, $a_2$,…, 你想知道对于每个 $1 \leq i \leq 1000$, 除了 $a_i$ 以外其它所有数字 `&` 起来的结果.
 
+你可以做至多 $13$ 次下面的询问: 给定若干个位置, 交互库会返回这些位置对应数字 `&` 的结果. -->
 
+### 例题
+
+一个 $n * n$ 的矩形 $(n \leq 1000)$, 你可以进行如下操作至多 $20$ 次:
+
+选择若干行和若干列, 涂黑这些行列的交点.
+
+使得最后只有主对角线没被涂黑.
+
+两次操作可以将平行于对角线的一半的线上的交点转化为黑点, 这样就可以用 $O(2\log n)$ 次操作完成转化.
 
 ### 例题
 
@@ -1545,6 +1547,395 @@ $n, m, Q \leq 2000$
 
 离线查询, 排序, 发现每个物品有贡献的询问一定是一个连续区间, 用线段树维护这个区间, 于是将每个物品插入对应节点上, 在线段树上 DFS, 过程中统计路径贡献, 每次到叶子就回答对应位置的询问.
 
-## Day9
+## Day9: 平衡树
 
-### 
+### Splay
+
+过水已隐藏
+
+### Treap
+
+过水已隐藏
+
+### 非旋 Treap (FHQ)
+
+跑得比 Splay 还慢, 可以持久化.
+
+内核是普通 Treap 的分裂和合并 (Split & Merge).
+
+插入时首先将树分裂成两部分, 这两部分和插入的单点合并成一棵树.
+
+删除时将树分成删除的单点, 该点左边的树, 该点右边的树, 然后合并它左右的树即可.
+
+实现 (是谁说 FHQ 短的):
+
+```cpp
+const unsigned Base(1000000009);
+unsigned Seed(1000000007), m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Val, RVal, Size;
+}N[2000005], *CntN(N);
+inline unsigned Rand() {
+  return Seed *= Base;
+}
+void Upd(Node *x) {
+  x->Size = 1;
+  if (x->LS) x->Size += x->LS->Size;
+  if (x->RS) x->Size += x->RS->Size;
+}
+pair<Node*, Node*> Split (Node *x) {
+  register pair<Node*, Node*> TmpP;
+  if(x->Val > C) {
+    if(x->LS) {
+      TmpP = Split(x->LS);
+      x->LS = TmpP.second;
+      Upd(x);
+      return make_pair(TmpP.first, x);
+    } else {
+      TmpP.first = NULL, TmpP.second = x;
+      return TmpP;
+    }
+  } else {
+    if(x->RS) {
+      TmpP = Split(x->RS);
+      x->RS = TmpP.first;
+      Upd(x);
+      return make_pair(x, TmpP.second);
+    } else {
+      TmpP.first = x, TmpP.second = NULL;
+      return TmpP;
+    }
+  }
+}
+Node *Merge(Node *x, Node *y) {
+  if(!x) return y;
+  if(!y) return x;
+  if(x->RVal < y->RVal) {
+    x->RS = Merge(x->RS, y);
+    Upd(x);
+    return x;
+  } else {
+    y->LS = Merge(x, y->LS);
+    Upd(y);
+    return y;
+  }
+}
+void Insert() {
+  C = B;
+  register pair<Node*, Node*> TmpP(Split(N));
+  register Node *LTr(TmpP.first), *RTr(TmpP.second), *Now(++CntN);
+  Now->RVal = Rand(), Now->Val = B, Now->Size = 1; 
+  Now = Merge(LTr, Now);
+  Merge(Now, RTr);
+}
+void Delete() {
+  C = B - 1;
+  register pair<Node*, Node*> TmpP1(Split(N));
+  C = B;
+  register pair<Node*, Node*> TmpP2(Split(TmpP1.second));
+  register Node *Now(TmpP2.first);
+  if(Now) {
+    Now = Merge(Now->LS, Now->RS);
+    Now = Merge(TmpP1.first, Now);
+  } else {
+    Now = TmpP1.first;
+  }
+  Merge(Now, TmpP2.second);
+}
+void Rank() {
+  register Node *now(N);
+  while (now) {
+    if(now->Val < B) {
+      if(now->LS) D += now->LS->Size;
+      ++D;
+      now = now->RS;
+    } else { 
+      now = now->LS;
+    }
+  }
+}
+void Find() {
+  register Node *now(N);
+  while (now) {
+    if(now->LS) {
+      if(now->LS->Size < B) {
+        B -= now->LS->Size;
+      } else {
+        now = now->LS;
+        continue; 
+      } 
+    }
+    if(B ^ 1) {
+      --B, now = now->RS;
+    } else {
+      D = now->Val - 20000000;
+      return;
+    }
+  }
+}
+int main() {
+  m = RD();
+  N[0].RVal = 0, N[0].Val = 0, N[0].Size = 0; 
+  for (register unsigned i(1); i <= m; ++i) {
+    A = RD();
+    B = RDsg() + 20000000;
+    switch (A) {
+      case (1) :{
+        Insert();
+        break;
+      }
+      case (2) :{
+        Delete(); 
+        break;
+      }
+      case (3) :{
+        D = 0, Rank();
+        break;
+      }
+      case (4) :{
+        B -= 19999999; 
+        Find();
+        break;
+      }
+      case (5) :{
+        D = 0, Rank();
+        B = D, Find();
+        break;
+      }
+      case (6) :{
+        ++B, D = 1, Rank();
+        B = D, Find();
+        break;
+      }
+    }
+    if(A >= 3) {
+      printf("%d\n", D);
+    } 
+  }
+  return Wild_Donkey;
+}
+```
+
+### 文艺平衡树
+
+过水已隐藏
+
+### [HNOI2012](https://www.luogu.com.cn/problem/P3224)
+
+给 $n$ 个带权点, 支持两种操作:
+
+- 两点之间连边
+
+- 查询某点所在连通块中权值第 $i$ 大的点
+
+每个点维护一个平衡树, 连边可以用启发式合并在 $O(n \log^2 n)$ 内解决问题.
+
+当然也可以使用权值线段树合并, 在均摊 $O(n \log^2 n)$ 时间内解决问题.
+
+### [CF573E](https://www.luogu.com.cn/problem/CF573E)
+
+给定一个长度为 $n$ 的序列 $A$, 求子序列 $B$ (可以为空), 使得 $\displaystyle \sum_{i=1}^m iB_i$ 的值最大.
+
+$n \leq 10^5$, $|a_i| \le 10^7$
+
+先考虑 $O(n^2)$ DP, 设计 $f_{i, j}$ 表示 $A_i$ 位作为 $B_j$ 的最大 $\displaystyle \sum_{k=1}^j kB_k$.
+
+状态转移方程很好写:
+
+$$
+f_{i, j} = max(f_{k, j - 1}) + jA_i
+$$
+
+$max(f_{k, j - 1})$ 可以用一个数组 $Max_j$ 记录并维护, 所以转移是 $O(1)$, 总复杂度 $O(nm)$, 滚掉一维.
+
+接下来考虑优化, 将当前 $i$ 的 $f_{i, j}$ 放到坐标系中, $j$ 为横坐标, $f_{i, j}$ 为纵坐标, 将点两两相连, 发现这是一个下凸函数.
+
+每次移动 $i$, 可能对凸包产生影响的新凸包是原凸包整体右移并且斜率加 $A_i$, 最左边 $(1, f_{i, 1})$ 的点是 $(1, A_i)$.
+
+因为新凸包和原凸包有一个可二分的交点, 焦点之后, 区间增加一个等差数列 $jA_i$, 然后将整个凸包前面加一个点 $(1, A_i)$, 这些操作可以用支持区间操作的平衡树维护.
+
+## Day10: 可持久化
+
+### 可持久化线段树
+
+过水已隐藏
+
+### [CF323C](https://codeforces.com/contest/323/problem/C)
+
+给定两个长度均为 $n$ 的排列.
+
+$m$ 次询问. 每次询问您要求出在第一个排列的 $[l_1,r_1]$ 和第二个排列的 $[l_2,r_2]$ 同时出现的数有多少个.
+
+$1 \leq n \leq 10^6$, $1 \leq m \leq 2 \times 10^5$, 强制在线.
+
+因为是排列, 所以一个数字在两个排列中一定都出现, 而一个数字在两个排列中的位置构成一个二维坐标, 问题转化成了求二维平面上的一个矩形包含了多少点.
+
+以横坐标为版本时间轴, 纵坐标为序, 每个点权值为 $1$, 建立可持久化线段树, 在版本 $r_1$ 和 $l_1 - 1$ 两个版本对 $[l_2, r_2]$ 进行查询并做差, 即为所求.
+
+代码实现: 可持久化开 $40n$ 数组吧.
+
+```cpp
+unsigned a[1000005],b[1000005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Val;
+}N[40000005], *Order[1000005], *CntN(N);
+void Add(Node *x, Node *y, unsigned L, unsigned R) {
+  if(!x) {
+    y->Val = 1;
+    if (L == R) return;
+    register unsigned Mid((L + R) >> 1);
+    if(Mid >= A) {
+      Add(NULL, y->LS = ++CntN, L, Mid);
+    } else {
+      Add(NULL, y->RS = ++CntN, Mid + 1, R);
+    }
+    return;
+  }
+  y->Val = x->Val + 1; 
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  if(Mid >= A) {
+    if(!y->LS) y->LS = ++CntN; 
+    Add(x->LS, y->LS, L, Mid);
+    y->RS = x->RS;
+  } else {
+    if(!y->RS) y->RS = ++CntN; 
+    Add(x->RS, y->RS, Mid + 1, R);
+    y->LS = x->LS;
+  }
+}
+void Qry(Node *x, unsigned L, unsigned R){
+  if((A <= L) && (R <= B)) {
+    Tmp += x->Val; return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if ((A <= Mid) && (x->LS)) {
+    Qry(x->LS, L, Mid);
+  }
+  if ((Mid < B) && (x->RS)) {
+    Qry(x->RS, Mid + 1, R); 
+  }
+}
+inline unsigned F(unsigned x) {
+  return ((x - 1 + Ans) % n) + 1;
+}
+int main() {
+  n = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[RD()] = i;
+  }
+  for (register unsigned i(1); i <= n; ++i) {
+    b[a[RD()]] = i;
+  }
+  Order[0] = N;
+  for (register unsigned i(1); i <= n; ++i) {
+    A = b[i], Add(Order[i - 1], Order[i] = ++CntN, 1, n);
+  }
+  m = RD();
+  for (register unsigned i(1); i <= m; ++i) {
+    C = F(RD()), D = F(RD()), A = F(RD()), B = F(RD());
+    if(C > D) swap(C, D); 
+    if(A > B) swap(A, B);
+    Tmp = 0, Qry(Order[D], 1, n);
+    Ans = Tmp, Tmp = 0, Qry(Order[C - 1], 1, n);
+    printf("%u\n", Ans = Ans - Tmp);
+    ++Ans;
+  }
+  return Wild_Donkey;
+}
+```
+
+### Kruskal 重构树
+
+执行 Kruskal 算法时, 将所有原图上的点作为叶节点, 将连边的两点所在的树根加一个公共祖先, 这样就加了 $n - 1$ 个点, 将最小生成树变成一棵重构之后的二叉树, 这棵二叉树就是 Kruskal 重构树, 重构树上的边权是连接这条边时原图上对应边的边权.
+
+Kruskal 重构树的一个非常重要的性质就是一个链从下到上边权递增. 如果将边权 $\geq x$ 的边禁用, 一个点能到达的点则相当于 Kruskal 重构树上某个祖先的子树上的节点.
+
+### 可持久化平衡树
+
+除了均摊都可持久
+
+### 可持久化 Trie
+
+过水已隐藏
+
+### [12OI2019](https://loj.ac/p/3048)
+
+给 $n$ 个数的序列, 求 $m$ 个不同的区间, 使得这些区间异或和的和最大.
+
+求前缀异或和, 以便 $O(1)$ 查询区间异或和.
+
+枚举右端点 $i$, 从左往右扫描 $i$, 不断将前缀异或和插入 0/1 Trie, 将 Trie 可持久化.
+
+从可持久化 Trie 上可以 $O(32)$ 地查询一个前缀的第 $k$ 大后缀异或和, 将所有 $[1, i]$ 的最大的后缀异或和插入大根堆, 每次取出堆顶, 将堆顶对应的 $i$ 的次大的后缀异或和插入堆, 直到弹出 $m$ 次为止, 总复杂度 $O(32(n + m))$.
+
+### [CTSC2018](https://loj.ac/p/2555)
+
+给 $n$ 种果汁, 每种果汁有三个属性: 美味度 $d$, 单位体积价格 $p$, 和每瓶最多添加的体积 $l$.
+
+$m$ 个询问, 每个询问规定总价不高于 $g$, 总体积不小于 $L$, 选择的果汁中美味度最小值最大.
+
+考虑二分, 将果汁按 $d$ 为反向时间轴 (版本 $i$ 由版本 $i + 1$ 修改而来), $p$ 为序, $pl$ 和 $l$ 为权值, 插入可持久化线段树.
+
+每次 Judge $x$ 的时候, 在版本 $x$ 按 $pl$ 二分, 选出美味度大于等于 $x$ 的所有果汁中, 按价格从小到大, 选择不大于 $L$ 体积的所有果汁的价值总和, 然后将剩下的 $L$ 用还没选的最便宜的果汁补全.
+
+二分答案复杂度 $O(\log n)$, 二分查找复杂度 $O(\log n)$, 总复杂度 $O(n \log n + m \log^2 n)$
+
+### [P2839](https://www.luogu.com.cn/problem/P2839)
+
+给一个序列, 每次求序列的子区间, 满足左端点在 $[a, b]$ 之间, 右端点在 $[c, d]$ 之间的最大中位数. 和一般定义不同的是, 本题中偶数个元素的中位数定义为第 $\frac n2$ 个数.
+
+$n \leq 20000, q \leq 25000$ 强制在线.
+
+先考虑 $O(qn^2 \log^2 n)$ 的做法, 以位置为时间轴建立可持久化权值线段树, 二分中位数 $x$, 枚举左右端点, 判断区间 $\leq x$ 的数量和 $\geq x$ 的数量是否合法.
+
+接下来优化算法, 发现枚举左右端点时可以顺便统计数字和 $x$ 关系的情况. 去掉线段树后优化到 $O(qn^2\log n)$.
+
+发现左界右界对答案的影响是相独立的, 所以可以分别处理左右界, 将复杂度优化到 $O(qn\log n)$.
+
+
+
+## Day11: SA 
+
+### 倍增
+
+过水已隐藏
+
+### SA 做 SAM 板子
+
+求字符串本质不同的子串个数.
+
+所有字串都可以唯一地表示为第 $i$ 个后缀的第 $j$ 个前缀, 共 $\frac {n(n + 1)}2$ 个. 所以我们只要排序后缀, 然后求出 LCP_{i, i + 1}, 就可以知道一个后缀和相邻后缀有多少前缀相同, 总数减去重复的数量就是不同的数量.
+
+### 例题
+
+求所有无序后缀对两两 lcp 之和.
+
+定义 $h_i = lcp_{i, i + 1}$. 有一个引理: $lcp_{i, j} = min(h_k) k\in[i, j)$.
+
+单调栈求出 $h_i$ 左边的连续大于等于它的数量 $l_i$, 右边连续大于它的数量 $r_i$, 这时统计 $\displaystyle\sum_{i = 1}^{n}(r_i + l_i + 1) \times h_i$.
+
+### CF666E
+
+一个母串 $S$, $n$ 个模式串 $T_i$, 每次询问子串 $S[l_1, r_1]$ 在 $T_i i\in[l_2, r_2]$ 中哪个模式串中出现最多.
+
+将所有模式串加入 $S$ 后面, 中间插特殊字符, 然后求 $SA$, $h$.
+
+离线所有询问, 将每个询问转化为求对于 $x \in [Head_{l_2}, Tail_{r_2}]$ 区间 $LCP_{l_1, x} \geq r_1 - l_1 + 1$ 的 $x$ 数量. 而 $LCP_{l_1, x}\geq r_1 - l_1 + 1$ 的 $Rank$ 一定是一段连续的区间, 并且可以二分, 然后用莫队维护在每个区间 $[Head_{l_2}, Tail_{r_2}]$ 中所有 $Rank$ 在对应区间中的 $x$ 属于每个模式串的数量 $Cnt$, 并且维护 $Cnt_i i \in [l2, r2]$ 的最大值. 这样就能 $O(n \log n + q \sqrt n)$ 解决问题了.
+
+### CF1063F
+
+将字符串 $S$ 划分成 $m$ 个不相交的子串 $T_i$, 使得从左到右排序后 $T_i$ 是 $T_{i - 1}$ 的严格子串 (不是它本身的子串), 求这个最大的 $m$. 
+
+容易发现一个显然的性质: $Len_{T_i} = Len_{T_{i + 1}} + 1$ 一定不会使答案更劣.
+
+所以 $m$ 是 $\sqrt{n}$ 规模的.
+
+设 $f_i$ 表示以 $S_i$ 开头的子串作为 $T_1$, $m$ 的最大值. 可以发现 $f_i \leq f_{i + 1} + 1$.
+
+另外能得到一个性质, 
+
+## Day12
+
