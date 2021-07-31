@@ -1895,6 +1895,10 @@ $n \leq 20000, q \leq 25000$ 强制在线.
 
 发现左界右界对答案的影响是相独立的, 所以可以分别处理左右界, 将复杂度优化到 $O(qn\log n)$.
 
+突然发现可以以权值为时间轴, 以下标为序, 建立可持久化线段树, 然后在版本 $x$ 上进行线段树上二分即可 $O(\log n)$ 找出对应的 $l$ 和 $r$, 最终复杂度 $O(n \log n + q\log ^ 2 n)$.
+
+值域偏大, 不要忘了离散化.
+
 
 
 ## Day11: SA 
@@ -1933,9 +1937,610 @@ $n \leq 20000, q \leq 25000$ 强制在线.
 
 所以 $m$ 是 $\sqrt{n}$ 规模的.
 
-设 $f_i$ 表示以 $S_i$ 开头的子串作为 $T_1$, $m$ 的最大值. 可以发现 $f_i \leq f_{i + 1} + 1$.
+设 $f_i$ 表示以 $S_i$ 开头的子串作为 $T_1$, $m$ 的最大值. 可以发现 $f_i \leq f_{i + 1} + 1$, 这是因为如果 $f_i = f_{i + 1} + 2$, 那么将 $f_i$ 方案中的所有子串 $T$ 都删掉第一个字符, 得到了 $f_{i + 1} + 1$ 个子串也是合法的, 所以这时 $f_{i + 1}$ 应该是原来的 $f_{i + 1} + 1$.
 
-另外能得到一个性质, 
+于是可以发现在 $f_i$ 确定的情况下, $f_{i - 1}$ 有 $f_{i - 1} + 1$ 种可能的取值, 即自然数 $[1, f_{i - 1} + 1]$. 我们只要二分所有可能的取值 $x$, 然后判断满足 $j \geq i + x$ 的 $LCP_{i, j} \geq x - 1$ 的 $j$ 是否满足 $f_j \geq x - 1$ 即可.
 
-## Day12
+但是我们完全没必要二分, 因为每个 $f_i$ 最多比 $f_{i + 1}$ 大 $1$, 所以即使倒序枚举所有 $x$, 也不过是均摊 $O(n)$ 次判断而已.
 
+## Day12: SAM & GSAM
+
+### 后缀树
+
+一棵压缩的 Trie, Trie 中存了所有后缀, 并且将 Trie 中的链压缩成一个点.
+
+构造 Trie 的同时, 连接 $go_{x, c}$, 指向点 $x$ 的后缀前面加一个字符 $c$ 得到的字符串所在的节点. 这样就能得到一个后缀自动机.
+
+但是为了压缩一个后缀树, 我们需要一条边表示一个字符串, 所以每条边保存一个上/下界 $l$, $r$, 表示自己表示的字符串是原串的 $[l, r]$ 子串.
+
+具体方法是动态维护每条边的上界 $Right$, 第一个字符插入时, 新建一个节点, 指向它的边的子串是 $[1, Right]$, 这时 $Right = 1$. 第二个字符插入, 将 $Right$ 增加 $1$, 然后增加一个点, 指向它的边的子串是 $[2, Right]$.
+
+这里仅讨论新的字符串一位也无法被识别的情况, 插入复杂度 $O(1)$. 而如果被识别了, 则分裂一条边, 增加一个点, 但是这样的复杂度可以达到 $O(n)$, 所以需要连接转移边 $go$ 辅助后缀树的构造, 
+
+### SAM
+
+过水已隐藏
+
+### 求第 $k$ 大子串
+
+在后缀自动机上记录 $Size$ 然后类似于线段树上二分地在转移边上 DFS 查找即可.
+
+### 求所有后缀的 LCP 总和
+
+每个节点存自己子树中叶结点个数 $Size$, 然后对每个点, 枚举它所有儿子中的所有无需点对 $(i, j)$ 的 $Size_i * Size_j$, 前缀和优化到 $O(Son_x)$, 最后乘上 $Len_x$ 即可.
+
+### 求长度 $k$ 的子串出现次数最大值
+
+建立 SAM, BFS 到深度为 $k$, 然后统计到达次数即可.
+
+### [CF700E]()
+
+一个字符串对另一个字符串是好的, 当且仅当这个字符串在另一个字符串中出现了两次.
+
+求对于一个 $S_1$, 最长有多少字符串满足 $S_{i + 1}$ 对 $S_i$ 是好的.
+
+建立 $S_1$ 的后缀树
+
+### 倍增找子串所在的节点
+
+保存每个后缀所在的叶节点, $Leaf_i$ 表示的子串是 $[i, n]$.
+
+找子串 $[a, b]$ 倍增找 $Leaf_a$ 的第 $n - b + 1$ 代祖先.
+
+### [TJOI2016]()
+
+给一个字符串 $S$, 每次询问子串 $[a, b]$ 的任意子串和 $[c, d]$ 的 LCP 的最大值.
+
+首先确定一点, 答案子串一定在 $[a, b]$ 后缀中, 因为在子串后面增加字符不会使 LCP 变短.
+
+二分答案, 设 LCP 为 $x$. 这样就可以倍增找到点 $[1, b]$ 的后缀链接中 $Len$ 最长的 $Len \leq b - a + 1$ 的点 $X$. 然后倍增找 $[c, d]$ 的点 $Y$ 求它和 $X$ 的 LCA 的 $Len$ 即可, 单次询问 $O(\log n)$.
+
+### GSAM
+
+过水已隐藏
+
+### [ZJOI2015]()
+
+给⼀个叶⼦数不超过 $20$ 的 Trie, 但是与一般 Trie 不同的是, 它可以将任意一条路径作为一个字符串, 而不是只有从上往下的路径, 求有多少个不同的字符串.
+
+分别以每个叶子作为根, 遍历新的 Trie, 建 GSAM. 然后在后缀树上 DP 统计.
+
+### 例题
+
+给一个 Trie 字典序, 询问字典序第 $k$ 大的子串.
+
+建立 GSAM, 每个点记录 $Size$ 表示转移边树上子树的大小, 然后进行 GSAM 上 $n$ 分查找.
+
+### [BZOJ4545]()
+
+给一棵 Trie, 支持三种操作:
+
+- 求本质不同的子串数量
+
+- 插入一个子树
+
+- 询问一个字符串出现了多少次
+
+### [BZOJ1921]()
+
+一棵节点带权为字符的树, 问一个字符串在树上对应的路径有多少条.
+
+### 求多少子串是 $n$ 个字符串中至少 $k$ 个字符串的子串
+
+建立 GSAM, 每个点存一个 $Cnt$ 记录多少个字符串存在这个点, 然后对后缀自动机进行 DP, 只走那些 $Cnt \geq k$ 的节点.
+
+### [NOI2018]()
+
+您的名字
+
+给一个字符串, 每次给一个模式串 $T$ 求有多少本质不同的子串不是 $[l, r]$ 的子串.
+
+离线所有询问, 然后建立 $T$ 的 GSAM, 然后. 
+
+## Day13: 模拟赛
+
+### A
+
+给一个字符串, 判断它是否是一个字符串连续写两次后插入一个字符得到的, 如果可以构造并且唯一, 输出这个字符串.
+
+```cpp
+unsigned m, n, Cnt(0), Flg(0), A, B, C, D, t, Ans1(0), Ans2(0), Tmp(0);
+char a[2000005];
+int main() {
+  n = RD(), m = n >> 1;
+  if(!(n & 1)) {
+    printf("NOT POSSIBLE\n");
+    return 0;
+  }
+  fread(a + 1, 1, 2000002, stdin);
+  Flg = 0;
+  for (register unsigned i(1); i <= m; ++i) {
+    if(a[i] ^ a[i + Flg + m]) {
+      if(Flg) {
+        Ans1 = 0x3fffffff;
+        break;
+      }
+      if(a[i] == a[i + m + 1]) {
+        Ans1 = 1;
+        Flg = 1;
+      } else {
+        Ans1 = 0x3fffffff;
+        break;
+      }
+    }
+  }
+  Flg = 0;
+  for (register unsigned i(1); i <= m; ++i) {
+    if(a[i + Flg] ^ a[i + m + 1]) {
+      if(Flg) {
+        Ans2 = 0x3fffffff;
+        break;
+      }
+      if(a[i + 1] == a[i + m + 1]) {
+        Ans2 = 1;
+        Flg = 1;
+      } else {
+        Ans2 = 0x3fffffff;
+        break;
+      }
+    }
+  }
+  if((Ans1 > 0x3f3f3f3f) && (Ans2 > 0x3f3f3f3f)) {
+    printf("NOT POSSIBLE\n");
+    return 0;
+  }
+  if((Ans1 < 0x3f3f3f3f) && (Ans2 < 0x3f3f3f3f)) {
+    for (register unsigned i(1); i <= m; ++i) {
+      if(a[i] != a[i + m + 1]) {
+        printf("NOT UNIQUE\n");
+        return 0;
+      }
+    }
+  }
+  if(Ans1 < 0x3f3f3f3f) {
+    for (register unsigned i(1); i <= m; ++i) {
+      putchar(a[i]);
+    }
+    putchar('\n');
+    return 0;
+  }
+  for (register unsigned i(m + 2); i <= n; ++i) {
+    putchar(a[i]);
+  }
+  putchar('\n');
+  return Wild_Donkey;
+}
+```
+
+### B
+
+给一个环, 每次选择 $a_i$, 给左右两个相邻的数加上 $a_i$, 将 $a_i$ 变成 $-a_i$. 求最少操作次数, 使得所有数非负.
+
+发现总和永远不变, 所以 $Sum < 0$ 时不可能有解.
+
+而 $Sum = 0$ 也不会有解, 因为无论如何都不能给出状态 `0 0...0 0 0` 是如何变换来的.
+
+所以有解当且仅当 $Sum \geq 1$ 的
+
+发现每次操作是交换环的两位前缀和, 所以破环为链跑 DP.
+
+### C
+
+### D
+
+貌似是第二简单的.
+
+给一个 0/1 串 $S$, 求随机添加字符, 得到后缀 $S$ 停止, 求长度期望.
+
+先分析边界, 如果 $S$ 只有一个 `1`, 则期望是 $2$, 这个值是 $\frac 12 + \frac 24 + \frac 38 + \frac 4{16} + ...$ 得到的, 转化为递归式 $x = 1 + 0 + \frac 12x$ 即可解出, 其意义是这一位无论选什么, 都会贡献 $1$ 的期望, 其中 $\frac 12$ 的几率选 $1$, 长度是 $0$, 剩下的 $\frac 12$, 仍然是这个问题的递归, 所以期望就是自己本身.
+
+设计状态 $f_i$, 表示 $S$ 的 $(i, n]$ 作为后缀的期望长度, 容易知道边界的 $f_n = 0$ 这时可以写出转移方程:
+
+$$
+f_i = 1 + \frac 12 f_{i + 1} + \frac 12 f_{Pos}
+$$
+
+所求答案是 $f_0$, $Pos$ , 方程的意义同样是第 $i$ 位的贡献 $1$, 选 $0$ 和 $1$ 的分支分别计算. 所以倒推即可得到答案.
+
+```cpp
+```
+
+## Day14: [ACtion Movie](https://mbit.mbhs.edu/archive/2021s/standard.pdf)
+
+[Sol](https://mbit.mbhs.edu/archive/2021s/standard_editorial.pdf)
+
+### N
+
+轮廓线长度
+
+```cpp
+unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char b[10005];
+inline void Clr() {}
+int main() {
+  Ans = n = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD();
+  }
+  ++n;
+  for (register unsigned i(1); i <= n; ++i) {
+    if(a[i] > a[i - 1]) {
+      Ans += a[i] - a[i - 1];
+    } else {
+      Ans += a[i - 1] - a[i];
+    }
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### O
+
+构造一个长度为 $m$ 的数, 各位和为 $n$.
+
+不能有前导零, $n = 0$ 时只有 $m = 1$ 时有解, 为 `0`.
+
+```cpp
+unsigned m, n, Base, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+inline void Clr() {}
+int main() {
+  n = RD(), m = RD();
+  if(!n) {
+    if(m > 1) {
+      printf("-1\n");
+      return 0;
+    } else {
+      printf("0\n");
+      return 0;
+    }
+  }
+  Base = n / m;
+  if(Base > 9) {
+    printf("-1\n");
+    return 0;
+  }
+  if((Base == 9) && (Base * m < n)) {
+    printf("-1\n");
+    return 0;
+  }
+  for (register unsigned i(1); i <= n - (Base * m); ++i) {
+    printf("%u", Base + 1);
+  }
+  for (register unsigned i(n - (Base * m) + 1); i <= m; ++i) {
+    printf("%u", Base);
+  }
+  putchar('\n');
+  return Wild_Donkey;
+}
+```
+
+### P
+
+翻转字符串, 如果首字母大写, 则反转后的首字母大写, 也就是原串末字符大写.
+
+```cpp
+unsigned Pos[3005], n(3000), Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char a[3005], b[3005], Tag[3005];
+int main() {
+  fread(a + 1, 1, 3002, stdin);
+  while (a[n] < 'A') {
+    --n;
+  }
+  Pos[0] = 0;
+  for (register unsigned i(1); i <= n; ++i) {
+    if(a[i] < 'A') {
+      Pos[++Cnt] = i;
+    }
+    if(a[i] >= 'A' && a[i] < 'a') {
+      Tag[Cnt] = 1;
+      a[i] += 'a' - 'A';
+    }
+  }
+  Pos[++Cnt] = n + 1;
+  for (register unsigned i(0); i < Cnt; ++i) {
+    if(Tag[i]) {
+      a[Pos[i + 1] - 1] -= 'a' - 'A';
+    }
+  }
+  for (register unsigned i(n); i; --i) {
+    putchar(a[i]);
+  }
+  putchar('\n');
+  return Wild_Donkey;
+}
+```
+
+### M
+
+二分答案题
+
+```cpp
+unsigned a[100005], m, n, Cnt(0), A, B, C, D, L, t, Ans(0), Tmp(0);
+char Judge (unsigned x) {
+  register unsigned Now(0);
+  a[n + 1] = L + x + 1;
+  for (register unsigned i(1); i <= n; ++i) {
+    Now += min(a[i] - a[i - 1] - 1, x);
+    if(a[i + 1] - a[i] - 1 > x) {
+      Now += min(a[i + 1] - a[i] - 1 - x, x);
+    }
+  }
+  return Now >= m;
+}
+int main() {
+  n = RD(), m = RD(), L = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RD();
+  }
+  a[0] = 0;
+  sort(a + 1, a + n + 1);
+  register l(1), r(L), Mid;
+  while (l < r) {
+    Mid = ((l + r) >> 1);
+    if(Judge(Mid)) {
+      r = Mid;
+    } else {
+      l = Mid + 1;
+    }
+  }
+  printf("%u\n", l);
+  return Wild_Donkey;
+}
+```
+
+### G
+
+删边, 从下删到上, 然后从上删到下, 两遍 DFS 即可.
+
+```cpp
+unsigned a[10005], m, n, Cnt(0), C, D, t, Ans(0), Tmp(0);
+struct Edge;
+struct Node {
+  Edge *Fst;
+  Node *Fa;
+}N[100005], *A, *B;
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+}E[200005], *CntE(E);
+void Link(Node *x, Node *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+}
+void DFS(Node *x) {
+  Edge *Sid(x->Fst);
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      Sid->To->Fa = x;
+      DFS(Sid->To);
+      printf("%u %u\n", x - N, Sid->To - N);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+void DFS2 (Node *x) {
+  Edge *Sid(x->Fst);
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      printf("%u %u\n", Sid->To - N, x - N);
+      DFS2(Sid->To);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+int main() {
+  n = RD();
+  for (register unsigned i(1); i < n; ++i) {
+    A = N + RD(), B = N + RD();
+    Link(A, B);
+    Link(B, A);
+  }
+  DFS(N + 1);
+  DFS2(N + 1);
+  return Wild_Donkey;
+}
+```
+
+### A
+
+大模拟, 有 $N$ 个苹果, $M$ 个骨头, 需要 $A$ 个苹果, $B$ 个骨头.
+
+需要 $X$ 时间生产一个苹果, $Y$ 时间生产一个骨头.
+
+可以用 $C$ 个苹果换
+
+```cpp
+unsigned a[10005], N, M, X, Y, m, n, Cnt(0), A, B, C, D, t, TmpB, TmpA, Ans(0), Tmp1(0), Tmp2(0), Tmp(0);
+char b[10005];
+int main() {
+  N = RD(), M = RD(), X = RD(), Y = RD(), A = RD(), B = RD(), C = RD(), D = RD();
+  if((N >= A) && (M >= B)) {
+    printf("0\n");
+    return 0;
+  }
+  if(N >= A) {
+    M += ((N - A) / C) * D;
+    if(M >= B) {
+      printf("0\n");
+      return 0;
+    }
+    Tmp = (N - A + C - 1) / C;
+    TmpB = M + Tmp * D;
+    if(TmpB >= B) Tmp1 = X * (A + Tmp * C - N);
+    else Tmp1 = X * (A + Tmp * C - N) + min(((B - TmpB + D - 1) / D) * C * X, Y * (B - TmpB));
+    Tmp2 = min(((B - M + D - 1) / D) * C * X, Y * (B - M));
+    Ans += min(Tmp1, Tmp2);
+    printf("%u\n", Ans);
+    return 0;
+  }
+  if(M >= B) {
+    N += ((M - B) / D) * C;
+    if(N >= A) {
+      printf("0\n");
+      return 0;
+    }
+    Tmp = (M - B + D - 1) / D;
+    TmpA = N + Tmp * C;
+    if(TmpA >= A) Tmp1 = Y * (B + Tmp * D - M);
+    else Tmp1 = Y * (B + Tmp * D - M) + min(((A - TmpA + C - 1) / C) * D * Y, X * (A - TmpA));
+    Tmp2 = min(((A - N + C - 1) / C) * D * Y, X * (A - N));
+    Ans += min(Tmp1, Tmp2);
+    printf("%u\n", Ans);
+    return 0;
+  }
+  TmpA = ((A - N) / C) * D * Y + X * (A - (((A - N) / C) * C) - N);
+  TmpB = ((B - M) / D) * C * X + Y * (B - (((B - M) / D) * D) - M);
+  Ans += min(min(((A - N + C - 1) / C) * D * Y, X * (A - N)), TmpA);
+  Ans += min(min(((B - M + D - 1) / D) * C * X, Y * (B - M)), TmpB);
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### B
+
+打表题, 每种数字出现次数相同, 快速幂解决.
+
+$x \vee (x - 1) = 2lowbit(x) - 1$, 也就是二进制后缀 $1$.
+
+每个数 $x$ 减少 $1$ 相当于原数异或和异或 $lowbit(x) - 1$.
+
+```cpp
+const unsigned long long MOD(1000000007);
+unsigned long long m, n, Cnt(0), N, Ans(0), Tmp(0), a[1005];
+unsigned long long Power(unsigned long long y) {
+  register unsigned long long Tmpx(2), Final(1);
+  while (y) {
+    if(y & 1) {
+      Final = Final * Tmpx % MOD;
+    }
+    Tmpx = Tmpx * Tmpx % MOD;
+    y >>= 1;
+  }
+  return Final;
+}
+int main() {
+  Tmp = n = RD(), m = RD();
+  while (Tmp) {
+    ++Cnt;
+    Tmp >>= 1;
+  }
+  N = ((unsigned long long)1 << Cnt) - 1;
+  m = min(N, m);
+  printf("%llu\n", ((1 + m) % MOD) * Power(n - Cnt) % MOD);
+  return Wild_Donkey;
+}
+```
+
+### D
+
+构造数据卡贪心.
+
+有 $n$ 个数, 要求分成两个集合使得它们的和的差尽可能小.
+
+需要 Hack 的算法: 降序排序, 将数字插入和较小的那个集合.
+
+给定 $n$, $m$, 输出 $n$ 个数, 分成两个集合差值最小是 $m$.
+
+发现原算法可以在 $n \leq 5$ 的时候给出正确答案.
+
+原算法一定会使得最大的和二大的数字分到两个不同的集合中, 所以我们只要构造数据使得答案中最大的和二大的数字分到一个集合中即可.
+
+### [J](https://vjudge.net/contest/449927#problem/J)
+
+对一个序列执行一次操作, 使得前 $k$ 个数接到第 $n$ 个数后面.
+
+然后对序列进行合并, 规则是两个相邻的数字 $x$, $y$ 合成一个数 $x - y$, 每轮之后对新的数组重复操作, 直到数组只剩一个元素.
+
+求合并到只剩一个元素的最大值.
+
+使用倍增, $a_{i, j}$ 表示从 $i$ 开始合并到 $i + 2^i - 1$ 的结果.
+
+破环为链, 枚举每个起始位置, 这样就可以每次二进制分组, 暴力合并得到的长度为 $\log n$ 的序列即可.
+
+暴力合并时, 要注意不能使用直接合并的规则, 因为每个元素不是同时得到的, 所以一定是原序列较小的元素先合并, 所以答案应该是得到的序列从左到右交替加减得到的结果.
+
+```cpp
+long long a[200005][20], m, n, Cnt(0), A, B, C, D, t, Ans(-0x3f3f3f3f3f3f3f3f), Tmp[100005], Bin[200005], Log[200005];
+long long Force() {
+  register long long All(0);
+  for (register unsigned i(1); i <= Cnt; ++i) {
+    if(i & 1) {
+      All += Tmp[i]; 
+    } else {
+      All -= Tmp[i];
+    }
+  }
+  return All;
+}
+int main() {
+  m = RD(), n = m << 1;
+  for (register unsigned i(1), j(0); i <= n; i <<= 1, ++j) {
+    Bin[j] = i, Log[i] = j; 
+  }
+  for (register unsigned i(1); i <= n; ++i) {
+    Log[i] = max(Log[i - 1], Log[i]);
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    a[i + m][0] = a[i][0] = RD();
+  }
+  for (register unsigned j(1); j <= Log[m]; ++j) {
+    for (register unsigned i(1); i + Bin[j] <= n; ++i) {
+      a[i][j] = a[i][j - 1] - a[i + Bin[j - 1]][j - 1];
+    }
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    Cnt = 0;
+    register unsigned Len(0);
+    for (register unsigned j(Log[m]); j < 0x3f3f3f3f; --j) {
+      if(Len + Bin[j] <= m) {
+        Tmp[++Cnt] = a[i + Len][j];
+        Len += Bin[j];
+      }
+    }
+    Ans = max(Force(), Ans);
+  }
+  printf("%lld\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### L
+
+给一个六边形网格, 每次将一个连通块涂成红色或蓝色, 求整个变成蓝色的最少涂色数量.
+
+搜索, 得到每个连通块的相邻关系, 每个连通块作为一个点, 和与它相邻的点连边, 得到一个二分图, 这时二分图一定是一棵树, 这是因为六边形网格的特殊性不存在环.
+
+发现每次做染色操作相当于以某个连通块所在的点为根, 将树从上面减少一层, 所以整个图变成统一颜色的操作数是树高, 所以我们要求出树高最小的根.
+
+这个最小的树高即为直径的二分之一向上取整. (直径定义为最长链的边数)
+
+特别地, 有可能最后整个图变成红色, 在直径为奇数的时候可以通过选择合适的直径中点作为根来控制最终颜色, 操作次数也不会改变.
+
+特判直径为偶数的时候, 这时如果直径中点是蓝色, 直径的一半是偶数, 答案不变, 直径一半是奇数, 答案增加 $1$; 如果中点是红色, 直径一半是偶数, 答案增加 $1$, 否则答案不变.
+
+## Day15: 连通性
+
+### 强连通分量
+
+过水已隐藏
+
+Tip: Tarjan 找到强连通分量的顺序反转后是得到的 DAG 的拓扑序.
+
+### [NOIp2009](https://www.luogu.com.cn/problem/P1073)
+
+$n$ 个点, $m$ 条单/双向边, 从点 $1$ 到点 $n$, 在路径上取一个点 $A$, 然后在这个点之后再取一个点 $B$, 求 $B - A$ 的最大值.
+
+缩点, 处理每个强连通分量的最大值和最小值, 然后拓扑排序 + DP, 求出从 $1$ 到一个点路径上最小值和从一个点到 $n$ 路径上最大值. 答案即为这两个值差最大的点的差值.
+
+也可以只搜索一次, 选择不记录一个点到 $n$ 的最大值, 可以维护 $1$ 到每个点的答案, 每次使用入边起点的答案更新自己的答案, 然后用自己的最大值维护 $B$ 取在自己的强连通分量中的情况.
+
+### 边双连通
+
+过水已隐藏
+
+缩点后得到树.
+
+###
