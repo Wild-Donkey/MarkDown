@@ -15,10 +15,10 @@ $$
 从 $\binom{p}{m}~(p > m)$ 开始证明
 
 $$
-\binom{p}{m} = \frac{p!}{m!(p - m)!} = \frac px \frac{(p - 1)!}{(m - 1)!((p - 1) - (m - 1))!} = \frac pm \binom{p - 1}{m - 1}
+\binom{p}{m} = \frac{p!}{m!(p - m)!} = \frac pm \frac{(p - 1)!}{(m - 1)!((p - 1) - (m - 1))!} = \frac pm \binom{p - 1}{m - 1}
 $$
 
-由于是模 $p$ 意义下的运算, 且 $gcd(x, p) = 1$, 所以对 $m \in (0, p)$ 有
+由于是模 $p$ 意义下的运算, 且 $gcd(m, p) = 1$, 所以对 $m \in (0, p)$ 有
 
 $$
 \binom{p}{m}~\%~p = pInv_m \binom{p - 1}{m - 1}~\%~p = 0
