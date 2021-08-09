@@ -1156,7 +1156,7 @@ int main(){
 }
 ```
 
-## Day20
+## Day20: 区间 & 树形 DP
 
 ### 区间 DP
 
@@ -1277,12 +1277,66 @@ $$
 的最少数目.
 
 $$
-f_{i, 4} = \sum_j^{j \in Son_i} \min(f_{j, 0}, f_{j, 1}, f_{j, 2}, f_{j, 3}, f_{j, 4})+ 1\\
-f_{i, 0} = \sum_j^{j \in Son_i} \min(f_{j, 1}, f_{j, 2}, f_{j, 3}, f_{j, 4})\\
-f_{i, 1} = \sum_j^{j \in Son_i} \min(f_{j, 2}, f_{j, 3}, f_{j, 4})\\
-f_{i, 2} = \sum_j^{j \in Son_i} \min(f_{j, 3}, f_{j, 4})\\
-f_{i, 3} = \sum_j^{j \in Son_i} f_{j, 4}\\
+f_{i, 4} = 1 + \sum_j^{j \in Son_i} f_{j, 0}\\
+f_{i, 3} = \min(f_{i, 4}, \min(f_{k, 4} - f_{k, 1} + \sum_j^{j \in Son_i} f_{j, 1}) (k \in Son_i))\\
+f_{i, 2} = \min(f_{i, 3}, \min(f_{k, 3} - f_{k, 2} + \sum_j^{j \in Son_i} f_{j, 2})(k \in Son_i))\\
+f_{i, 1} = \min(f_{i, 2}, \sum_{j}^{j \in Son_i} f_{j, 2})\\
+f_{i, 0} = \min(f_{i, 1}, \sum_{j}^{j \in Son_i} f_{j, 1})\\
 $$
+
+放代码:
+
+```cpp
+unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char b[10005];
+struct Node {
+  Node *Son, *Bro;
+  unsigned f[5];
+}N[1005];
+void DFS(Node *x) {
+  register Node *Now(x->Son);
+  if(!Now) {
+    x->f[0] = x->f[1] = 0;
+    x->f[2] = x->f[3] = x->f[4] = 1;
+    return;
+  }
+  register unsigned Sum2(0), Sum1(0);
+  while (Now) {
+    DFS(Now);
+    x->f[4] += Now->f[0];
+    x->f[0] += Now->f[1];
+    x->f[1] += Now->f[2];
+    Sum2 += Now->f[2];
+    Sum1 += Now->f[1];
+    Now = Now->Bro;
+  }
+  x->f[2] = x->f[3] = 0x3f3f3f3f;
+  Now = x->Son;
+  while (Now) {
+    x->f[2] = min(x->f[2], Sum2 - Now->f[2] + Now->f[3]);
+    x->f[3] = min(x->f[3], Sum1 - Now->f[1] + Now->f[4]);
+    Now = Now->Bro;
+  }
+  register unsigned Min(0x3f3f3f3f);
+  ++(x->f[4]);
+  for (register char i(4); i >= 0; --i) {
+    x->f[i] = min(x->f[i], Min);
+    Min = min(x->f[i], Min);
+  }
+  return;
+}
+int main() {
+  n = RD();
+  for (register unsigned i(2), j; i <= n; ++i) {
+    j = RD();
+    N[i].Bro = N[j].Son;
+    N[j].Son = N + i;
+  }
+  DFS(N + 1);
+  printf("%u\n", min(min(N[1].f[2], N[1].f[3]), N[1].f[4]));
+  return Wild_Donkey;
+}
+```
 
 ### [P3177](https://www.luogu.com.cn/problem/P3177)
 
@@ -1308,7 +1362,681 @@ $$
 f_{i} = \sum_j^{j \in Son_i} Max_g - g_{j} + f_{j}
 $$
 
+```cpp
+unsigned a[10005], m, n, Cnt(0), A, B, C, D, t;
+unsigned long long Ans(0);
+struct Edge;
+struct Node {
+  Node *Fa;
+  Edge *Fst;
+  unsigned long long Dep;
+}N[500005], *S;
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+  unsigned Val;
+}E[1000005], *CntE(E);
+inline void Link(Node *x, Node *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+  CntE->Val = C;
+}
+void DFS(Node *x) {
+  register Edge *Sid(x->Fst);
+  register unsigned long long Max(0);
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      Sid->To->Fa = x;
+      DFS(Sid->To);
+      Max = max(Sid->To->Dep + Sid->Val, Max);
+      x->Dep = max(x->Dep, Sid->To->Dep + Sid->Val);
+    }
+    Sid = Sid->Nxt;
+  }
+  Sid = x->Fst;
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      Ans += Max - Sid->To->Dep - Sid->Val;
+    }
+    Sid = Sid->Nxt; 
+  } 
+}
+int main() {
+  n = RD(), S = N + RD();
+  for (register unsigned i(1); i < n; ++i) {
+    A = RD(), B = RD(), C = RD();
+    Link(N + A, N + B);
+    Link(N + B, N + A);
+  }
+  DFS(S);
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
 ### [NOIO2020](https://www.luogu.com.cn/problem/P6478)
 
+## Day21: 状压 DP
 
-## Day21:
+### 状态压缩
+
+状态是一个 $k$ 进制数, 将每个元素的状态用每个 $k$ 进制位的值表示.
+
+### [USACO 06 Nov](https://www.luogu.com.cn/problem/P1879) 
+
+一个矩形, 分成 $n * m$ 个格子, 有的格子能选, 有的不能选, 要求选择的格子两两不相邻, 求合法的选取方式数对 $10^8$ 取模的余数.
+
+设计状态 $f_{i, j}$, 表示从上到第 $i$ 行, 第 $i$ 行的状态是 $j$ 的二进制表示的.
+
+我们可以先预处理出合法的行状态, $List_i$ 表示第 $i$ 个没有两个格子相邻的行状态.
+
+$$
+f_{i, j} = \sum_k^{k \in List, k \And j = k \And a_i = 0}(f_{i - 1, k})
+$$
+
+注: $a_i$ 是棋盘第 $i$ 行状态.
+
+### [NOI2001](https://www.luogu.com.cn/problem/P2704)
+
+仍然先预处理出合法状态集合 $List$, 然后设计状态 $f_{i, j, k}$ 表示算到第 $i$ 行, 第 $i$ 行状态为 $j$, 第 $i - 1$ 行状态为 $k$ 的情况.
+
+$$
+f_{i, j, k} = \sum_{l}^{l \in List, l \And j = l \And k = l \And a_{i - 2} = 0} f_{i - 1, k, l}
+$$
+
+### [SDOI2009](https://www.luogu.com.cn/problem/P2157)
+
+设计状态 $f_{i, j, k}$ 表示在 $i$ 前面, $j$ 表示的人先拿饭, 最后拿到饭的人是 $i - 7 + k$ 的最少时间.
+
+$$
+f_{i, j, k} = min(f_{i - 7 + k, j << (7 - k), l})~(k < 7)\\
+f_{i, j, k} = min()~(k > 7)
+$$
+
+### [AHOI2009](https://www.luogu.com.cn/problem/P2051)
+
+在棋盘上放置中国象棋中的炮, 使得没有炮能互相攻击, 求方案数.
+
+问题转化为往棋盘上放点, 使得不存在三个点在一行或一列中.
+
+状态 $f_{i, j, k}$ 表示到第 $i$ 行, 有 $j$ 列没有炮, $k$ 列有 $1$ 个炮.
+
+$$
+f_{i, j, k} = \sum_{a, b}^{a + b \leq k} \binom {j + a}{a} \binom {k + b - a}{b} f_{i - 1, j + a, k + b - a}
+$$
+
+### [P5005](https://www.luogu.com.cn/problem/P5005)
+
+在棋盘上放置中国象棋中的马, 使得没有马能互相攻击或单向攻击, 求方案数.
+
+仍然状压两位, $f_{i, j, k}$ 表示到第 $i$ 行, 第 $i$ 行状态为 $j$, 第 $i - 1$ 行状态为 $k$ 的状态.
+
+$$
+f_{i, j, k} = \sum_{l} f_{i, k, l}\\
+(j << 1 \And l) | (j \And l >> 1) | k = k,\\
+(j >> 1 \And l) | (j \And l << 1) | k = k,\\
+((j << 2 \And k) >> 1) | k = k,\\
+((j << 2 \And k) >> 1) | j = j,\\
+((j >> 2 \And k) << 1) | k = k,\\
+((j >> 2 \And k) << 1) | j = j,\\
+$$
+
+### [TJOI2015](https://www.luogu.com.cn/problem/P3977)
+
+每个点的范围是 $3 * p$, 仍然求放点使其不能攻击的方案数.
+
+因为转移规则是一个矩阵, 所以不方便使用位运算判断, 用转移矩阵对状态进行转移.
+
+新建一个 $2^n * 2^n$ 的矩阵, 用矩阵快速幂加速转移.
+
+### [NOIP2017](https://www.luogu.com.cn/problem/P3959)
+
+给一个无向图, 求一个生成树使得代价最小, 一个生成树的代价是边的代价之和, 每条边的代价是边的权值和边下端点深度的积.
+
+这个题 Prim 被 Hack 了, 详情见 RQY 的[数据](https://paste.ubuntu.com/25953020/).
+
+### [P3943](https://www.luogu.com.cn/problem/P3943)
+
+一个长为 $n$ 的 `0/1` 串, 有 $k$ 个 $0$, 每次允许取反特定长度的区间, $m$ 种区间长度. 求最少取反几次得到 $n$ 个 $1$.
+
+### [SCOI2005](https://www.luogu.com.cn/problem/P1896)
+
+往棋盘上放国际象棋国王, 使其不能互相攻击, 求方案数.
+
+仍然是状态 $f_{i, j}$ 表示到第 $i$ 行, 第 $i$ 行状态为 $j$ 时的方案数.
+
+$$
+f_{i, j} = \sum_k^{(k | (k << 1) | (k >> 1)) \And j = 0}f_{i - 1, k}
+$$
+
+### 轮廓线 DP
+
+上一道题如果不是一行一起转移, 而是每个位置讨论放或者不放, 将讨论的状态变成这个位置及以上的一个轮廓线的状态, 这样可以优化时间复杂度, 从 $O(2^nn)$ 状态, $O(2^n)$ 转移优化到 $O(2^nn^2)$ 状态, $O(1)$ 转移.
+
+### 例题
+
+给一个有障碍物的棋盘, 放 $k$ 对人, 每队人不能和自己对应的人相邻, 求方案数.
+
+设计状态 $f_{i, j, k, l}$ 表示讨论到 $(i, j)$, 轮廓线状态为 $k$, 已经填完了 $l$ 对点的方案数.
+
+需要统计 $Em_{i, j}$ 表示扫描到 $(i, j)$ 的时候的空位个数.
+
+最后乘一个排列数即可.
+
+### [NOI2015](https://www.luogu.com.cn/problem/P2150)
+
+给正整数 $[2, n]$, 选两个不交子集, 使得两个子集中任意两个数互质. 求方案数.
+
+分析性质, 发现对于每个质数 $p$, 两个数集中只有一个数集存在整除 $p$ 的元素. 所以状态就是两个集合分别包含的质因数集合即可, 必须要求两个集合 $\And$ 后是 $0$.
+
+设 $n$ 以内有 $m$ 个质数, 则复杂度是 $O(2^{2m}n)$.
+
+为了优化, 我们可以枚举质数, 将所有以这个质数为最大质因数的数都考虑一遍, 这样就可以减少状态的记录, 并且加速了转移. 
+
+但是因为仍要记录两个交为 $0$ 的集合, 所以有结论说明这样的集合有 $O(3^n)$ 对.
+
+根号分治可以将其优化到 $O(n3^{\sqrt n})$
+
+### [THU2012](https://www.luogu.com.cn/problem/P5933)
+
+有 $n$ 个本质不同的点, 用若干条颜色不同的边将他们连成连通图, 求方案数. 每种颜色有 $c_i$ 条边备选. 不允许出现重边, 自环.
+
+### [AT2390](https://ww w.luogu.com.cn/problem/AT2390)
+
+博弈论 + DP?
+
+貌似博弈论和 DAG 往往同时出现...
+
+### [P4363](https://www.luogu.com.cn/problem/P4363)
+
+一个棋盘, 每个格子有两个值 $a_{i, j}$ 和 $b_{i, j}$, 每个格子 $(i, j)$ 选当且仅当除了它以外, $x \in [1, i]$, $y \in [1, j]$ 的所有 $(x, y)$ 都已经选了.
+
+求最后双方最小的差值.
+
+先手选一个格子 $(i, j)$ 获得收益 $a_{i, j}$, 后手选 $(i, j)$ 获得 $b_{i, j}$.
+
+这时要维护一个单调不减的折线, 折线左上方都选了, 左下都没选, 而折线向左上凸出的位置的顶点处可以选. 这种折线有 $\binom {n + m}n$ 种.
+。一
+将 $[1, \binom {n + m}n]$ 的数作为状态值, 然后对它进行转移.
+
+## Day22: 模拟赛
+
+### A
+
+给一个数 $S$, 和一个序列 $a$, 每次可以选择一个数, 使得 $S$ 变成 $S + a_i$ 或 $Sa_i$, 每个数用一次, 求操作后 $S$ 最大值.
+
+升序排序, 贪心, 一定有一个界, 使得在此之前都选 $S + a_i$, 之后都选 $Sa_i$. 而这个界限可以贪心地判断考虑到每个数字时 $S + a_i$ 和 $Sa_i$ 的大小.
+
+由于 $S$ 和给出序列的长度两个范围看反了, 所以数组开小了, 而且没开 `long double`, 所以直接爆炸.
+
+```cpp
+unsigned m, n, Cnt(0), A, B, C, D, t;
+long double Ans, a[100005];
+inline void Clr() {}
+int main() {
+  scanf("%LF", &Ans), n = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    scanf("%LF", &a[i]);
+  }
+  sort(a + 1, a + n + 1);
+  for (register unsigned i(1); i <= n; ++i) {
+    if(a[i] <= 1) {
+      Ans += a[i]; 
+      continue; 
+    }
+    if(a[i] * Ans > a[i] + Ans) {
+      Ans *= a[i];
+    } else {
+      Ans += a[i]; 
+    }
+  }
+  printf("%.9LF\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### B
+
+题假了, 爆零人站起来了.
+
+### C
+
+先考虑只有两个值的情况, 容易想到贪心, 按 $a_i - b_i$ 升序排序, 前 $B$ 个都选 $b$, 后 $A$ 个都选 $a$.
+
+首先想到了 DP, 状态 $f_{i, j, k}$ 表示前 $i$ 个物品, 已经选了 $j$ 个 $a$, $k$ 个 $b$, $i - j - k$ 个 $c$ 的最大收益.
+
+$$
+f_{i, j, k} = max(f_{i - 1, j - 1, k} + a_{i}, f_{i - 1, j, k - 1} + b_{i}, f_{i - 1, j, k} + c_{i})
+$$
+
+状态 $O(n^3)$, 转移 $O(1)$, 时间复杂度 $O(n^3)$, 滚动数组后空间复杂度 $O(n^2)$. 可以得到 $60'$.
+
+```cpp
+unsigned long long a[3][300005], f[5005][5005];
+unsigned m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+inline void Clr() {}
+int main() {
+  n = RD(), A = RD(), B = RD();// C = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[0][i] = RD(), a[1][i] = RD(), a[2][i] = RD();
+  }
+  for (register unsigned i(1); i <= n; ++i) {
+    for (register unsigned j(i - 1); j; --j) {
+      f[j][i - j] = max(f[j - 1][i - j] + a[0][i], f[j][i - j - 1] + a[1][i]);
+    }
+    f[i][0] = f[i - 1][0] + a[0][i];
+    f[0][i] = f[0][i - 1] + a[1][i];
+    for (register unsigned j(i - 1); j; --j) {
+      for (register unsigned k(i - j - 1); k; --k) {
+        f[j][k] = max(max(f[j - 1][k] + a[0][i], f[j][k - 1] + a[1][i]), f[j][k] + a[2][i]);
+      }
+    }
+    for (register unsigned j(i - 1); j; --j) {
+      f[j][0] = max(f[j - 1][0] + a[0][i], f[j][0] + a[2][i]);
+      f[0][j] = max(f[0][j - 1] + a[1][i], f[0][j] + a[2][i]);
+    }
+    f[0][0] = f[0][0] + a[2][i];
+  }
+  printf("%llu\n", f[A][B]);
+  return Wild_Donkey;
+}
+```
+
+能得 $60'$ 的算法还有费用流, 开三个点分别连向汇点免费的, 容量为 $A$, $B$, $C$ 的边. 然后从源点向每个物品连免费的容量为 $1$ 的边, 然后每个物品分别向 $A$, $B$, $C$ 点连接容量为 $1$, 费用分别是 $a_i$, $b_i$, $c_i$ 的边, 跑最大费用最大流即可.
+
+接下来是正解:
+
+如果有三个值, 仍先按 $a_i - b_i$ 升序排序, 假设已经把选 $c$ 的 $C$ 个物品删掉了, 这时剩下的 $A + B$ 个物品仍应该是前 $B$ 个选 $b$, 后 $A$ 个选 $a$. 因此在排好序的 $n$ 个物品的序列中, 一定存在一个分界线, 它左边除了 $b$ 就是 $c$, 它右边除了 $a$ 就是 $c$.
+
+假设我们已经知道, 分界线是 $x$, 也就是说 $[1, x]$ 中, 有 $B$ 个选 $b$, $x - B$ 个选 $C$.
+
+我们已经知道了只有两种选择的时候如何贪心, 直接选择 $x$ 个数中的前 $B$ 大的 $b_i - c_i$ 的物品选 $b$ 即可.
+
+但是如果对于每个分界点都这样判断, 无疑是非常慢的, 定义两个数组, $f_i$ 和 $g_i$, 分别代表 $[1, i]$ 中前 $B$ 大的 $b_i - c_i$ 值之和, 和 $[i, n]$ 中前 $A$ 大的 $a_i - c_i$ 值之和. 到时候只要取 $f_{i} + g_{i + 1} + SumC$ 的最大值即可.
+
+如何求 $f$ 和 $g$, $f$ 的下标范围是 $[B, n]$, 而 $f_{B}$ 显然是 $\displaystyle{\sum_{i = 1}^{i \leq B} b_i - c_i}$, 接下来的每个 $f_i$, 都是在上一个版本的基础上加入当前位置的 $b_i - c_i$. 然后删去最小值得到的总和, 每次弹出最小值可以用堆维护, $g$ 同理. 这样就可以 $O(n \log n)$ 求出 $f$ 和 $g$. 最后 $O(n)$ 扫描统计答案即可.
+
+```cpp
+struct Gift {
+  unsigned V1, V2;
+  inline const char operator<(const Gift &x) const{
+    return (this->V1 + x.V2) > (x.V1 + this->V2);
+  }
+}G[300005];
+unsigned V3[300005], m, n, Cnt(0), A, B, C, D, t;
+unsigned long long Ans(0), f[300005], g[300005], Tmp;
+priority_queue<unsigned, vector<unsigned>, greater<unsigned> > Q;
+int main() {
+  n = RD(), A = RD(), B = RD(); C = n - B;
+  for (register unsigned i(1), Min; i <= n; ++i) {
+    G[i].V1 = 1000000000 + RD(), G[i].V2 = 1000000000 + RD(), Ans += (V3[i] = RD());
+    G[i].V1 -= V3[i], G[i].V2 -= V3[i];
+  }
+  sort(G + 1, G + n + 1), Ans -= (unsigned long long)1000000000 * (A + B);
+  for (register unsigned i(1); i <= A; ++i) {
+    Tmp = G[i].V1;
+    Q.push(Tmp);
+    f[i] = f[i - 1] + Tmp;
+  }
+  for (register unsigned i(A + 1); i <= n; ++i) {
+    Tmp = G[i].V1;
+    Q.push(Tmp);
+    f[i] = f[i - 1] + Tmp - Q.top();
+    Q.pop();
+  }
+  while (Q.size()) Q.pop();
+  for (register unsigned i(n); i > C; --i) {
+    Tmp = G[i].V2;
+    Q.push(Tmp);
+    g[i] = g[i + 1] + Tmp;
+  }
+  for (register unsigned i(C); i; --i) {
+    Tmp = G[i].V2;
+    Q.push(Tmp);
+    g[i] = g[i + 1] + Tmp - Q.top();
+    Q.pop();
+  }
+  Tmp = 0;
+  for (register unsigned i(A); i <= C; ++i) {
+    Tmp = max(Tmp, f[i] + g[i + 1]);
+  }
+  printf("%llu\n", Ans + Tmp);
+  return Wild_Donkey;
+}
+```
+
+### D
+
+据说正解是矩阵乘法或可持久化平衡树, 但是我们不管这么多, 直接踩一下标算.
+
+![1949.png](https://i.loli.net/2021/08/08/SbW3AhXH1gYJfdr.png)
+
+开 $20$ 棵动态开点线段树, 通过交换和共用儿子来操作, 通过节点分裂保证每一行互不干扰, 复杂度 $O(m \log n)$.
+
+```cpp
+unsigned m, n, q, Cnt(0), A, P, B, C, D, t, Ans(0), Tmp(0);
+const unsigned MOD(998244353);
+inline void Clr() {}
+struct Node {
+  Node *LS, *RS;
+  unsigned Val, Tag, Deg;
+}*Root[25], N[50000005], *CntN(N);
+inline void New(Node *x, Node *y) {
+  x->Deg = 1;
+  x->Val = y->Val;
+  x->Tag = y->Tag;
+  x->LS = y->LS;
+  x->RS = y->RS;
+  if(x->LS) ++(x->LS->Deg);
+  if(x->RS) ++(x->RS->Deg);
+  --(y->Deg);
+}
+inline void PsDw(Node *x, const unsigned Len) {
+  if(!(x->LS)) x->LS = ++CntN, x->LS->Deg = 1;
+  if(!(x->RS)) x->RS = ++CntN, x->RS->Deg = 1;
+  if(x->LS->Deg > 1) {
+    New(++CntN, x->LS);
+    x->LS = CntN;
+  }
+  if(x->RS->Deg > 1) {
+    New(++CntN, x->RS);
+    x->RS = CntN;
+  }
+  if(x->Tag) {
+    x->LS->Tag += x->Tag;
+    if(x->LS->Tag >= MOD) x->LS->Tag -= MOD;
+    x->LS->Val = ((unsigned long long)(x->Tag) * ((Len + 1) >> 1) + x->LS->Val) % MOD;
+    x->RS->Tag += x->Tag;
+    if(x->RS->Tag >= MOD) x->RS->Tag -= MOD;
+    x->RS->Val = ((unsigned long long)(x->Tag) * (Len >> 1) + x->RS->Val) % MOD;
+    x->Tag = 0;
+  }
+  return;
+}
+void Qry(Node *x, unsigned L, unsigned R) {
+  if((B <= L) && (R <= C)) {
+    Ans += x->Val;
+    if(Ans >= MOD) Ans -= MOD;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  PsDw(x, R - L + 1);
+  if(B <= Mid) {
+    Qry(x->LS, L, Mid);
+  }
+  if(C > Mid) {
+    Qry(x->RS, Mid + 1, R);
+  }
+  return;
+}
+void Chg(Node *x, unsigned L, unsigned R) {
+  if((B <= L) && (R <= C)) {
+    x->Tag += D;
+    if(x->Tag >= MOD) x->Tag -= MOD;
+    x->Val = (((unsigned long long)D * (R - L + 1)) + x->Val) % MOD;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  PsDw(x, R - L + 1);
+  if(B <= Mid) {
+    Chg(x->LS, L, Mid);
+  }
+  if(C > Mid) {
+    Chg(x->RS, Mid + 1, R);
+  }
+  x->Val = x->LS->Val + x->RS->Val;
+  if(x->Val >= MOD) x->Val -= MOD;
+  return;
+}
+void Swap(Node *x, Node *y, unsigned L, unsigned R) {
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  PsDw(x, R - L + 1);
+  PsDw(y, R - L + 1);
+  if(C <= Mid) {
+    if((C <= L) && (Mid <= D)) {
+      swap(x->LS, y->LS);
+    } else {
+      Swap(x->LS, y->LS, L, Mid);
+    }
+  }
+  if(D > Mid) {
+    if((C <= Mid + 1) && (R <= D)) {
+      swap(x->RS, y->RS);
+    } else {
+      Swap(x->RS, y->RS, Mid + 1, R);
+    }
+  }
+  x->Val = x->LS->Val + x->RS->Val;
+  if(x->Val >= MOD) x->Val -= MOD;
+  y->Val = y->LS->Val + y->RS->Val;
+  if(y->Val >= MOD) y->Val -= MOD;
+  return;
+}
+void Copy(Node *x, Node *y, unsigned L, unsigned R) {
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  PsDw(x, R - L + 1);
+  PsDw(y, R - L + 1);
+  if(C <= Mid) {
+    if((C <= L) && (Mid <= D)) {
+      y->LS = x->LS;
+      ++(y->LS->Deg);
+    } else {
+      Copy(x->LS, y->LS, L, Mid);
+    }
+  }
+  if(D > Mid) {
+    if((C <= Mid + 1) && (R <= D)) {
+      y->RS = x->RS;
+      ++(y->RS->Deg);
+    } else {
+      Copy(x->RS, y->RS, Mid + 1, R);
+    }
+  }
+  x->Val = x->LS->Val + x->RS->Val;
+  if(x->Val >= MOD) x->Val -= MOD;
+  y->Val = y->LS->Val + y->RS->Val;
+  if(y->Val >= MOD) y->Val -= MOD;
+  return;
+}
+int main() {
+  n = RD(), m = RD(), q = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    Root[i] = ++CntN;
+  }
+  for (register unsigned i(1); i <= q; ++i) {
+    A = RD(), P = RD(), B = RD(), C = RD();
+    switch (A) {
+      case (0) :{
+        Ans = 0, Qry(Root[P], 1, m);
+        printf("%u\n", Ans);
+        break;
+      }
+      case (1) :{
+        D = RD(), Chg(Root[P], 1, m);
+        break;
+      }
+      case (2) :{
+        D = RD();
+        if(B == P) break;
+        Swap(Root[P], Root[B], 1, m);
+        break;
+      }
+      case (3) :{
+        D = RD();
+        if(B == P) break;
+        Copy(Root[P], Root[B], 1, m);
+        break;
+      }
+    }
+  }
+  return Wild_Donkey;
+}
+```
+
+## Day23: 数位 DP
+
+### [SCOI2009](https://www.luogu.com.cn/problem/P2657)
+
+设计状态 $f_{i, j, 0/1}$, 其中 $i$ 表示位置, $j$ 表示当前位的数, 第一个 $0/1$ 表示前 $i$ 位是否顶界.
+
+$$
+f_{i, j, 0} = f_{i - 1, a_{i - 1}, 1} * [|a_{i - 1} - j| \geq 2, j < a_{i}] + \sum_k^{|k - j| \geq 2} f_{i - 1, k, 0}\\
+f_{i, j, 1} = f_{i - 1, a_{i - 1}, 1} * [|a_{i - 1} - j| \geq 2, j = a_{i}]
+$$
+
+### [P4317](https://www.luogu.com.cn/problem/P4317)
+
+设 $Count_i$ 表示 $i$ 二进制表示有多少 $1$, $Num_i$ 表示 $[1, n]$ 中 $Count = i$ 的数的数量, 问题转化为求 $\displaystyle{\prod_i i^{Num_i}}$.
+
+设计状态 $f_{i, j, 0/1}$ 表示到第 $i$ 位, 二进制有 $j$ 个 $1$, 前 $i$ 位是否顶界的数的数量.
+
+$$
+f_{i, j, 0} = f_{i - 1, j, 0} + f_{i - 1, j - 1, 0} + f_{i - 1, j, 1} * [a_{i} = 1]\\
+f_{i, j, 1} = f_{i - 1, j, 1} * [a_{i} = 0] + f_{i - 1, j - 1, 1} * [a_{i} = 1]\\
+Num_i = f_{Len, i, 0} + f_{Len, i, 1}
+$$
+
+### [HNOI2002](https://www.luogu.com.cn/problem/P2235)
+
+问题转化为求 $[1, m]$ 中的二进制回文数个数.
+
+先判断 $m$ 是否为二进制回文数.
+
+### [SCOI2013](https://www.luogu.com.cn/problem/P3281)
+
+状态 $f_{i, j, 0/1}$ 表示到第 $i$ 位, 第 $i$ 位为 $j$, 是否顶界.
+
+$$
+f_{i, j, 0} = (f_{i - 1, a_{i - 1}, 1} * [j < a_{i}] + \sum_{k = 0}^{k < B}{f_{i - 1, k, 0}}) * B + j * (i)\\
+f_{i, j, 1} = f_{i - 1, a_{i - 1}, 1} * [j = a_{i}] * B + j * (i)
+$$
+
+### 例题
+
+求
+
+$$
+\sum_{i = l}^{r} \binom{a+i}{b}c^i \% p
+$$
+
+设 $a + i = A_0 + pA_1 + p^2A_2...$, $b = B_0 + pB_1 + p^2B_2...$
+
+$$
+\binom{a + i}{b} \equiv \prod_{j = 0} \binom{A_j}{B_j} \pmod p
+$$
+
+设 $i = C_0 + pC_1 + p^2C_2...$
+
+$$
+c^i \equiv \prod_{j = 0} c^{C_jp^j} \pmod p
+$$
+
+问题转化为:
+
+$$
+\sum_{i = l}^{r} (\prod_{j = 0} \binom{A_j}{B_j})(\prod_{j = 0} c^{C_j}) \% p
+$$
+
+预处理 $g_i = c^i \% p$.
+
+状态 $f_{i, 0/1, 0/1}$, 表示到 $p$ 进制第 $i$ 位, 是否顶界, 是否. (转移的条件细节已省略)
+
+$$
+f_{i, 0/1, 0/1} = \sum_k f_{i - 1}{0/1'}{0/1'} * \binom{k}{B_i} * g_k
+$$
+
+### 集合幂级数
+
+用一个幂级数表示一个集合的状态, 每一位存一个元素的状态.
+
+### FMT
+
+假设有一个各维度坐标为 $0/1$ 的高维超立方体, 求它顶点的前缀和.
+
+一位一位地考虑, 每次将第 $j$ 位为 $1$ 的下标的元素加上它这一位异或 $1$ 得到的下标代表的元素.
+
+一共是 $n$ 位, 下标范围 $2^n$, 复杂度 $O(n2^n)$.
+
+这个求高维前缀和的过程称为 `FMT`.
+
+### FWT
+
+对一个多项式 $A$ 需要求 $A'$, 规则为:
+
+$$
+A'_i = \sum_{j = 0}^{j < 2^n} (-1)^{|i \cap j|} A_j
+$$
+
+类似地, 一位一位地考虑, 假设考虑到第 $i$ 位, $j$ 的第 $i$ 位为 $0$. 这时使得 $A_j$ 变成 $A_j + A_{j \oplus {1 << i}}$, $A_{j \oplus {1 << i}}$ 变成 $A_j - A_{j \oplus {1 << i}}$.
+
+这样就能在同样的 $O(n2^n)$ 计算 FWT 了.
+
+### 异或卷积
+
+计算多项式 $C$ 使得 $C_i = a$
+
+## Day24: 期望和概率 DP
+
+### [NOIP2003](https://www.luogu.com.cn/problem/P1040)
+
+中序遍历的一个区间就是一棵子树, 所以将树上问题转化为区间 DP.
+
+$f_{i, j}$ 表示区间 $[i, j]$ 作为一棵子树的最大加分.
+
+$$
+f_{i, j} = \max(f_{i, k - 1} * f_{k + 1, j} + a_k)
+$$
+
+### [NOIP2008](https://www.luogu.com.cn/problem/P1006)
+
+两条路径同时走, 状态 $f_{i, j, k}$ 表示走了 $i$ 步, 第一条路经走到 $(j, i + 2 - j)$, 第二条路经走到 $(k, i + 2 - k)$ 的最大总和.
+
+$$
+f_{i, j, k} = max(f_{i - 1, j, k}, f_{i - 1, j - 1, k}, f_{i - 1, j, k - 1}, f_{i - 1, j - 1, k - 1})
+$$
+
+$O(n^3)$ 状态, $O(1)$ 转移.
+
+(这个题貌似费用流也可)
+
+### [NOIP2010](https://www.luogu.com.cn/problem/P1514)
+
+首先可以证明一个输水站覆盖的城市一定是一个连续的区间, 每个点 $(i, j)$ 维护一个左端点 $f_{i, j}$, 一个右端点 $g_{i, j}$, 表示它能覆盖的城市区间. 求出每个蓄水站的区间后, 贪心求解.
+
+### [ZJOI2006](https://www.luogu.com.cn/problem/P2585)
+
+节点 $i$ 存 $f_{i, 0/1/2}$ 表示当前节点选红/绿/蓝的最多绿色数量, $g_{i, 0/1/2}$ 存最少绿色数量.
+
+对于叶子 $i$.
+
+$$
+g_{i, 0} = f_{i, 0} = 0\\
+g_{i, 1} = f_{i, 1} = 1\\
+g_{i, 2} = f_{i, 2} = 0
+$$
+
+对于只有一个儿子的节点 $i$.
+
+$$
+f_{i, 0} = max(f_{Son_i, 1}, f_{Son_i, 2})\\
+f_{i, 1} = max(f_{Son_i, 0}, f_{Son_i, 2}) + 1\\
+f_{i, 2} = max(f_{Son_i, 0}, f_{Son_i, 1})\\
+g_{i, 0} = min(f_{Son_i, 1}, f_{Son_i, 2})\\
+g_{i, 1} = min(f_{Son_i, 0}, f_{Son_i, 2}) + 1\\
+g_{i, 2} = min(f_{Son_i, 0}, f_{Son_i, 1})
+$$
+
+对于有两个儿子的 $i$.
+
+$$
+f_{i, 0} = max(f_{LS_i, 1} + f_{RS_i, 2}, f_{RS_i, 1} + f_{LS_i, 2})\\
+f_{i, 1} = max(f_{LS_i, 0} + f_{RS_i, 2}, f_{RS_i, 0} + f_{LS_i, 2}) + 1\\
+f_{i, 2} = max(f_{LS_i, 0} + f_{RS_i, 1}, f_{RS_i, 0} + f_{LS_i, 1})\\
+g_{i, 0} = min(f_{LS_i, 1} + f_{RS_i, 2}, f_{RS_i, 1} + f_{LS_i, 2})\\
+g_{i, 1} = min(f_{LS_i, 0} + f_{RS_i, 2}, f_{RS_i, 0} + f_{LS_i, 2}) + 1\\
+g_{i, 2} = min(f_{LS_i, 0} + f_{RS_i, 1}, f_{RS_i, 0} + f_{LS_i, 1})\\
+$$
+
