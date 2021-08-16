@@ -57,4 +57,71 @@ void Union(ui u, ui v){
 
 > August.12th 2021 By WD
 
-##
+## `b` -> `B`: 一个 `Shift` 引发的血案
+
+- 错误示范
+
+这里传入的是 $B$, 但是函数中调用的是 $b$, 所以调用了全局变量, 得到了错误的答案.
+
+```cpp
+void exgcd(ll A, ll B, ll &X, ll &Y){
+	if(B == 0){
+		X = 1; Y = 0; return;
+	}
+	exgcd(B, A % B, Y, X);
+	Y -= A/b * X;
+	return;
+}
+```
+
+- 正确示范
+
+传入 $B$ 就用 $B$, 非常难调 "最安全的地方往往是最危险的地方". 
+
+```cpp
+void exgcd(ll A, ll B, ll &X, ll &Y){
+	if(B == 0){
+		X = 1; Y = 0; return;
+	}
+	exgcd(B, A % B, Y, X);
+	Y -= A/B * X;
+	return;
+}
+```
+
+> August.13th 2021 By JJK
+
+## $a^b \equiv a^{b \% p} \pmod p$ $\times$
+
+这个错误涉及到欧拉定理, 因为一般取模的问题都是在过程中不断取模, 将过程中的值控制在模数以内. 但是对于乘方运算, 有 $a^b \equiv a^{b \% \phi(p)} $. 而一个合数的 $\phi$ 并不是它 $-1$, 所以不能直接取模, 所以有两种方案: 求出 $\phi$ 或者不取模.
+
+- 错误示范
+
+```cpp
+ll ksm(ll base, unsigned long long p){
+	p %= Mod - 1;
+	ll res=1;
+	while (p) {
+		if(p&1) res = res * base % Mod;
+		base = base * base % Mod;
+		p >>= 1;
+	}
+	return res;
+}
+```
+
+- 正确示范
+
+```cpp
+ll ksm(ll base, unsigned long long p){
+	ll res=1;
+	while (p) {
+		if(p&1) res = res * base % Mod;
+		base = base * base % Mod;
+		p >>= 1;
+	}
+	return res;
+}
+```
+
+> August.15th 2021 By JJK

@@ -2597,7 +2597,786 @@ int main() {
 
 因为一个点可以反转多次, 所以不妨先将两个矩阵变换到理想的中间态, 然后将第一个矩阵的变换序列反转, 拼到第二个矩阵的序列后面就是答案.
 
-### 
+而变换到中间态也很简单, 只要从外到内, 一格一格扩张到自己该到达的边界即可. (注意只扩展那些不会产生新连通块的格子)
+
+### L
+
+据说是稳定婚姻问题的裸题, 但是很遗憾没有翻译到.
 
 ### M
 
+又是构造, 同样没翻译.
+
+## Day27: 模拟赛
+
+### A
+
+给一个 DAG, 要求有序对 $(a, b)$ 使得存在一个 $c$, 既能到达 $a$, 又能到达 $b$. 数据保证点的编号就是拓扑序.
+
+首先想到的是将所有入度为 $0$ 的点作为 $c$, 因为如果对于点对 $(a, b)$ 的 $c$, 能连向它的点一定也能做这个 $c$. 所以合法答案中所有点对的 $c$ 都可以是一个入度为 $0$ 的点.
+
+将从某个 $c$ 出发能到达的所有点存到一个数组中, 然后 $O(n^2)$ 得到所有点对, 将对应的二维数组的位置置为 $1$.
+
+$O(n)$ 个源点, 每个源点 $O(n^2)$ 扫描, 复杂度 $O(n^3)$.
+
+`70'.cpp`
+
+```cpp
+unsigned List[3005], Hd(0), Tl(0), m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char b[3005][3005];
+struct Edge;
+struct Node {
+  Edge *Fst;
+  unsigned Deg, Topo, Vis, Size, Tms;
+}N[3005];
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+}E[3005];
+unsigned DFS1 (Node *x) {
+  List[++Cnt] = x - N;
+  register Edge *Sid(x->Fst);
+  if(!Sid) {
+    return 1;
+  }
+  register unsigned TmSz(1);
+  while (Sid) {
+    if(!(Sid->To->Vis)) {
+      Sid->To->Vis = 1;
+      TmSz += DFS1(Sid->To);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+inline void Clr() {
+  memset(b, 0, sizeof(b));
+  memset(N, 0, sizeof(N));
+  memset(E, 0, sizeof(E));
+  Ans = 0;
+}
+int main() {
+  t = RD();
+  for (register unsigned T(1); T <= t; ++T){
+    Clr();
+    n = RD(), m = RD();
+    for (register unsigned i(1); i <= m; ++i) {
+      A = RD(), B = RD();
+      E[i].Nxt = N[A].Fst;
+      N[A].Fst = E + i;
+      ++(N[B].Deg);
+      E[i].To = N + B;
+    }
+    for (register unsigned i(1); i <= n; ++i) {
+      if(!(N[i].Deg)) {
+        Cnt = 0;
+        DFS1(N + i);
+        for (register unsigned j(1); j <= n; ++j) {
+          N[j].Vis = 0;
+        }
+        for (register unsigned j(1); j <= Cnt; ++j) {
+          b[List[j]][List[j]] = 1;
+          for (register unsigned k(j + 1); k <= Cnt; ++k) {
+            b[List[j]][List[k]] = b[List[k]][List[j]] = 1;
+          }
+        }
+      }
+    }
+    for (register unsigned i(1); i <= n; ++i) {
+      for (register unsigned j(1); j <= n; ++j) {
+        Ans += b[i][j];
+      }
+    }
+    printf("%u\n", Ans);
+  }
+  return Wild_Donkey;
+}
+```
+
+正解考虑 DP, 发现有一个条件还没使用, 就是点的拓扑序是编号. 设布尔变量 $f_{i, j}$ 表示 $(i, j)$ 点对合法.
+
+接下来枚举 $i$, $j$ 转移即可, 因为只要 $(i, j)$ 合法, 那么对于任何 $i$ 能到达的 $i'$, $j$ 能到达的 $j'$, 都有 $(i', j')$ 合法.
+
+所以按拓扑序转移即可. 复杂度 $O(n(n + m))$.
+
+```cpp
+unsigned m, n, Cnt(0), A, B, C, D, t, Ans(0);
+char f[3005][3005];
+struct Edge {
+  unsigned To;
+  Edge *Nxt;
+}E[3005], *Fst[3005];
+inline void Clr() {
+  memset(f, 0, sizeof(f));
+  memset(Fst, 0, sizeof(Fst));
+  Ans = 0;
+}
+int main() {
+  t = RD();
+  for (register unsigned T(1); T <= t; ++T){
+    Clr();
+    n = RD(), m = RD();
+    for (register unsigned i(1); i <= m; ++i) {
+      A = RD(), B = RD();
+      E[i].Nxt = Fst[A];
+      Fst[A] = E + i;
+      E[i].To = B;
+    }
+    for (register unsigned i(1); i <= n; ++i) {
+      f[i][i] = 1;
+      for (register unsigned j(1); j <= n; ++j) {
+        if(f[i][j]) {
+          ++Ans;
+          register Edge *Sid(Fst[j]);
+          register unsigned Son;
+          while (Sid) {
+            Son = Sid->To;
+            f[i][Son] = f[Son][i] = f[j][Son] = f[Son][j] = 1; 
+            Sid = Sid->Nxt;
+          }
+        }
+      }
+    }
+    printf("%u\n", Ans);
+  }
+  return Wild_Donkey;
+}
+```
+
+### B
+
+每个物品可以放到 $a_i$ 筐中, 也能放到 $b_i$ 筐中. 求如何使得筐中有奇数物品的筐最小.
+
+每个筐看作一个点, 每个物品当作一条边, 连接 $a_i$, $b_i$. 对于一个连通块, 我们尝试将有端点相同的节点配对然后同时删除, 意义是将两个物品同时放入一个筐中, 发现存在策略使得连通块最后只剩 $0$ 或 $1$ 条边.
+
+删边策略是: 以任意点为根生成一棵 DFS 树, 这棵树存在三种边, 树边, 自环边, 回边 (树边如果有重边, 则除了第一次经过的树边, 其余算作回边), 从叶子开始考虑. 对于一个叶子, 如果它的自环边和回边数量是偶数, 就直接将自环边和回边删除, 否则删除的同时还要带上连接父亲的边. 考虑完叶子回溯到它的父亲 $x$, 这时 $x$ 可能连着 $4$ 种边, 连接 $x$ 的父亲的树边, 连接 $x$ 的儿子的树边, 回边, 自环边. 因为这时如果还有儿子边, 儿子就只剩一个单点了, 讨论后三种边的数量, 如果是偶数就直接删除, 如果是奇数就带上连接父亲的树边. 这样每次讨论一个点就必定删除偶数条边, 到了根, 如果出现了需要带上连接父亲边的情况, 这时删除偶数条边后, 会剩下一条. 
+
+这种只剩一条边的情况出现, 唯一的条件是连通块的总边数是奇数. 所以我们只要统计每个连通块的边数 $\And 1$ 的总和即可.
+
+```cpp
+unsigned m, n, Cnt(0), A, B, Ans(0);
+struct Edge;
+struct Node {
+  Edge *Fst;
+  char Vis; 
+}N[200005];
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+}E[400005], *CntE(E);
+void Link(Node *x, Node *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+}
+void DFS(Node *x) {
+  x->Vis = 1;
+  register Edge *Sid(x->Fst);
+  while (Sid) {
+    ++Cnt;
+    if(!(Sid->To->Vis)) {
+      DFS(Sid->To);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+int main() {
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    A = RD(), B = RD();
+    Link(N + A, N + B);
+    Link(N + B, N + A);
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    if(!N[i].Vis) {
+      Cnt = 0;
+      DFS(N + i);
+      Ans += ((Cnt >> 1) & 1);
+    }
+  }
+  printf("%u\n", Ans);
+}
+```
+
+与此同时, 不建图, 仅用并查集维护连通块, 貌似可以得到更优的常数.
+
+### C
+
+$f_{a_1, a_2, a_3, a_4}$ 代表已经选了 $a_1$ 个 $2$, $a_2$ 个 $3$, $a_3$ 个 $4$, $a_4$ 个 $5$ 的最少纸币.
+
+我们知道对于 $f_{a_1, a_2, a_3, a_4}$ 的答案中, 前 $a_1 + a_2 + a_3 + a_4$ 种纸币凑出了 $n \% (2^{a_1}3^{a_2}4^{a_3}5^{a_4})$ 的钱, 剩下的钱用 $\frac{n}{2^{a_1}3^{a_2}4^{a_3}5^{a_4}}$ 张第 $a_1 + a_2 + a_3 + a_4 + 1$ 种纸币凑出.
+
+转移要枚举本次选哪个数, 然后转移即可.
+
+$$
+\begin{aligned}
+&f_{a_1, a_2, a_3, a_4} = min(\\
+&f_{a_1 - 1, a_2, a_3, a_4} - \frac{n}{2^{a_1 - 1}3^{a_2}4^{a_3}5^{a_4}} + \frac{n}{2^{a_1 - 1}3^{a_2}4^{a_3}5^{a_4}} \% 2,\\
+&f_{a_1, a_2 - 1, a_3, a_4} - \frac{n}{2^{a_1}3^{a_2 - 1}4^{a_3}5^{a_4}} + \frac{n}{2^{a_1}3^{a_2 - 1}4^{a_3}5^{a_4}} \% 3,\\
+&f_{a_1, a_2, a_3 - 1, a_4} - \frac{n}{2^{a_1}3^{a_2}4^{a_3 - 1}5^{a_4}} + \frac{n}{2^{a_1}3^{a_2}4^{a_3 - 1}5^{a_4}} \% 4,\\
+&f_{a_1, a_2, a_3, a_4 - 1} - \frac{n}{2^{a_1}3^{a_2}4^{a_3}5^{a_4 - 1}} + \frac{n}{2^{a_1}3^{a_2}4^{a_3}5^{a_4 - 1}} \% 5\\
+&) + \frac{n}{2^{a_1}3^{a_2}4^{a_3}5^{a_4}}
+\end{aligned}
+$$
+
+但是细节有亿点点多, 所以有了这般地狱绘图:
+
+```cpp
+unsigned long long g[70][70][70][70], f[70][70][70][70];
+unsigned long long m, Ans(0x3f3f3f3f3f3f3f3f), Tmp;
+int main() {
+  g[0][0][0][0] = RD(), m = RD() - 1;
+  for (register unsigned i(1); i <= m; ++i) {
+    g[i][0][0][0] = g[i - 1][0][0][0] / 2;
+    g[0][i][0][0] = g[0][i - 1][0][0] / 3;
+    g[0][0][i][0] = g[0][0][i - 1][0] / 4;
+    g[0][0][0][i] = g[0][0][0][i - 1] / 5;
+    if(!g[i][0][0][0]) break;
+    for (register unsigned j(1); j + i <= m; ++j) {
+      g[i][j][0][0] = g[i][j - 1][0][0] / 3;
+      g[i][0][j][0] = g[i][0][j - 1][0] / 4;
+      g[i][0][0][j] = g[i][0][0][j - 1] / 5;
+      g[0][i][j][0] = g[0][i][j - 1][0] / 4;
+      g[0][i][0][j] = g[0][i][0][j - 1] / 5;
+      g[0][0][i][j] = g[0][0][i][j - 1] / 5;
+      if(!g[i][j][0][0]) break;
+      for (register unsigned k(1); k + j + i <= m; ++k) {
+        g[i][j][k][0] = g[i][j][k - 1][0] / 4;
+        g[i][j][0][k] = g[i][j][0][k - 1] / 5;
+        g[i][0][j][k] = g[i][0][j][k - 1] / 5;
+        g[0][i][j][k] = g[0][i][j][k - 1] / 5;
+        if(!g[i][j][k][0]) break;
+        for (register unsigned l(1); l + k + j + i <= m; ++l) {
+          g[i][j][k][l] = g[i][j][k][l - 1] / 5;
+          if(!g[i][j][k][l]) break;
+        }
+      }
+    }
+  }
+  memset(f, 0x3f, sizeof(f));
+  f[0][0][0][0] = g[0][0][0][0];
+  for (register unsigned i(1); i <= m; ++i) {
+    if(!g[i][0][0][0]) break;
+    f[i][0][0][0] = min(f[i][0][0][0], f[i - 1][0][0][0] - g[i - 1][0][0][0] + g[i - 1][0][0][0] % 2 + g[i][0][0][0]);
+    f[0][i][0][0] = min(f[0][i][0][0], f[0][i - 1][0][0] - g[0][i - 1][0][0] + g[0][i - 1][0][0] % 3 + g[0][i][0][0]);
+    f[0][0][i][0] = min(f[0][0][i][0], f[0][0][i - 1][0] - g[0][0][i - 1][0] + g[0][0][i - 1][0] % 4 + g[0][0][i][0]);
+    f[0][0][0][i] = min(f[0][0][0][i], f[0][0][0][i - 1] - g[0][0][0][i - 1] + g[0][0][0][i - 1] % 5 + g[0][0][0][i]);
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    if(!g[i][0][0][0]) break;
+    for (register unsigned j(1); j + i <= m; ++j) {
+      if(!g[i][j][0][0]) break;
+      f[i][j][0][0] = min(f[i][j][0][0], f[i][j - 1][0][0] - g[i][j - 1][0][0] + g[i][j - 1][0][0] % 3 + g[i][j][0][0]);
+      f[i][j][0][0] = min(f[i][j][0][0], f[i - 1][j][0][0] - g[i - 1][j][0][0] + g[i - 1][j][0][0] % 2 + g[i][j][0][0]);
+      f[i][0][j][0] = min(f[i][0][j][0], f[i][0][j - 1][0] - g[i][0][j - 1][0] + g[i][0][j - 1][0] % 4 + g[i][0][j][0]);
+      f[i][0][j][0] = min(f[i][0][j][0], f[i - 1][0][j][0] - g[i - 1][0][j][0] + g[i - 1][0][j][0] % 2 + g[i][0][j][0]);
+      f[i][0][0][j] = min(f[i][0][0][j], f[i][0][0][j - 1] - g[i][0][0][j - 1] + g[i][0][0][j - 1] % 5 + g[i][0][0][j]);
+      f[i][0][0][j] = min(f[i][0][0][j], f[i - 1][0][0][j] - g[i - 1][0][0][j] + g[i - 1][0][0][j] % 2 + g[i][0][0][j]);
+      f[0][i][j][0] = min(f[0][i][j][0], f[0][i][j - 1][0] - g[0][i][j - 1][0] + g[0][i][j - 1][0] % 4 + g[0][i][j][0]);
+      f[0][i][j][0] = min(f[0][i][j][0], f[0][i - 1][j][0] - g[0][i - 1][j][0] + g[0][i - 1][j][0] % 3 + g[0][i][j][0]);
+      f[0][i][0][j] = min(f[0][i][0][j], f[0][i][0][j - 1] - g[0][i][0][j - 1] + g[0][i][0][j - 1] % 5 + g[0][i][0][j]);
+      f[0][i][0][j] = min(f[0][i][0][j], f[0][i - 1][0][j] - g[0][i - 1][0][j] + g[0][i - 1][0][j] % 3 + g[0][i][0][j]);
+      f[0][0][i][j] = min(f[0][0][i][j], f[0][0][i][j - 1] - g[0][0][i][j - 1] + g[0][0][i][j - 1] % 5 + g[0][0][i][j]);
+      f[0][0][i][j] = min(f[0][0][i][j], f[0][0][i - 1][j] - g[0][0][i - 1][j] + g[0][0][i - 1][j] % 4 + g[0][0][i][j]);
+    }
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    if(!g[i][0][0][0]) break;
+    for (register unsigned j(1); j + i <= m; ++j) {
+      if(!g[i][j][0][0]) break;
+      for (register unsigned k(1); k + j + i <= m; ++k) {
+        if(!g[i][j][k][0]) break;
+        f[i][j][k][0] = min(f[i][j][k][0], f[i][j][k - 1][0] - g[i][j][k - 1][0] + g[i][j][k - 1][0] % 4 + g[i][j][k][0]);
+        f[i][j][k][0] = min(f[i][j][k][0], f[i][j - 1][k][0] - g[i][j - 1][k][0] + g[i][j - 1][k][0] % 3 + g[i][j][k][0]);
+        f[i][j][k][0] = min(f[i][j][k][0], f[i - 1][j][k][0] - g[i - 1][j][k][0] + g[i - 1][j][k][0] % 2 + g[i][j][k][0]);
+        f[i][j][0][k] = min(f[i][j][0][k], f[i][j][0][k - 1] - g[i][j][0][k - 1] + g[i][j][0][k - 1] % 5 + g[i][j][0][k]);
+        f[i][j][0][k] = min(f[i][j][0][k], f[i][j - 1][0][k] - g[i][j - 1][0][k] + g[i][j - 1][0][k] % 3 + g[i][j][0][k]);
+        f[i][j][0][k] = min(f[i][j][0][k], f[i - 1][j][0][k] - g[i - 1][j][0][k] + g[i - 1][j][0][k] % 2 + g[i][j][0][k]);
+        f[i][0][j][k] = min(f[i][0][j][k], f[i][0][j][k - 1] - g[i][0][j][k - 1] + g[i][0][j][k - 1] % 5 + g[i][0][j][k]);
+        f[i][0][j][k] = min(f[i][0][j][k], f[i][0][j - 1][k] - g[i][0][j - 1][k] + g[i][0][j - 1][k] % 4 + g[i][0][j][k]);
+        f[i][0][j][k] = min(f[i][0][j][k], f[i - 1][0][j][k] - g[i - 1][0][j][k] + g[i - 1][0][j][k] % 2 + g[i][0][j][k]);
+        f[0][i][j][k] = min(f[0][i][j][k], f[0][i][j][k - 1] - g[0][i][j][k - 1] + g[0][i][j][k - 1] % 5 + g[0][i][j][k]);
+        f[0][i][j][k] = min(f[0][i][j][k], f[0][i][j - 1][k] - g[0][i][j - 1][k] + g[0][i][j - 1][k] % 4 + g[0][i][j][k]);
+        f[0][i][j][k] = min(f[0][i][j][k], f[0][i - 1][j][k] - g[0][i - 1][j][k] + g[0][i - 1][j][k] % 3 + g[0][i][j][k]);
+      }
+    }
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    if(!g[i][0][0][0]) break;
+    for (register unsigned j(1); j + i <= m; ++j) {
+      if(!g[i][j][0][0]) break;
+      for (register unsigned k(1); k + j + i <= m; ++k) {
+        if(!g[i][j][k][0]) break;
+        for (register unsigned l(1); l + k + j + i <= m; ++l) {
+          if(!g[i][j][k][l]) break;
+          f[i][j][k][l] = min(f[i][j][k][l], f[i][j][k][l - 1] - g[i][j][k][l - 1] + g[i][j][k][l - 1] % 5 + g[i][j][k][l]);
+          f[i][j][k][l] = min(f[i][j][k][l], f[i][j][k - 1][l] - g[i][j][k - 1][l] + g[i][j][k - 1][l] % 4 + g[i][j][k][l]);
+          f[i][j][k][l] = min(f[i][j][k][l], f[i][j - 1][k][l] - g[i][j - 1][k][l] + g[i][j - 1][k][l] % 3 + g[i][j][k][l]);
+          f[i][j][k][l] = min(f[i][j][k][l], f[i - 1][j][k][l] - g[i - 1][j][k][l] + g[i - 1][j][k][l] % 2 + g[i][j][k][l]);
+        }
+      }
+    }
+  }
+  for (register unsigned i(0); i <= m; ++i) {
+    if(!g[i][0][0][0]) break;
+    for (register unsigned j(0); j + i <= m; ++j) {
+      if(!g[i][j][0][0]) break;
+      for (register unsigned k(0); k + j + i <= m; ++k) {
+        if(!g[i][j][k][0]) break;
+        for (register unsigned l(0); l + k + j + i <= m; ++l) {
+          if(!g[i][j][k][l]) break;
+          Ans = min(Ans, f[i][j][k][l]);
+        }
+      }
+    }
+  }
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+但是因为不满冗长的预处理和奇妙的转移, 改变转移的顺序, 让代码变成这副模样, 成功将常数压缩 $6$ 倍.
+
+```cpp
+unsigned long long f[70][40][35][30], m, n, Ans(0x3f3f3f3f3f3f3f3f);
+int main() {
+  n = RD(), m = RD() - 1;
+  memset(f, 0x3f, sizeof(f));
+  f[0][0][0][0] = n;
+  for (register unsigned long long i(0), Gi(n); (i <= m) && (Gi); ++i) {
+    for (register unsigned long long j(0), Gj(Gi); (j + i <= m) && (Gj); ++j) {
+      for (register unsigned long long k(0), Gk(Gj); (k + j + i <= m) && (Gk); ++k) {
+        for (register unsigned long long l(0), Gl(Gk); (l + k + j + i <= m) && (Gl); ++l) {
+          Ans = min(Ans, f[i][j][k][l]);
+          f[i + 1][j][k][l] = min(f[i + 1][j][k][l], f[i][j][k][l] - (Gl >> 1));
+          f[i][j + 1][k][l] = min(f[i][j + 1][k][l], f[i][j][k][l] - ((Gl / 3) << 1));
+          f[i][j][k + 1][l] = min(f[i][j][k + 1][l], f[i][j][k][l] - (Gl >> 2) * 3);
+          f[i][j][k][l + 1] = min(f[i][j][k][l + 1], f[i][j][k][l] - ((Gl / 5) << 2));
+          Gl /= 5;
+        }
+        Gk >>= 2;
+      }
+      Gj /= 3;
+    }
+    Gi >>= 1;
+  }
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+### D
+
+场上写的是 $O({n^2}^{n^2})$ 的巨大爆搜, 
+
+## Day28: 基础数论
+
+### 欧拉函数
+
+设 $p_i$ 为一个质数, $\displaystyle{x = \prod_{i}^{a_i > 0} {p_i}^{a_i}}$, 则欧拉函数可以表示为:
+
+$$
+\phi(x) = \frac{x}{\displaystyle{\prod_{i}^{a_i > 0}(p_i - 1)}}
+$$
+
+$\phi$ 是积性函数, 因为对于互质的 $x$ 和 $y$, 它们没有公共质因数, 所以有:
+
+$$
+\begin{aligned}
+&~~~~~~\phi(x)\phi(y)\\
+& = \frac{x}{\displaystyle{\prod_{i}^{a_i > 0}(p_i - 1)}} \times \frac{y}{\displaystyle{\prod_{i}^{b_i > 0}(p_i - 1)}}\\
+& = \frac{xy}{\displaystyle{\prod_{i}^{a_i > 0 \lor b_i > 0}(p_i - 1)}}\\
+& = \phi(xy)
+\end{aligned}
+$$
+
+### 欧拉定理
+
+对于互质的 $a$, $p$, 有:
+
+$$
+a^{\phi(p)} \% p = 1
+$$
+
+所以就有:
+
+$$
+a^{b} \% p = a^{b \% \phi(p)} % p
+$$
+
+### 扩展欧拉定理
+
+对于 $a$, $p$ 不互质的情况:
+
+$$
+\begin{aligned}
+a^b \% p = a^{b \% \phi(p)} \% p~~~~~&(gcd_{a, p} = 1)\\
+a^b \% p = a^b \% p~~~~~&(gcd_{a, p} \neq 1, b < \phi(p))\\
+a^b \% p = a^{b \% \phi(p) + \phi(p)}\% p~~~~~&(gcd_{a, p} \neq 1, b \geq \phi(p))
+\end{aligned}
+$$
+
+### 埃氏筛
+
+扫描正整数, 一个数没有被筛过, 则它是质数, 对于每一个质数, 筛出它的所有倍数. 时间复杂度 $O(n\log(\log n))$.
+
+### 欧拉筛
+
+仍然扫描, 但是一个质数 $p$ 筛别的数的时候, 如果 $p$ 不是待筛的数的最大质因子, 则停止. 这样可以保证一个数仅被筛掉一次, 也就是被它的最大质因数筛掉.
+
+为了在 $p$ 不是最大质因数的时候跳出, 当和 $p$ 相乘的因数能被 $p$ 整除的时候跳出即可.
+
+### 求 $\binom {n}{m}$ 中 $p$ 的幂次
+
+分别求 $n!$, $m!$ 和 $(n - m)!$ 中 $p$ 的幂次, 然后做减法即可.
+
+如何求阶乘的幂次, 用 $n$ 不断除以 $p$, 则 $n!$ 中 $p$ 的幂次可以表示为:
+
+$$
+\sum_{i \geq 1} \lfloor \frac {n}{p^i} \rfloor
+$$
+
+所以答案就是
+
+$$
+\sum_{i \geq 1} (\lfloor \frac {n}{p^i} \rfloor - \lfloor \frac {m}{p^i} \rfloor - \lfloor \frac {n - m}{p^i} \rfloor)
+$$
+
+尝试发现 $p$ 的幂次的新意义.
+
+
+$$
+\begin{aligned}
+m &= a_1p^i + r_1~(r_1 < p^i)\\
+n - m &= a_2p^i + r_2~(r_2 < p^i)\\
+n &= (a_1 + a_2)p^i + r_1 + r_2\\
+n &= a_3p^i + r_3\\
+r_3 &= (r_1 + r_2) \% p^i\\
+a_3 &= a_1 + a_2 + \lfloor \frac {r_1 + r_2}{p^i} \rfloor
+\end{aligned}
+$$
+
+发现这就是 $m$ 和 $n - m$ 在 $p$ 进制加法中的进位次数.
+
+### BSGS
+
+求满足 $a^x \equiv b \pmod p$ 的最小自然数 $x$.
+
+首先将 $b$ 变成 $b \% p$.
+
+先假设 $a$ 和 $p$ 互质.
+
+设 $Sq = \lceil \sqrt p \rceil$, 将 $a$ 分解成 $kSq + r$.
+
+因为 $a^x \equiv a^{x \% \phi(p)}$,  所以 $x < p$, 所以 $k, r \leq Sq$.
+
+原来的式子变成:
+
+$$
+\begin{aligned}
+a^x &\equiv b \pmod p\\
+a^{kSq + r} &\equiv b \pmod p\\
+a^{kSq} &\equiv bInv_{a^{r}} \pmod p\
+\end{aligned}
+$$
+
+处理出对于所有 $r \leq Sq$ 的 $BInv_{a^{r}}$, 存入 `map`, 然后枚举 $k$, 在 `map` 中查询 $a^{kSq}$, 如果存在, 那么就找到一个特解 $x$.
+
+接下来将解最小化.
+
+这时只要将 $x$ 变成 $x \% \phi(p)$ 即可.
+
+然后考虑 $a$, $p$ 不互质的情况, 因为这时可能不存在 $Inv_{a^r}$. 记 $\gcd(a, p) = g$.
+
+首先判有解, 有解当且仅当 $g|b$. 将方程转化为 $\frac {a}{g} a^{x - 1} \equiv \frac {b}{g} \pmod {\frac {p}{g}}$
+
+如果这时 $a$ 和 $\frac{p}{g}$ 仍不互质, 仍然同时除以 gcd. 直到 $a$ 和 $p$ 互质位置这时方程会变成:
+
+$$
+\frac {a^{x}}{\displaystyle{\prod_{i}g_i}} \equiv \frac {b}{\displaystyle{\prod_{i}g_i}} \pmod {\frac {p}{\displaystyle{\prod_{i}g_i}}}\\
+\frac {a^{k}}{\displaystyle{\prod_{i}g_i}} a^{x - k} \equiv \frac {b}{\displaystyle{\prod_{i}g_i}} \pmod {\frac {p}{\displaystyle{\prod_{i}g_i}}}\\
+a^{x - k} \equiv \frac {b}{\displaystyle{\prod_{i}g_i}} Inv_{\frac {a^{k}}{\displaystyle{\prod_{i}g_i}}} \pmod {\frac {p}{\displaystyle{\prod_{i}g_i}}}\\
+$$
+
+这时 $a$ 和 $\frac {p}{\displaystyle{\prod_{i}g_i}}$ 互质, 则将 $\frac {b}{\displaystyle{\prod_{i}g_i}} Inv_{\frac {a^{k}}{\displaystyle{\prod_{i}g_i}}}$ 作为新的 $b$, $\frac {p}{\displaystyle{\prod_{i}g_i}}$ 作为新的 $p$, 做一次正常 BSGS 即可. 答案就是正常 BSGS 答案 $+ k$ 即可.
+
+### 原根
+
+一个数 $p$ 的原根 $x$ 需要满足 $x^0 \% p$, $x^1 \% p$, $x^2 \% p$, ..., $x^{p - 1} \% p$ 遍历了 $[0, p)$ 的所有整数.
+
+一个数可以有多个原根.
+
+### 莫比乌斯函数
+
+仍设 $x = \prod_i p_i^{a_i}$
+
+$$
+\mu(x) =
+\begin{cases} 
+-1^{\sum a_i},  & (\forall a_i \leq 1)\\
+0, & (\exists a_i \geq 2)
+\end{cases}
+$$
+
+### 迪利克雷卷积
+
+$$
+f(i) = \sum_{j|i} a_jb_{\frac ij}
+$$
+
+假设将每一项都是 $1$ 的函数记为 $1$, 有结论 $1 * \mu = \epsilon$. $\epsilon$ 是迪利克雷卷积的单位元, 也就是说什么东西卷 $\epsilon$ 都是它本身. $\epsilon(1) = 1, \epsilon (i > 1) = 0$
+
+迪利克雷卷积满足乘法交换律, 结合律, 分配律.
+
+尝试构造 $f(x)$ 的迪利克雷卷积逆元 $g(x)$.
+
+$$
+g(x) = \frac{\epsilon(x) - \displaystyle{\sum_{d|x, d \neq 1} f(d)g(\frac xd)}}{f(1)}
+$$
+
+这时对于 $h = f * g$, 有:
+
+$$
+\begin{aligned}
+h(1) &= g(1)f(1)\\
+&= \epsilon(1) - \displaystyle{\sum_{d|1, d \neq 1} f(d)g(\frac 1d)}\\
+&= \epsilon(1)\\
+&= 1\\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+h(x) &= \sum_{i|x} g(i)f(\frac{x}{i})\\
+&= \sum_{i|x} \frac{\epsilon(i) - \displaystyle{\sum_{d|i, d \neq 1} f(d)g(\frac id)}}{f(1)} \times f(\frac{x}{i})\\
+\end{aligned}
+$$
+
+### 莫比乌斯反演
+
+常用来判断 $[x = 1]$, 因为对于 $\sum_{d|x} \mu (d)$
+
+$$
+\begin{aligned}
+f_n &= \sum_{d|n} \mu (d)\\
+\end{aligned}
+$$
+
+### [P1516](https://www.luogu.com.cn/problem/P1516)
+
+对 $n$, $m$, 求满足 $a + xn \equiv b + xm \pmod {p}$ 的最小的 $x$.
+
+$$
+\begin{aligned}
+a + xn &\equiv b + xm \pmod {p}\\
+x(n - m) &\equiv b - a \pmod {p}\\
+x(n - m) &= b - a + kp\\
+x(n - m) - k  p &= b - a
+\end{aligned}
+$$
+
+用 Exgcd 求出 $x$ 即可.
+
+### [NOI2010](https://www.luogu.com.cn/problem/P1447)
+
+将问题转化为求下式的值:
+
+$$
+\sum_{i = 1}^{i \leq n}\sum_{j = 1}^{j \leq m} (2\gcd(i, j) - 1) 
+$$
+
+然后转化为枚举 $gcd$:
+
+$$
+\begin{aligned}
+&\sum_{d = 1}\sum_{i = 1}^{i \leq n}\sum_{j = 1}^{j \leq m} (2d - 1)[\gcd(i, j) = d]\\
+=&\sum_{d = 1}\sum_{i = 1}^{i \leq \frac{n}{d}}\sum_{j = 1}^{j \leq \frac{m}{d}} (2d - 1)[gcd(i, j) = 1]\\
+=&2(\sum_{d = 1}\sum_{i = 1}^{i \leq \frac{n}{d}}\sum_{j = 1}^{j \leq \frac{m}{d}} d[gcd(i, j) = 1]) - 1\\
+\end{aligned}
+$$
+
+### [POI2007](https://www.luogu.com.cn/problem/P3455)
+
+将 $a$, $b$ 同时除以 $d$, 转化为求 $a$, $b$ 以内所有互质的数的个数, 对于每个数求 $\phi$
+
+### [P1829](https://www.luogu.com.cn/problem/P1829)
+
+### [SDOI2015](https://www.luogu.com.cn/problem/P3327)
+
+定义 $d(x)$ 表示 $x$ 的约数个数, 给定 $n$, $m$, 求:
+
+$$
+\sum_{i = 1}^{n} \sum_{j = 1}^{m} d(ij)
+$$
+
+### 生成函数
+
+???
+
+## Day29: 线性代数
+
+### 向量
+
+对于 $(x_0, y_0)$ 和 $(x_1, y_1)$, 其点乘结果为 $x_0x_1 + y_0y_1$, 叉乘结果为 $x_0y_1 - x_1y_0$, 其绝对值是两个向量决定的平行四边形面积.
+
+任意 $n$ 维向量 $(a_0, a_1, a_2,...,a_{n - 1})$, $(b_0, b_1, b_2,...,b_{n - 1})$, 其点乘定义为 $\prod_{i = 0}^{n - 1} a_i + \prod_{i = 0}^{n - 1} b_i$.
+
+对于三维向量 $(x_0, y_0, z_0)$, $(x_1, y_1, z_1)$, 其叉乘定义为两个向量所在平面的法向量. 即为 $(y_0z_1 - z_0y_1, z_0x_1 - x_0z_1, x_0y_1 - x_1y_0)$
+
+### 矩阵乘法
+
+矩阵乘法的单位矩阵 $I_n$ 是一个 $n * n$ 的矩阵, 其左上右下对角线为 $1$, 其余部分为 $0$.
+
+### 秩
+
+两个向量 $(a_1, a_2, a_3,..., a_3)$ 线性相关, 定义为存在不全为 $0$ 的实数 $(c_1, c_2, c_3,..., c_n)$.
+
+一个矩阵的秩代表最多取出多少行向量线性不相关.
+
+一个矩阵的秩等于它转置矩阵的秩.
+
+### 矩阵树定理
+
+求无向图的生成树个数:
+
+构造一个矩阵, 对角线上 $(i, i)$ 是第 $i$ 个点的度, 两个点 $i$, $j$ 之间连边就将 $(i, j)$ 和 $(j, i)$ 设为 $-1$, 钦定一个点为根, 则删掉这个点对应的行和列, 矩阵的行列式就是需要求的答案.
+
+对于有向图, $(i, i)$ 记录出度, 每条有向边 $(i, j)$ 将 $(i, j)$ 置为 $-1$. 需要枚举每个点作为根, 然后求和.
+
+### 特征多项式
+
+$$
+\begin{bmatrix}
+1 1 1\\
+1 1 a\\
+1 1 1
+\end{bmatrix}
+$$
+
+### 杜教筛
+
+求积性函数前缀和.
+
+
+
+## Day30: 欢乐模拟赛
+
+### A
+
+没读题亏死, "非空" 子段, 所以需要在最大子段和的程序上略加修改, 使得枚举的元素必选, 避免空选.
+
+幸亏只挂了 $10'$.
+
+```cpp
+unsigned n;
+long long a[1000005], K, B, Cnt(0), A, Ans(-0x3f3f3f3f3f3f3f3f), Tmp(0);
+inline void Clr() {}
+int main() {
+  n = RD(), K = RDsg(), B = RDsg();
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = RDsg() * K;
+  }
+  Ans = Tmp = a[1];
+  for (register unsigned i(2); i <= n; ++i) {
+    Tmp += a[i];
+    if(Tmp < a[i]) Tmp = a[i];
+    Ans = max(Ans, Tmp);
+  }
+  printf("%lld\n", Ans + B);
+//  }
+  return Wild_Donkey;
+}
+```
+
+### B
+
+貌似可以 $O(n)$, 但是场上想的 $O(n \log n)$, 所以就写了, 而且飞快.
+
+因为有两个值, 生命和收益, 给两个值做前缀和, 记为 $H$, $W$. 因为收益单调不减, 所以固定左端点, 不死亡的前提下尽可能多走一定不会更劣. 
+
+而左端点 $i$ 选在 $H$ 连续下降的末尾一定是极优的, 因为 $H_i < H_{i - 1}$, 所以选 $i - 1$ 相当于上来就直接去世. 而 $H_i \leq H_{i + 1}$, 所以选 $i$ 相当于比 $i + 1$ 多回了一次血或者多收益了一个单位.
+
+接下来需要求固定左端点 $i$ 的不死亡最远点 $j$, 也就是右端点, 而这个左端点对应的答案就是 $W_j - W_{i - 1}$.
+
+枚举左端点, 如果左端点为 $i$, 则右端点 $j$ 是 $j > i$ 的第一个 $H_j < H_i$ 的位置 $-1$.
+
+使用 ST 查询 $H_i$ 的区间最小值, 然后二分右端点 $j$, 判断 $[i, j]$ 的最小值是否是 $H_i$, 如果是, 说明 $j$ 合法, 否则 $j$ 取大了.
+
+ST 预处理 $O(n \log n)$, 枚举左端点 $O(n)$, 二分右端点 $O(\log n)$, 单次判断 $O(1)$, 总复杂度 $O(n \log n)$.
+
+```cpp
+int Pre[1000005][21];
+unsigned m, n(1), Sum[1000005], Log[1000005], Bin[25], Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char a[1000005];
+int Find(unsigned L, unsigned R) {
+  register unsigned TmpF(Log[R - L + 1]);
+  return min(Pre[L][TmpF], Pre[R - Bin[TmpF] + 1][TmpF]);
+}
+int main() {
+  fread(a + 2, 1, 1000001, stdin);
+  for (; a[n + 1] >= 'A'; ++n) a[n] -= 'A';
+  a[n] -= 'A';
+  if(n == 1) {
+    if(a[1] == 0) Ans = 1;
+    printf("%u\n", Ans);
+    return 0;
+  }
+  for (register unsigned i(1), j(0); i <= n; ++j, i <<= 1) {
+    Log[i] = j, Bin[j] = i;
+  }
+  for (register unsigned i(1); i <= n; ++i) {
+    Log[i] = max(Log[i], Log[i - 1]);
+  }
+  Pre[0][0] = 0x3f3f3f3f, Pre[1][0] = 1, Sum[0] = 0;
+  for (register unsigned i(2); i <= n; ++i) {
+    Sum[i] = Sum[i - 1];
+    Pre[i][0] = Pre[i - 1][0];
+    if(!a[i]) ++Sum[i];
+    else {
+      if(a[i] ^ 1) ++Pre[i][0];
+      else --Pre[i][0];
+    }
+  }
+  for (register unsigned i(1), j(0); i < n; i <<= 1, ++j) {
+    for (register unsigned k(1); k + i <= n; ++k) {
+      Pre[k][j + 1] = min(Pre[k][j], Pre[k + i][j]);
+    }
+  }
+  for (register unsigned i(1); i + 2 <= n; ++i) {
+    if((Pre[i][0] < Pre[i - 1][0]) && (Pre[i][0] <= Pre[i + 1][0])) {
+      register unsigned L(i + 2), R(n), Mid;
+      while (L < R) {
+        Mid = ((L + R + 1) >> 1);
+        if(Pre[i][0] > Find(i, Mid)) {
+          R = Mid - 1;
+        } else {
+          L = Mid;
+        }
+      }
+      Ans = max(Ans, Sum[L] - Sum[i - 1]);
+    }
+  }
+  if(Sum[n - 1] - Sum[n - 2]) Ans = max(Ans, (unsigned)1);
+  if(Sum[n] - Sum[n - 1]) {
+    Ans = max(Ans, (unsigned)1);
+    if(Sum[n - 1] - Sum[n - 2]) Ans = max(Ans, (unsigned)2);
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+接下来胡一下线性算法, 我们将之前枚举的极优左端点称为 "谷点", 考虑谷点的优劣关系, 如果一个谷点 $i_1 < i_2$, 且 $H_{i_1} < H_{i_2}$, 这时 $[i_2, j_2] \subset [i_1, j_1]$, 所以 $i_1$ 一定不比 $i_2$ 劣.
+
+所以可能更新答案的谷点, 一定满足 $H$ 值随下标的增加而单调不增.
+
+而这些谷点所对应的右端点是单调递增的, 所以可以双指针扫描整个数组, 总复杂度 $O(n)$.
+
+### C
+
+讨论题, 我貌似假了, 但是我不愿承认, 所以等我调出来...
+
+
+
+
+
+### 
