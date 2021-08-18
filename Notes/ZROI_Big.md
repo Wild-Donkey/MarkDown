@@ -60,6 +60,57 @@
 
 给一棵边带权的树, 规定根为 $K$, 每次询问 $x$, $y$ 经过 $K$ 的最短距离. 这时规定一个点的深度为到 $K$ 的路径的边权和. 每次查询输出 $x$, $y$ 的深度和即可.
 
+实现超级简单:
+
+```cpp
+unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+bool b[10005];
+struct Edge; 
+struct Node {
+  Edge *Fst;
+  Node *Fa; 
+  unsigned long long Dep;
+}N[100005], *S;
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+  unsigned Val;
+}E[200005], *CntE(E);
+void Link(Node *x, Node *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+  CntE->Val = C;
+}
+void DFS(Node *x) {
+  Edge *Sid(x->Fst);
+  while (Sid) {
+    if(Sid->To != x->Fa) {
+      Sid->To->Fa = x;
+      Sid->To->Dep = x->Dep + Sid->Val; 
+      DFS(Sid->To);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+int main() {
+  n = RD();
+  for (register unsigned i(1); i < n; ++i) {
+    A = RD(), B = RD(), C = RD();
+    Link(N + A, N + B);
+    Link(N + B, N + A);
+  }
+  for (register unsigned i(1); i <= n; ++i) N[i].Dep = 0x3f3f3f3f3f3f3f3f;
+  m = RD(), S = N + RD(), S->Dep = 0;
+  DFS(S); 
+  for (register unsigned i(1); i <= m; ++i) {
+    A = RD(), B = RD();
+    printf("%llu\n", N[A].Dep + N[B].Dep); 
+  }
+  return Wild_Donkey;
+}
+```
+
 ### 例2
 
 给定一棵边带权的树, 询问 $x$ 到 $y$ 路径上边权的最小值.
@@ -74,6 +125,102 @@ $n, m \leq 10^5$, $边权 \leq 10^9$
 
 先求最小生成树, 如果选定边本来就在树中, 则直接输出最小生成树权值. 否则选一点为根, 求选定边的两端点在最小生成树上的路径中权值的最大值, 删除这个权值, 将选定边的权值统计入答案即可.
 
+码量没有那么短, 但是都是板子, 细节少, 半小时连写带调.
+
+```cpp
+unsigned Fa[200005], Stack[200005], StTp(0), m, n, Cnt(0), A, B, C, D, t;
+unsigned long long Sum(0), Ans[200005], Tmp(0);
+bool b[10005];
+struct FakeEdge {
+  unsigned Val, Fr, To, Num;
+  char Tag;
+  inline const char operator< (const FakeEdge &x) const{
+    return this->Val < x.Val;
+  }
+}FE[200005];
+struct Edge;
+struct Node {
+  Edge *Fst;
+  Node *Fa[20];
+  unsigned Max[20], Dep;
+}N[200005];
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+  unsigned Val;
+  char InTr;
+}E[400005], *CntE(E);
+void Link(Node *x, Node *y) {
+  (++CntE)->Nxt = x->Fst;
+  x->Fst = CntE;
+  CntE->To = y;
+  CntE->Val = C;
+}
+unsigned Find(unsigned x) {
+  register unsigned Tmpx(x);
+  while (Fa[Tmpx] ^ Tmpx) Stack[++StTp] = Tmpx, Tmpx = Fa[Tmpx];
+  while (StTp) Fa[Stack[StTp--]] = Tmpx;
+  return Tmpx;
+}
+void DFS(Node *x) {
+  Edge *Sid(x->Fst);
+  while (Sid) {
+    if(Sid->To != x->Fa[0]) {
+      Sid->To->Fa[0] = x;
+      Sid->To->Max[0] = Sid->Val;
+      Sid->To->Dep = x->Dep + 1;
+      for (register unsigned i(0); Sid->To->Fa[i]; ++i) {
+        Sid->To->Fa[i + 1] = Sid->To->Fa[i]->Fa[i];
+        Sid->To->Max[i + 1] = max(Sid->To->Max[i], Sid->To->Fa[i]->Max[i]);
+      }
+      DFS(Sid->To);
+    }
+    Sid = Sid->Nxt;
+  }
+}
+unsigned LCA(Node *x, Node *y) {
+  register unsigned TmpM(0);
+  if(x->Dep < y->Dep) swap(x, y);
+  for (register unsigned i(18); i < 0x3f3f3f3f; --i) if(x->Fa[i]) if(x->Fa[i]->Dep >= y->Dep) {
+    TmpM = max(TmpM, x->Max[i]);
+    x = x->Fa[i];
+  }
+  if(x == y) return TmpM;
+  for (register unsigned i(18); i < 0x3f3f3f3f; --i) if(x->Fa[i] != y->Fa[i]) {
+    TmpM = max(TmpM, x->Max[i]);
+    TmpM = max(TmpM, y->Max[i]);
+    x = x->Fa[i];
+    y = y->Fa[i];
+  }
+  TmpM = max(TmpM, x->Max[0]);
+  TmpM = max(TmpM, y->Max[0]);
+  return TmpM;
+}
+int main() {
+  n = RD(), m = RD(); 
+  for (register unsigned i(1); i <= m; ++i)
+    FE[i].Fr = RD(), FE[i].To = RD(), FE[i].Val = RD(), FE[i].Num = i;
+  sort(FE + 1, FE + m + 1);
+  for (register unsigned i(1); i <= n; ++i) Fa[i] = i;
+  for (register unsigned i(1); i <= m; ++i) if(Find(FE[i].Fr) ^ Find(FE[i].To)) {
+    FE[i].Tag = 1;
+    Fa[Fa[FE[i].Fr]] = Fa[FE[i].To];
+    Sum += FE[i].Val;
+  }
+  for (register unsigned i(1); i <= m; ++i) if(FE[i].Tag) {
+    C = FE[i].Val;
+    Link(N + FE[i].Fr, N + FE[i].To);
+    Link(N + FE[i].To, N + FE[i].Fr);
+  }
+  DFS(N + 1);
+  for (register unsigned i(1); i <= m; ++i)
+    if(FE[i].Tag) Ans[FE[i].Num] = Sum;
+    else Ans[FE[i].Num] = Sum + FE[i].Val - LCA(N + FE[i].Fr, N + FE[i].To);
+  for (register unsigned i(1); i <= m; ++i) printf("%llu\n", Ans[i]);
+  return Wild_Donkey;
+}
+```
+
 ### 例4: [HDU3183](https://acm.hdu.edu.cn/showproblem.php?pid=3183)
 
 每个测试点给一个 $1000$ 位以内的整数, 要求删除 $m$ 位, 使得结果最小.
@@ -81,6 +228,52 @@ $n, m \leq 10^5$, $边权 \leq 10^9$
 每次从左往右扫, 如果当前位比下一位大, 删除这一位, 删完 $m$ 位为止. 如果当前位更小, 则当前位往后移一位, 继续判断.
 
 错误: 我竟然再次用 `char` 存整数...
+
+```cpp
+unsigned m, n(1), Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char a[10005], b[10005], Flg(0);
+unsigned Pre[10005], Pro[10005];
+inline void Clr() {
+  memset(b, 0, n + 2);
+  memset(a, 0, n + 2);
+  memset(Pre, 0, (n + 2) << 2);
+  memset(Pro, 0, (n + 2) << 2);
+  n = 1;
+  Flg = 0;
+}
+int main() {
+  while (scanf("%s", a + 1) != -1) { 
+    m = RD();
+    while (a[n]) ++n;
+    for (register unsigned i(0); i <= n; ++i) {
+      Pre[i] = i - 1;
+      Pro[i] = i + 1;
+    }
+    for (register unsigned i(1), j(0); i <= m; ++i) {
+      while (a[j] <= a[Pro[j]]) j = Pro[j];
+      b[j] = 1;
+      Pro[Pre[j]] = Pro[j];
+      Pre[Pro[j]] = Pre[j];
+      j = Pre[j];
+    }
+    for (register unsigned i(1); i < n; i = Pro[i]){
+      if(!b[i]) {
+        if (a[i] == '0') {
+          if(!Flg) continue;
+          else printf("%c", a[i]);
+        } else {
+          printf("%c", a[i]);
+          Flg = 1;
+        }
+      }
+    }
+    if(!Flg) putchar('0');
+    putchar('\n'); 
+    Clr();
+  }
+  return Wild_Donkey;
+}
+```
 
 ### 例5: [POJ3419](http://poj.org/problem?id=3419)
 
@@ -93,6 +286,47 @@ $n, m \leq 10^5$, $边权 \leq 10^9$
 然后对 $f$ 建立最大值 ST 表.
 
 接下来, 使用二分答案, 二分最长段的长度 $x$. `Judge()` 函数很简单, 只要查询 $[L, R - x + 1]$ 区间内的长度最大值是否大于 $x$ 即可.
+
+```cpp
+unsigned a[200005], f[200005][20], Log[200005], Bin[20], m, n, A, B, L, R, Mid, t, Ans(0), Tmp(0);
+char Cnt[2000005];
+inline void Clr() {}
+inline unsigned Qry(unsigned x, unsigned y) {
+  register unsigned Tmp(Log[y - x + 1]);
+  return max(f[x][Tmp], f[y - Bin[Tmp] + 1][Tmp]);
+}
+inline char Judge(unsigned x) {
+  return (Qry(A, B - x + 1) >= x);
+}
+int main() {
+  n = RD(), m = RD(); 
+  for (register unsigned i(1); i <= n; ++i)
+    a[i] = RDsg() + 1000000;
+  for (register unsigned i(1), j(1); i <= n; ++i) {
+    while (!Cnt[a[j]]) ++Cnt[a[j++]];
+    f[i][0] = j - i; 
+    --Cnt[a[i]];
+  }
+  for (register unsigned i(1), j(0); i <= n; i <<= 1, ++j) 
+    Log[i] = j, Bin[j] = i;
+  for (register unsigned i(3); i <= n; ++i)
+    Log[i] = max(Log[i], Log[i - 1]);
+  for (register unsigned i(1), j(0); i <= n; i <<= 1, ++j)
+    for (register unsigned k(1); k + (i << 1) <= n + 1; ++k)
+      f[k][j + 1] = max(f[k][j], f[k + i][j]);
+  for (register unsigned i(1); i <= m; ++i) {
+    A = RD() + 1, B = RD() + 1;
+    L = 1, R = B - A + 1;
+    while (L ^ R) {
+      Mid = ((L + R + 1) >> 1);
+      if(Judge(Mid)) L = Mid;
+      else R = Mid - 1;
+    }
+    printf("%u\n", L);
+  }
+  return Wild_Donkey;
+}
+```
 
 ## Day2: 线段树&树状数组
 
@@ -135,6 +369,78 @@ $n \leq 10^5$
 - 单点查询前前缀和
 
 单点修改相当于对前缀和的区间修改, 单点查前前缀和相当于对前缀和区间查询, 所以我们可以直接对前缀和建立线段树, 然后进行区间修改和查询.
+
+```cpp
+unsigned n, m, A;
+long long a[100005], Sum[100005], B, C, Ans(0);
+char Op[10];
+struct Node {
+  Node *LS, *RS;
+  long long Val, Tag;
+}N[200005], *CntN(N);
+void PsDw(Node *x, unsigned Len) {
+  if(x->Tag) {
+    x->LS->Tag += x->Tag;
+    x->LS->Val += x->Tag * ((Len + 1) >> 1);
+    x->RS->Tag += x->Tag;
+    x->RS->Val += x->Tag * (Len >> 1);
+    x->Tag = 0;
+  }
+}
+void Build(Node *x, unsigned L, unsigned R) {
+  if(L == R) {
+    x->Val = Sum[L];
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  Build(x->LS = ++CntN, L, Mid);
+  Build(x->RS = ++CntN, Mid + 1, R);
+  x->Val = x->LS->Val + x->RS->Val;
+  return;
+}
+void Chg(Node *x, unsigned L, unsigned R) {
+  if(A <= L) {
+    x->Tag += C;
+    x->Val += (R - L + 1) * C;
+    return;
+  }
+  PsDw(x, R - L + 1);
+  register unsigned Mid((L + R) >> 1);
+  Chg(x->RS, Mid + 1, R);
+  if(Mid >= A) Chg(x->LS, L, Mid);
+  x->Val = x->LS->Val + x->RS->Val;
+}
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(A >= R) {
+    Ans += x->Val;
+    return;
+  }
+  PsDw(x, R - L + 1);
+  register unsigned Mid((L + R) >> 1);
+  Qry(x->LS, L, Mid);
+  if(Mid < A) {
+    Qry(x->RS, Mid + 1, R);
+  }
+}
+int main() {
+  n = RD(), m = RD(); 
+  for (register unsigned i(1); i <= n; ++i) Sum[i] = Sum[i - 1] + (a[i] = RD());
+  Build(N, 1, n);
+  for (register unsigned i(1); i <= m; ++i) {
+    scanf("%s", &Op);
+    if(Op[0] ^ 'Q') {
+      A = RD(), B = RD();
+      C = B - a[A], a[A] = B;
+      Chg(N, 1, n);
+    } else {
+      A = RD(), Ans = 0;
+      Qry(N, 1, n);
+      printf("%lld\n", Ans);
+    }
+  }
+  return Wild_Donkey;
+}
+```
 
 ### 例3: [POJ2155](http://poj.org/problem?id=2155)
 

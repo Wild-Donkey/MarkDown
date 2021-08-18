@@ -3373,10 +3373,173 @@ int main() {
 
 ### C
 
-讨论题, 我貌似假了, 但是我不愿承认, 所以等我调出来...
+讨论题.
 
+首先可以发现, 一个点是前三名, 所有可到达这个点的点一定需要小于 $3$, 否则一定不合法. 所以所有入度大于等于 $3$ 的点都是废点, 不会被答案统计到, 并且所有它到达的点都是废点.
 
+然后建分层图, 发现分层图中有用的节点最多只有 $3$ 层.
 
+分析可能前三的点组成的性质:
+
+- 每层节点内部没有连边
+
+- 第一层节点入度为 $0$
+
+- 第二层节点入度为 $1$ 或 $2$
+
+- 第二层的点入度为 $2$ 的情况下不能有出边
+
+- 第三层节点的入度要么为 $1$, 要么入度为 $2$ 的情况下满足两条入边起点中间也有连边, 深度分别是 $1$, $2$, 也就是 `a>b, b>c, a>c` 三个约束同时出现, 这时可以直接删除 `a>c` 这条边. 所以可以认为最后分层图中第三层的点合法入度为 $1$.
+
+然后对于每种情况分析答案数量:
+
+- `1, 2, 3`
+
+这种情况是指指定一个第三层的点作为第三名, 由于它只有一个入度, 来自一个第二层的点, 于是选中这个点作为第二名, 因为有出度的第二层的点只有一个入度, 所以最后一个作为第一名的点也确定了. 所以每个第三层的点对应一个 `1, 2, 3` 方案. 剩下的情况都不含第三层的点.
+
+- `1, 2, 2`
+
+这种情况选定了一个第一层的点做第一名, 然后任选两个入度为 $1$ 的第二层点做第二和第三. 假设一个第一层的点出边连向 $x$ 个入度为 $1$ 的第二层的点, 那么这个点对 `1, 2, 2` 方案贡献的答案就是 $A_2^x$, 也就是 $x(x - 1)$.
+
+- `1, 1, 2`
+
+这是针对入度为 $2$ 的第二层的点的, 选定一个入度为二的第二层的点做第三名, 它的两条入边对应的两个第一层的点分别做第一和第二, 每个入度为 $2$ 的第二层的点对应 $2$ 中方案.
+
+- `1, 2 + 1`
+
+这种方案选择了一个第一层的点, 一个它出边对应的入度为 $1$ 的第二层的点, 然后任选另外一个第一层的点, 分别作第一, 第二, 第三. 一开始选定的两个点按顺序做剩下的两名. 假设第一层有 $y$ 个点, 那么每个入度为 $1$ 的第二层的点都会对答案做出 $3(y - 1)$ 个贡献.
+
+- `1 + 1 + 1`
+
+三个入度为零的点任意组合, 假设有 $y$ 个入度为 $0$ 的点, 则对答案贡献为 $A^y_3[y \geq 3]$.
+
+考场上得了 $20'$, 原因是将第三层的入度大于 $1$ 的点一棍子打死了, 没有考虑 `a>b, b>c, a>c` 也是可行的, 漏掉了 `a` 第一, `b` 第二, `c`第三的答案.
+
+改了一下午变成 $30'$, 原因是将所有第三层入度为 $2$ 的点, 只要满足两个入度对应的点有约束关系就放走了, 以至于将 `a>b, b>c, a>c, d>b` 数据中的 `c` 放走了, 需要判断每个点的入度再讨论是否放走.
+
+实现方面, 一开始从所有入度为 $0$ 的点多源 BFS, 一边分层一边删除点. 然后在所有打 `Ava` 标记的可行点组成的分层图上以每个点为跑 DFS, 然后统计五种答案.
+
+复杂度也很简单, 一开始排序去重 $O(m \log m)$, BFS 时每个点都会入队一次, 遍历所有的边, $O(n + m)$, DFS 的时候, 一个第三层的点只会被一个第一层的点搜到, 而一个第二层的点最多被搜到两次, 所以复杂度 $O(n)$. 总复杂度 $O(m \log m + n)$.
+
+```cpp
+struct EdIn {
+  unsigned Fr, To;
+  inline const char operator < (const EdIn &x) const {
+    return (this->Fr ^ x.Fr) ? (this->Fr < x.Fr) : (this->To < x.To);
+  }
+  inline const char operator == (const EdIn &x) const {
+    return (this->Fr == x.Fr) && (this->To == x.To);
+  }
+}EI[200005];
+struct Edge;
+struct Node {
+  Node *In1, *In2;
+  char Ava;
+  unsigned Dep, ID, OD;
+  Edge *Fst;
+}N[100005], *Q[100005];
+inline void Print(Node *x) {
+  printf("Node %u ID %u OD %u Ava %u Dep %u\n", x - N, x->ID, x->OD, x->Ava, x->Dep);
+  printf("In1 %u In2 %u\n", x->In1 - N, x->In2 - N);
+}
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+}E[200005];
+unsigned m, n, Hd, Tl;
+unsigned long long Cnt(0), Cnt0(0), Ans(0);
+void DFS (Node *x) {
+  register Edge *Sid(x->Fst);
+  register unsigned TA(0);
+  while (Sid) {
+    if(Sid->To->Ava) {
+      ++(x->OD);
+      if((Sid->To->Dep == 2) && (Sid->To->ID == 1)) DFS(Sid->To);
+      if(x->Dep == 1) {
+        if(Sid->To->ID == 2) ++Ans;// 1, 1, 2
+        else {
+          Ans += Sid->To->OD;// 1, 2, 3
+          Ans += 3 * (Cnt0 - 1); // 1, 2 + 1
+          ++TA; // 1, 2, 2
+        }
+      }
+    }
+    Sid = Sid->Nxt;
+  }
+  Ans += ((unsigned long long)TA * (TA - 1));
+}
+int main() {
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= m; ++i) {
+    EI[i].Fr = RD(), EI[i].To = RD();
+  }
+  sort(EI + 1, EI + m + 1);
+  m = unique(EI + 1, EI + m + 1) - EI - 1;
+  for (register unsigned i(1); i <= m; ++i) {
+    ++N[EI[i].To].ID;
+    E[i].Nxt = N[EI[i].Fr].Fst;
+    N[EI[i].Fr].Fst = E + i;
+    E[i].To = N + EI[i].To;
+    if(N[EI[i].To].In1) N[EI[i].To].In2 = EI[i].Fr + N;
+    else N[EI[i].To].In1 = EI[i].Fr + N;
+  }
+  Hd = Tl = 0;
+  for (register unsigned i(1); i <= n; ++i) if(!(N[i].ID)) {
+    ++Cnt0, N[i].Dep = 1, Q[++Tl] = N + i, N[i].Ava = 1;
+    continue;
+  }
+  if(Cnt0 >= 3) Ans = (unsigned long long)Cnt0 * (Cnt0 - 1) * (Cnt0 - 2);
+  register Node *Now;
+  register Edge *Sid;
+  while (Hd < Tl) {
+    Now = Q[++Hd], Sid = Now->Fst;
+    while (Sid) {
+      if(!(Sid->To->Dep)) {
+        Sid->To->Dep = Now->Dep + 1;
+        Q[++Tl] = Sid->To;
+        if(Now->Dep == 1) {
+          if(Sid->To->ID <= 2) {
+            Sid->To->Ava = 1, Sid = Sid->Nxt;
+            continue;
+          }
+        } else {
+          if((Sid->To->ID == 1) && (Now->Dep == 2)) { // Available
+            Sid->To->Ava = 1, Sid = Sid->Nxt;
+            continue;
+          }
+        }
+      } else {// Visited
+      	Sid->To->Dep = Now->Dep + 1;
+      	if(Sid->To->Dep > 3) {
+      	  Sid->To->Ava = 0;
+          Sid = Sid->Nxt;
+          continue;
+        }
+      	if(Sid->To->Dep == 3) {
+      	  if((Now->ID == 1) && (Sid->To->ID == 2)) { // Available
+            if(Sid->To->In1 == Now) {
+              if((Sid->To->In2 == Now->In1) || (Sid->To->In2 == Now->In2)) {
+                Sid->To->Ava = 1, --(Now->OD), Sid = Sid->Nxt;
+                continue;
+              }
+            } else {
+              if((Sid->To->In1 == Now->In1) || (Sid->To->In1 == Now->In2)) {
+                Sid->To->Ava = 1, --(Now->OD), Sid = Sid->Nxt;
+                continue;
+              }
+            }
+          }
+          Sid->To->Ava = 0;
+        }
+      }
+      Sid = Sid->Nxt;
+    }
+  }
+  for (register unsigned i(1); i <= n; ++i) if(!(N[i].ID)) DFS(N + i);
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
 
 
 ### 
