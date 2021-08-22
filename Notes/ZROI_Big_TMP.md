@@ -3365,11 +3365,52 @@ int main() {
 }
 ```
 
-接下来胡一下线性算法, 我们将之前枚举的极优左端点称为 "谷点", 考虑谷点的优劣关系, 如果一个谷点 $i_1 < i_2$, 且 $H_{i_1} < H_{i_2}$, 这时 $[i_2, j_2] \subset [i_1, j_1]$, 所以 $i_1$ 一定不比 $i_2$ 劣.
+接下来是线性算法, 我们将之前枚举的极优左端点称为 "谷点", 考虑谷点的优劣关系, 如果一个谷点 $i_1 < i_2$, 且 $H_{i_1} < H_{i_2}$, 这时 $[i_2, j_2] \subset [i_1, j_1]$, 所以 $i_1$ 一定不比 $i_2$ 劣.
 
 所以可能更新答案的谷点, 一定满足 $H$ 值随下标的增加而单调不增.
 
 而这些谷点所对应的右端点是单调递增的, 所以可以双指针扫描整个数组, 总复杂度 $O(n)$.
+
+```cpp
+int Pre[1000005], Last(0x3f3f3f3f);
+unsigned m, n(1), Sum[1000005], Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+char a[1000005];
+int main() {
+  fread(a + 2, 1, 1000001, stdin);
+  for (; a[n + 1] >= 'A'; ++n) a[n] -= 'A';
+  a[n] -= 'A';
+  if(n == 1) {
+    if(a[1] == 0) Ans = 1;
+    printf("%u\n", Ans);
+    return 0;
+  }
+  Pre[0] = 0x3f3f3f3f, Pre[1] = 1, Sum[0] = 0;
+  for (register unsigned i(2); i <= n; ++i) {
+    Sum[i] = Sum[i - 1];
+    Pre[i] = Pre[i - 1];
+    if(!a[i]) ++Sum[i];
+    else {
+      if(a[i] ^ 1) ++Pre[i];
+      else --Pre[i];
+    }
+  }
+  for (register unsigned i(1), j; i <= n; ++i) {
+    if((Pre[i] < Pre[i - 1]) && (Pre[i] <= Pre[i + 1])) {
+      if(Pre[i] <= Last) {
+        Last = Pre[i];
+        for (j = i; (j < n) && (Pre[j] >= Pre[i]); ++j);
+        Ans = max(Ans, Sum[j] - Sum[i - 1]);
+        if(j > i) i = j - 1;
+        else i = j;
+      }
+    }
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+仍然有一种想法, 扫描的时候开一个 $Pre$ 数组记录最后一次前缀和出现这个值的位置
 
 ### C
 

@@ -478,6 +478,189 @@ $O(n)$ 处理数组 $Pre_i$ 表示 $a_i$ 前面第一个和 $a_i$ 相同的元�
 
 这样, $g_{i, j}$ 可以递推地 $O(n^2)$ 求出, 状态 $O(nm)$, 转移 $O(n)$, 复杂度 $O(n^2m)$.
 
+很显然这个时空复杂度都是错的.
+
+考虑数据结构优化.
+
+预处理 $Pre_i$ 表示 $a_i$ 前面一个和 $a_i$ 相等的元素的位置.
+
+所以 $g_{k, j}$ 就可以表示为 $\displaystyle{\sum_{l = k}^{j} (l - Pre_l)[Pre_l \geq k]}$.
+
+带入原方程:
+
+
+$$
+f_{i, j} = \min (f_{k, j - 1} + \sum_{l = k + 1}^{i} (l - Pre_l)[Pre_l \geq k + 1])
+$$
+
+发现转移时, 每个 $l - Pre_l$ 都会对满足 $(k \leq Pre_l - 1)$ 的 $f_{k, j - 1}$ 产生贡献. 所以可以在枚举 $i$ 的过程中将所以 $i - Pre_i$ 可能造成贡献的 $f_{k, j - 1}$ 值先加上 $i - Pre_i$. 这个过程相当于区间修改.
+
+而转移就是要从这些数里面求出最小值, 相当于区间查最值.
+
+使用线段树维护转移即可, 时间复杂度 $O(nm\log n)$, 空间复杂度 $O(n)$.
+
+```cpp
+unsigned a[35005], f[35005], Pre[35005], Pos[35005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Val, Tag;
+}N[100005], *CntN(N);
+void Ins(Node *x, unsigned L, unsigned R) {
+  if(L == R) {
+    return;
+  } 
+  register unsigned Mid((L + R) >> 1); 
+  Ins(x->LS = ++CntN, L, Mid);
+  Ins(x->RS = ++CntN, Mid + 1, R);
+}
+void Build(Node *x, unsigned L, unsigned R) {
+  x->Tag = 0;
+  if(L == R) {
+    x->Val = f[L]; 
+    return;
+  }
+  register unsigned Mid((L + R) >> 1); 
+  Build(x->LS, L, Mid);
+  Build(x->RS, Mid + 1, R);
+  x->Val = min(x->LS->Val, x->RS->Val);
+}
+void PsDw(Node *x) {
+  if(x->Tag) {
+    x->LS->Tag += x->Tag;
+    x->LS->Val += x->Tag;
+    x->RS->Tag += x->Tag;
+    x->RS->Val += x->Tag;
+    x->Tag = 0;
+  }
+}
+void Chg(Node *x, unsigned L, unsigned R) {
+  if(R <= A) {
+    x->Val += B;
+    x->Tag += B;
+    return;
+  }
+  PsDw(x);
+  register unsigned Mid((L + R) >> 1);
+  Chg(x->LS, L, Mid);
+  if(Mid < A) {
+    Chg(x->RS, Mid + 1, R);
+  }
+  x->Val = min(x->LS->Val, x->RS->Val);
+}
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(R <= A) {
+    Ans = min(Ans, x->Val);
+    return;
+  }
+  PsDw(x);
+  register unsigned Mid((L + R) >> 1);
+  Qry(x->LS, L, Mid);
+  if(Mid < A) {
+    Qry(x->RS, Mid + 1, R);
+  }
+}
+int main() {
+  n = RD(), m = RD();
+  for (register unsigned i(1); i <= n; ++i) a[i] = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    if(!Pos[a[i]]) Pos[a[i]] = i;
+    Pre[i] = Pos[a[i]];
+    Pos[a[i]] = i;
+  }
+  Ins(N, 1, n);
+  for (register unsigned i(2); i <=n; ++i) {
+    f[i] = f[i - 1] + i - Pre[i]; 
+  }
+  Build(N, 1, n); 
+  for (register unsigned i(2); i <= m; ++i) {
+    for (register unsigned j(i); j <= n; ++j) {
+      A = Pre[j] - 1, B = j - Pre[j];
+      if(A) Chg(N, 1, n);
+      A = j - 1, Ans = 0x3f3f3f3f, Qry(N, 1, n);
+      f[j] = Ans;
+    }
+    Build(N, 1, n);
+  }
+  register Node *Now(N);
+  while (Now->RS) Now = Now->RS; 
+  printf("%u\n", Now->Val);
+  return Wild_Donkey;
+}
+```
+
+另有一个自己口胡的奇妙想法: 使用可持久化线段树.
+
+以 $i$ 为时间轴, $Pre_i$ 为下标, $i - Pre_i$ 为值, 建立可持久化线段树.
+
+这时, $g_{i, j}$ 就相当于是在第 $j$ 个版本中对 $[i, n]$ 区间进行区间查询的结果. 相当于是前 $j$ 个元素中, 前驱大于 $i$ 的元素产生的贡献和, 可以 $O(n\log n)$ 预处理, $O(\log n)$ 查询.
+
+关于转移, 因为 $f_{i, j}$ 的决策一定不比 $f_{i, j - 1}$ 的决策靠前 (总不会段数多了反而一段更长了吧), 也不会比 $f_{i - 1, j}$ 的决策靠前 (也不会遇到一个区间, 右边界多了一个元素反而左边界也增加元素的吧), 所以 $f$ 满足决策单调性.
+
+决策单调性优化之后, 时间复杂度变成 $O(n (n + m) \log n)$, 空间 $O(nm + n \log n)$, 貌似也会 T.
+
+```cpp
+unsigned a[35005], f[105][35005], Chs[105][35005], Pre[35005], Pos[35005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Val, Tag;
+}N[1000005], *Root[35005], *CntN(N);
+void Chg(Node *x, Node *y, unsigned L, unsigned R) {
+  if(!x) y->Val = B;
+  else y->Val = x->Val + B;
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  if(Mid < A) {
+    if(!x) y->LS = NULL, Chg(NULL, y->RS = ++CntN, Mid + 1, R); 
+    else y->LS = x->LS, Chg(x->RS, y->RS = ++CntN, Mid + 1, R);
+  } else {
+    if(!x) y->RS = NULL, Chg(NULL, y->LS = ++CntN, L, Mid); 
+    else y->RS = x->RS, Chg(x->LS, y->LS = ++CntN, L, Mid);
+  }
+}
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(A <= L) {
+    Ans += x->Val;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if(x->RS) Qry(x->RS, Mid + 1, R);
+  if((x->LS) && (Mid >= A)) Qry(x->LS, L, Mid);
+}
+int main() {
+  n = RD(), m = RD();
+  memset(f, 0x3f, sizeof(f));
+  for (register unsigned i(1); i <= n; ++i) a[i] = RD();
+  for (register unsigned i(1); i <= n; ++i) {
+    if(!Pos[a[i]]) Pos[a[i]] = i;
+    Pre[i] = Pos[a[i]];
+    Pos[a[i]] = i;
+  }
+  for (register unsigned i(1); i <= n; ++i) {
+    A = Pre[i], B = i - Pre[i];
+    Chg(Root[i - 1], Root[i] = ++CntN, 1, n);
+  }
+  f[1][0] = 0;
+  for (register unsigned i(1); i <= n; ++i) {
+    Chs[1][i] = 1;
+    f[1][i] = f[1][i - 1] + i - Pre[i];
+  }
+  for (register unsigned i(2); i <= m; ++i) {
+    Chs[i][n + 1] = n - 1;
+    for (register unsigned j(n); j >= i; --j) {
+      for (register unsigned k(Chs[i - 1][j]); k <= Chs[i][j + 1]; ++k) {
+        A = k + 1, Ans = 0, Qry(Root[j], 1, n);
+        if(f[i - 1][k] + Ans <= f[i][j]) {
+          f[i][j] = f[i - 1][k] + Ans;
+          Chs[i][j] = k;
+        }
+      }
+    }
+  }
+  printf("%u\n", f[m][n]);
+  return Wild_Donkey;
+}
+```
+
 ### 例5
 
 维护一个长度为 $n$ 的数组 $a$, 支持:
@@ -574,35 +757,96 @@ $3 \leq n \leq 10^5$, $1 \leq q \leq 10^5$
 
 将直径转化为括号序的权值最大的子段的权值, 因为括号序表示的是先序遍历这棵树的移动方向, `(` 表示向当前点的新的儿子移动, `)` 表示回到这个点的父亲. 一个括号序表示在树上的一条可重复经过每边的路径, 去掉匹配的括号相当于转化为从这个子段表示的路径起点移动到终点的路径, 它的长度也就是起点到终点简单路径长度. 权值最大的子段的权值也就是树上最长简单路径, 也就是树的直径.
 
-线段树维护这个权值, 一个节点维护三个值: `LPls`, `RPls`, `LDif`, `RDif`. 其中, $LDif$ 表示节点区间 $[L, R]$ 的前缀 $[L, i]$ 中左括号减右括号的最大值, $RDif$ 指后缀 $[i, R]$ 的右括号减左括号的最大值; $LPls$ 和 $RPls$ 表示在 $LDif$ 或 $RDif$ 取最大值时的前/后缀长度.
+线段树维护这个权值, 一个节点维护八个值: `CntD`, `Val`, `ValC`, `ValD`, `BdC`, `BdD`, `BdL`, `BdR`.
 
-接下来还需要维护一个指 $SumL$, 表示区间左括号总数, 这样就可以 $O(1)$ 推算出 $SumR$.
+- $CntD$ 是区间右括号数量, 结合区间长度可 $O(1)$ 求出 $CntC$, 所以不用特别维护
+- $Val$ 表示这个区间的最大答案
+- $ValC$ 表示区间去匹配后左括号数量
+- $ValD$ 区间去匹配后右括号数量
+- $BdC$ 表示节点区间 $[L, R]$ 的前缀 $[L, i]$ 中左括号减右括号的最大值
+- $BdD$ 指后缀 $[i, R]$ 的右括号减左括号的最大值
+- $BdL$ 是区间前缀去匹配后的最长长度
+- $BdR$ 是区间后缀去匹配后的最长长度
 
-维护这 $4$ 个值也很简单：
+然后是维护这些值:
 
-- $LDif_{LS} \geq SumL_{LS} - SumR_{LS} + LDif_{RS}$ 
+- $CntD$ 直接按区间求和维护
+- $ValC$ 和 $ValD$, 左儿子的左括号会和右儿子的左括号匹配, 这时需要判断这两种括号的数量关系, 以得到正确合并的结果
+- $BdC$ 和 $BdD$ 类似于最大子段和的维护方式, 枚举前/后缀是否越过中线
+- $BdL$ 和 $BdR$ 也是枚举是否越过中线, 不过对于跨中线的情况, 还要考虑中线左右的左右括号数量关系
+- $Val$ 有四种情况, 前两种是答案区间完全被某个儿子包含, 后两种都是跨过中线, 区别在于去匹配后左右括号分界处和中线的关系, 枚举四种情况取最大即可.
 
-这时 $LDif = LDif_{LS}$, $LPls = LPls_{LS}$.
+总复杂度是 $O(m \log n)$, 代码也很简单, 因为查询区间都是 $[1, n]$, 所以无需写查询函数. 并且只需要单点修改即可, 所以无需使用 $Tag$.
 
-- $LDif_{LS} < SumL_{RS} - SumR_{LS} + LDif_{RS}$ 
+```cpp
+unsigned m, n, Cnt(0), A, B, t, Ans(0), Tmp(0);
+char a[200005], Tmpc, Chgc;
+struct Node {
+  Node *LS, *RS;
+  int CntD, Val, ValC, ValD, BdC, BdD, BdL, BdR;
+}N[400005], *CntN(N);
+inline void Print(Node *x) {
+  printf("Point %u [%u, %u]\n", x - N, x->LS - N, x->RS - N);
+  printf("Cnt) %u Val %u Val( %u Val) %u\n", x->CntD, x->Val, x->ValC, x->ValD);
+  printf("( %u ) %u <- %u -> %u\n", x->BdC, x->BdD, x->BdL, x->BdR);
+}
+inline void Udt (Node *x, int Len) {
+  x->CntD = x->LS->CntD + x->RS->CntD;
+  x->ValC = x->RS->ValC + max(x->LS->ValC - x->RS->ValD, 0);
+  x->ValD = x->LS->ValD + max(x->RS->ValD - x->LS->ValC, 0);
+  x->BdC = max(x->LS->BdC, x->RS->BdC + ((Len + 1) >> 1) - ((x->LS->CntD) << 1));
+  x->BdD = max(x->RS->BdD, x->LS->BdD + ((x->RS->CntD) << 1) - (Len >> 1));
+  x->BdL = max(x->LS->BdL, max(x->LS->ValD + x->LS->ValC + x->RS->BdC, x->RS->BdL + x->LS->ValD - x->LS->ValC));
+  x->BdR = max(x->RS->BdR, max(x->RS->ValD + x->RS->ValC + x->LS->BdD, x->LS->BdR + x->RS->ValC - x->RS->ValD));
+  x->Val = max(x->LS->Val, x->RS->Val);
+  register int TmpV = max(x->LS->BdR + x->RS->BdC, x->RS->BdL + x->LS->BdD);
+  x->Val = max(x->Val, TmpV);
+  return; 
+}
+void Build (Node *x, unsigned L, unsigned R) {
+  if(L == R) {
+    x->BdL = x->BdR = x->Val = 1;
+    x->BdD = x->ValD = x->CntD = a[L];
+    x->BdC = x->ValC = a[L] ^ 0x1;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  Build(x->LS = ++CntN, L, Mid);
+  Build(x->RS = ++CntN, Mid + 1, R);
+  Udt(x, R - L + 1);
+}
+void Chg(Node *x, unsigned L, unsigned R) {
+  if(L == R) {
+    x->BdD = x->ValD = x->CntD = a[L];
+    x->BdC = x->ValC = a[L] ^ 0x1;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if(A <= Mid) Chg(x->LS, L, Mid);
+  else Chg(x->RS, Mid + 1, R);
+  Udt(x, R - L + 1); 
+}
+int main() {
+  n = ((RD() - 1) << 1), m = RD();
+  scanf("%s", a + 1);
+  for (register unsigned i(1); i <= n; ++i) a[i] -= '(';
+  Build(N, 1, n);
+  printf("%d\n", N->Val);
+  for (register unsigned i(1); i <= m; ++i) {
+    A = RD(), B = RD();
+    if(a[A] ^ a[B]) {
+      swap(a[A], a[B]);
+      Chg(N, 1, n);
+      A = B;
+      Chg(N, 1, n);
+    }
+    printf("%d\n", N->Val);
+  }
+  return Wild_Donkey;
+}
+```
 
-这时 $LDif = SumL_{LS} - SumR_{LS} + LDif_{RS}$, $LPls = Len_{LS} + LPls_{RS}$.
-
-对于 $RDif$ 和 $RPls$, 直接对称即可.
-
-接下来, 统计答案, 一个节点的答案是 $Ans$, 转移需要讨论两种情况:
-
-- 目标区间跨越了左右儿子
-
-这时答案就是 $LDif_{RS} + RDif_{LS}$.
-
-- 目标区间被某个儿子彻底包含
-
-直接使 $Ans = max(Ans, Ans_{LS}, Ans_{RS})$ 即可.
-
-这些值不是可以直接 $O(1)$ 推出, 就是可以直接用线段树维护, 所以总复杂度是 $O(m \log n)$, 代码也很简单, 因为查询区间都是 $[1, n]$, 所以无需写查询函数. 并且只需要单点修改即可, 所以无需使用 $Tag$.
-
-## Day3: 模拟赛: Ⅰ
+## Day3: 模拟赛
 
 ### T1: 模拟
 
@@ -869,9 +1113,124 @@ int main() {
 
 接下来考虑方案数.
 
-我们在枚举过程中考虑一个 $Cnt_i$, 表示长度为 $i$ 的序列一共有 $Cnt_i$ 种不同的情况.
+在处理从 $a_i$ 开始的最长上升/下降子序列时, 维护方案数.
 
-最后将最长的 $i$ 对应的 $Cnt_i$ 乘上一个 $2^{n - i}$, 因为剩下的不在这个序列中的元素在插入时是随便放的.
+实现:
+
+对于每个长度, 开一棵动态开点线段树, 以 $a_i$ 为序, 存这个长度的最长上升/下降子序列, 以某个权值为左端点的方案数.
+
+所以如果 $a_i$ 为左端点的最长上升/下降子序列的长度是 $L$, 那么就查询第 $L - 1$ 棵线段树中, 区间 $[1, a_i - 1]$/$[a_i + 1, Maxa]$ 的总和作为 $UpCnt_i$/$DownCnt_i$.
+
+随后在第 $L$ 棵线段树的位置 $a_i$ 增加 $UpCnt_i/DownCnt_i$.
+
+```cpp
+const unsigned long long MOD(1000000007);
+unsigned a[200005], Bin[200005], b[200005], Up[200005], Down[200005], UpCnt[200005], DownCnt[200005], Tmp[200005], f[200005];
+unsigned m, n, Max(0), Ans(0), Now(0), A, B, C, D;
+struct Node {
+  Node *LS, *RS;
+  unsigned Val;
+}N[5000005], *Root[200005], *CntN(N);
+void Add (Node *x, unsigned L, unsigned R) {
+  if(L == R) {
+    x->Val += B;
+    if(x->Val >= MOD) x->Val -= MOD; 
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if(A <= Mid) {
+    if(!(x->LS)) x->LS = ++CntN, x->LS->LS = x->LS->RS = NULL, x->LS->Val = 0; 
+    Add(x->LS, L, Mid);
+  } else {
+    if(!(x->RS)) x->RS = ++CntN, x->RS->LS = x->RS->RS = NULL, x->RS->Val = 0; 
+    Add(x->RS, Mid + 1, R);
+  }
+  x->Val = 0;
+  if(x->LS) x->Val = x->LS->Val;
+  if(x->RS) x->Val += x->RS->Val;
+  if(x->Val >= MOD) x->Val -= MOD; 
+  return;
+}
+void Qry1(Node *x, unsigned L, unsigned R) {
+  if(A <= L) {
+    B += x->Val;
+    if(B >= MOD) B -= MOD; 
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if(x->RS) Qry1(x->RS, Mid + 1, R);
+  if(A <= Mid) if(x->LS) Qry1(x->LS, L, Mid);
+  return;
+}
+void Qry2(Node *x, unsigned L, unsigned R) {
+  if(A >= R) {
+    B += x->Val;
+    if(B >= MOD) B -= MOD; 
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if(x->LS) Qry2(x->LS, L, Mid);
+  if(A > Mid) if(x->RS) Qry2(x->RS, Mid + 1, R);
+  return;
+}
+int main() {
+  n = RD() + 1;
+  Bin[0] = 1;
+  for (register unsigned i(1); i <= n; ++i) {
+    Bin[i] = Bin[i - 1] << 1;
+    if(Bin[i] >= MOD) Bin[i] -= MOD; 
+  }
+  for (register unsigned i(n - 1); i; --i) a[i] = b[i] = RD();
+  sort(a + 1, a + n);
+  D = unique(a + 1, a + n) - a;
+  for (register unsigned i(1); i < n; ++i) b[i] = lower_bound(a + 1, a + D, b[i]) - a + 1;
+  f[0] = 0x3f3f3f3f, ++D;
+  Root[0] = ++CntN, Root[0]->LS = Root[0]->RS = NULL, Root[0]->Val = 0, A = D, B = 1, Add(Root[0], 1, D);
+  for (register unsigned i(1); i < n; ++i) {
+    Tmp[i] = lower_bound(f, f + Now + 1, b[i], greater<unsigned>()) - f;
+    A = b[i] + 1, B = 0; if(A) Qry1(Root[Tmp[i] - 1], 1, D);
+    UpCnt[n - i] = B, A = b[i]; 
+    if(Tmp[i] > Now) {
+      Now = Tmp[i];
+      f[Now] = b[i];
+      Root[Now] = ++CntN, Root[Now]->LS = Root[Now]->RS = NULL, Root[Now]->Val = 0;
+    } else {
+      f[Tmp[i]] = max(f[Tmp[i]], b[i]);
+    }
+    Add(Root[Tmp[i]], 1, D);
+  }
+  for (register unsigned i(1); i < n; ++i) Up[i] = Tmp[n - i];
+  Now = 0, memset(f, 0, sizeof(f)), CntN = N;
+  Root[0] = ++CntN, Root[0]->LS = Root[0]->RS = NULL, Root[0]->Val = 0, A = 1, B = 1, Add(Root[0], 1, D);
+  for (register unsigned i(1); i < n; ++i) {
+    Tmp[i] = lower_bound(f, f + Now + 1, b[i]) - f;
+    A = b[i] - 1, B = 0; if(A) Qry2(Root[Tmp[i] - 1], 1, D);
+    DownCnt[n - i] = B, A = b[i]; 
+    if(Tmp[i] > Now) {
+      Now = Tmp[i];
+      f[Tmp[i]] = b[i];
+      Root[Now] = ++CntN, Root[Now]->LS = Root[Now]->RS = NULL, Root[Now]->Val = 0;
+    } else {
+      f[Tmp[i]] = min(f[Tmp[i]], b[i]);
+    }
+    Add(Root[Tmp[i]], 1, D);
+  }
+  --n;
+  for (register unsigned i(1); i <= n; ++i) {
+    if(Max < Up[i] + (Down[i] = Tmp[n - i + 1]) - 1) {
+      Max = Up[i] + Down[i] - 1;
+      Ans = ((unsigned long long)UpCnt[i] * DownCnt[i] % MOD) * Bin[n - Max] % MOD;
+    } else {
+      if(Max == Up[i] + Down[i] - 1) {
+        Ans += ((unsigned long long)UpCnt[i] * DownCnt[i] % MOD) * Bin[n - Max] % MOD;
+        if(Ans >= MOD) Ans -= MOD;
+      }
+    }
+  }
+  printf("%u %u\n", Max, Ans);
+  return Wild_Donkey;
+}
+```
 
 ### T4: 计算几何
 
@@ -930,26 +1289,6 @@ $$
 权值线段树一般伴随着离散化, 如果强制在线, 还可以结合动态开点.
 
 复杂度 $O(n\log n)$.
-<!-- 
-### Nowcoder-2019-MU-Day1-I
-
-平面上的点分成两部分 $A$, $B$, 每个点 $i \in A$ 的权值是 $a_i$, $i \in B$ 的权值是 $b_i$. 对于任意 $i \in A$, $j \in B$, 一定不存在 $x_i \geq x_j$ 并且 $y_i \leq y_j$. 也就是说 $A$ 中的点一定不会在 $B$ 中的点的右下方.
-
-这样就能维护一条单调不降的折线, 划分整个矩阵, 左上是 $A$, 右下是 $B$, 尝试 DP.
-
-设计状态 $f_{i, j}$ 表示纵坐标到了 $i$, 折线高度为 $j$ 的最大权值.
-
-提前处理每一列 $a$, $b$ 的前/后缀和. 转移时 $O(1)$ 查询.
-
-$$
-f_{i, j} = \max (f_{i - 1, k} + \sum^{q \in [j, n]}a_q + \sum^{q \in [1, j)}b_q)
-$$
-
-状态数 $O(n^2)$, 转移复杂度 $O(n)$, 总复杂度 $O(n^3)$.
-
-首先滚动数组, 因为 $f_{i, j}$ 只能由 $k \leq j$ 的状态 $f_{i - 1, k}$ 转移而来.
-
-接下来考虑优化, 用线段树维护以 $j$ 为序的 $f_{j}$ 最大值, 每次转移时, 查询 $[1, j]$ 的最大值尝试更新 $f_{i}$. -->
 
 ### [P1486](https://www.luogu.com.cn/problem/P1486)
 
@@ -963,7 +1302,90 @@ $$
 
 - 将低于下界的元素删除
 
-典型的权值线段树.
+典型的权值线段树, 记录一个 $Level$ 作为海平面, 每次全局加就降低海平面, 相当于整体增加了, 全局减就升高海平面, 并且将淹没的点删掉.
+
+查询的时候在线段树上二分查找即可.
+
+插入时记录一个总入队数 (注意判断一开始就不合法的情况, 直接跳过, 不计入总人数), 最后用总人数减去还在线段树里的人数即可.  
+
+```cpp
+unsigned a[10005], m, n, Cnt(0), A, B, C, D, t, Ans(0), Tmp(0), Level(100000);
+char Op[5];
+struct Node {
+  Node *LS, *RS;
+  unsigned Val;
+}N[600005], *CntN(N);
+void Del (Node *x, unsigned L, unsigned R){
+  x->Val = 0;
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  if(x->LS) {
+    if(x->LS->Val) Del(x->LS, L, Mid);
+    x->Val += x->LS->Val; 
+  }
+  if(x->RS) {
+    if(Mid < Level - 1) if(x->RS->Val) Del(x->RS, Mid + 1, R); 
+    x->Val += x->RS->Val;
+  }
+}
+void Chg(Node *x, unsigned L, unsigned R) {
+  ++(x->Val);
+  if(L == R) return;
+  register unsigned Mid((L + R) >> 1);
+  if(A <= Mid) {
+    if(!(x->LS)) x->LS = ++CntN;
+    Chg(x->LS, L, Mid);
+  } else {
+    if(!(x->RS)) x->RS = ++CntN; 
+    Chg(x->RS, Mid + 1, R);
+  }
+}
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(L == R) {B = L;return;}
+  register unsigned Mid((L + R) >> 1);
+  if(x->RS) {
+    if(x->RS->Val >= A) return Qry(x->RS, Mid + 1, R);
+    A -= x->RS->Val;
+  }
+  Qry(x->LS, L, Mid);
+}
+int main() {
+  n = RD(), Level += (m = RD());
+  for (register unsigned i(1); i <= n; ++i) {
+    scanf("%s", &Op[1]), A = RD();
+    switch (Op[1]) {
+      case ('I') :{
+        if(A >= m) {
+          A += Level - m;
+          ++Ans;
+          Chg(N, 1, 300000);
+        }
+        break;
+      }
+      case ('A') :{
+        Level -= A;
+        break;
+      }
+      case ('S') :{
+        Level += A;
+        Del(N, 1, 300000);
+        break;
+      }
+      case ('F') :{
+        if(A > N->Val) {
+          printf("-1\n");
+          break;
+        }
+        Qry(N, 1, 300000);
+        printf("%u\n", B - Level + m);
+        break;
+      }
+    }
+  }
+  printf("%u\n", Ans - N->Val);
+  return Wild_Donkey;
+}
+```
 
 ### HDU 2019-MU-Day3-G
 
@@ -1235,6 +1657,45 @@ int main() {
 
 将开 $26$ 个长度相同的 `0/1` 串, 分别存储每个字母的出现情况, 分别计算前缀哈希值, 对于每个询问查询区间哈希值, 然后排序后匹配两个哈希值数组.
 
+```cpp
+const unsigned MOD1(1000000007);
+unsigned Hash[26][200005], Bin[200005], m, n, Cnt(0), Len, A, B, C, D, t, Ans(0), Tmp(0), HashA[30], HashB[30];
+char a[200005], Flg;
+unsigned Find(unsigned L, unsigned R, unsigned *Ha) {
+  register unsigned AnsF(Ha[R]);
+  AnsF += MOD1 - ((unsigned long long)Ha[L - 1] * Bin[R - L + 1] % MOD1);
+  if(AnsF >= MOD1) AnsF -= MOD1;
+  return AnsF;
+}
+int main() {
+  n = RD(), m = RD(); 
+  scanf("%s", a + 1);
+  Bin[0] = 1;
+  for (register unsigned i(1); i <= n; ++i) {Bin[i] = Bin[i - 1] << 1; if(Bin[i] >= MOD1) Bin[i] -= MOD1;}
+  for (register unsigned i(0); i < 26; ++i) Hash[i][0] = 1;
+  for (register unsigned i(1); i <= n; ++i) {
+    for (register char j(0); j < 26; ++j) {
+      Hash[j][i] = (Hash[j][i - 1] << 1) + (((a[i] - 'a') ^ j) ? 0 : 1);
+      if(Hash[j][i] >= MOD1) Hash[j][i] -= MOD1;
+    }
+  }
+  for (register unsigned i(1); i <= m; ++i) {
+    A = RD(), B = RD(), Len = RD(), C = A + Len - 1, D = B + Len - 1, Flg = 0;
+    for (register unsigned j(0); j < 26; ++j) {
+      HashA[j] = Find(A, C, Hash[j]);
+      HashB[j] = Find(B, D, Hash[j]);
+    }
+    sort(HashA, HashA + 26);
+    sort(HashB, HashB + 26);
+    for (register unsigned j(0); j < 26; ++j) {
+      if(HashA[j] ^ HashB[j]) {Flg = 1;break;}
+    }
+    printf(Flg ? "NO\n" : "YES\n"); 
+  }
+  return Wild_Donkey;
+}
+```
+
 ### Aho_Corasick_Algorithm
 
 过水已隐藏
@@ -1245,13 +1706,112 @@ int main() {
 
 $A$ 一个情况是合法的, 定义为它有至少一个模式串作为子串. 输出在 $26^m$ 种情况中所有合法的情况数对 $10007$ 取模的结果.
 
-对模式串建立 ACAM, 然后从 ACAM 每个节点上建一个数组 $f_{i, j}$ 表示走到第 $i$ 个点时还剩 $j$ 步时的可行情况数, 用记忆化搜索, 每次遇到有结尾标记的点就走 $Fail$ 边, 最后统计根节点的 $f_{0, 100}$. 状态数 $O(nm)$, 转移 $O(1)$, 总复杂度 $O(nm)$.
+对模式串建立 ACAM, 然后从 ACAM 每个节点上建一个数组 $f_{i, j}$ 表示走到第 $i$ 个点时已经走了 $j$ 步时的可行情况数.
+
+重新标记结束点, 结束点 $Fail$ 树上的后代都是结束点.
+
+重新连接转移边, 对于原本连向结束点和原本不存在的转移边, 将其跳 $Fail$ 直到出现非结束点的终点为止, 找不到就连到根上. 对于原本就存在且不是连向结束点的转移边, 不动.
+
+在连接完的转移边的自动机上, 任意顺序枚举节点, 将它的当前长度 $f$ 值转移到对应点下一个长度的 $f$ 值上. 结束点不参与转移.
+
+这个过程重复 $m$ 次, 将所有非结束点的长度 $m$ 的 $f$ 值加起来, 就得到了长度为 $m$ 且不含有模式串的方案数, 用 $26^m$ 减去这个值即可. (全程别忘了取模).
+
+```cpp
+const short MOD(10007);
+const char _0(0), _26(26);
+short Ans(0);
+char m, n, a[105];
+struct Node {
+  Node *To[26], *Fail, *Fa, *Bro, *Son;
+  char Ava;
+  short f[105];
+}N[6005], *CntN(N), *Now(N);
+struct Sc {
+  Node *Am;char Chr;
+}Q[600005], *Hd(Q), *Tl(Q);
+short Power(unsigned x, char y) {
+  unsigned AnsP(1);
+  while (y) {
+    if(y & 1) AnsP = AnsP * x % MOD;
+    y >>= 1, x = x * x % MOD; 
+  }
+  return AnsP; 
+}
+void DFS1(Node *x) {
+  register Node *So(x->Son);
+  if(x->Fail) if(x->Fail->Ava) x->Ava = 1;
+  while (So) DFS1(So), So = So->Bro;
+}
+void DFS2(Node *x) {
+  for (register char i(_0); i < _26; ++i) if(x->To[i]) DFS2(x->To[i]); else {
+    register Node *Back(x->Fail);
+    while (Back) {
+      if(Back->To[i]) {
+        x->To[i] = Back->To[i];
+        break;
+      }
+      Back = Back->Fail;
+    }
+    if(!x->To[i]) x->To[i] = N;
+  }
+}
+void Add(char x) {
+  if(!(Now->To[x])) Now->To[x] = ++CntN, CntN->Fa = Now; 
+  Now = Now->To[x];
+}
+void Build() {
+  (++Tl)->Am = N;
+  register Node *x;
+  register char c;
+  while (Hd != Tl) {
+    x = (++Hd)->Am, c = Hd->Chr;
+    if(x->Fa) {
+      register Node *Back(x->Fa->Fail);
+      while (Back) {
+        if(Back->To[c]) {
+          x->Fail = Back->To[c];
+          x->Bro = Back->Son;
+          Back->Son = x; 
+          break;
+        }
+        Back = Back->Fail;
+      }
+      if(!(x->Fail)) x->Fail = N, x->Bro = N->Son, N->Son = x;
+    }
+    for (register char i(_0); i < _26; ++i) if(x->To[i]) (++Tl)->Am = x->To[i], Tl->Chr = i;
+  }
+}
+int main() {
+  n = RD(), m = RD();
+  for (register char i(1); i <= n; ++i) {
+    memset(a, 0, sizeof(a)), scanf("%s", &a[1]);
+    a[0] = strlen(a + 1), Now = N;
+    for (register unsigned j(1); j <= a[0]; ++j) Add(a[j] -= 'A');
+    Now->Ava = 1;
+  }
+  Build(), DFS1(N), DFS2(N), N->f[0] = 1;
+  for (register char i(1); i <= m; ++i) {
+    for (register Node *j(N); j <= CntN; ++j) if(!(j->Ava)) {
+      for (register char k(_0); k < _26; ++k) {
+        j->To[k]->f[i] += j->f[i - 1];
+        if(j->To[k]->f[i] >= MOD) j->To[k]->f[i] -= MOD; 
+      }
+    }
+  }
+  for (register Node *i(N); i <= CntN; ++i) {
+    Ans += ((i->Ava) ? 0 : (i->f[m])); 
+    if(Ans >= MOD) Ans -= MOD;
+  }
+  printf("%u\n", (MOD + Power(26, m) - Ans) % MOD);
+  return Wild_Donkey;
+}
+```
 
 ### [HEOI2021](https://www.luogu.com.cn/problem/P4600)
 
 给 $n$ 个字符串, 由 $26$ 个小写字母组成.
 
-给出 $m$ 个询问, 每个询问给出 $a$, $b$ 表示两个字符串的编号, $Posa$, $Posb$ 是两个字符串的下标, 描述了 $a$ 的前缀 $[1, Posa]$, $b$ 的前缀 $[1, Posb]$. 回答这两个前缀最长的公共后缀的权值.
+给出 $m$ 个询问, 每个询问给出 $a$, $b$ 表示两个字符串的编号, $Posa$, $Posb$ 是两个字符串的下标, 描述了 $a$ 的前缀 $[1, Posa]$, $b$ 的前缀 $[1, Posb]$. 回答这两个前缀最长的公共后缀的权值. 并且要求后缀是某个出现过的字符串的前缀.
 
 规定一个字符串的权值是将它看成 $26$ 进制数后转化为 $10$ 进制后对 $10^9 + 7$ 取模的结果.
 

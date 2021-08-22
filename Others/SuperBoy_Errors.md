@@ -125,3 +125,46 @@ ll ksm(ll base, unsigned long long p){
 ```
 
 > August.15th 2021 By JJK
+
+## `Ctrl + C`, `Ctrl + V`
+
+线段树的查询和修改操作很相似, 所以写的时候一般会先写一个函数, 另一个复制前一个修改而来, 这个问题就属于改干净的典型.
+
+- 错误示范
+
+递归查询右儿子的时候写成了修改, 导致出错.
+
+```cpp
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(A >= R) {
+    Ans += x->Val;
+    return;
+  }
+  PsDw(x, R - L + 1);
+  register unsigned Mid((L + R) >> 1);
+  Qry(x->LS, L, Mid);
+  if(Mid < A) {
+    Chg(x->RS, Mid + 1, R);
+  }
+}
+```
+
+- 正确示范
+
+递归的本质是自己调用自己, 所以将 `Chg` 改回 `Qry` 即可.
+
+```cpp
+void Qry(Node *x, unsigned L, unsigned R) {
+  if(A >= R) {
+    Ans += x->Val;
+    return;
+  }
+  PsDw(x, R - L + 1);
+  register unsigned Mid((L + R) >> 1);
+  Qry(x->LS, L, Mid);
+  if(Mid < A) {
+    Qry(x->RS, Mid + 1, R);
+  }
+}
+```
+
