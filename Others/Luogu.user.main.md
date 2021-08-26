@@ -22,9 +22,12 @@ $$
 
 > Wild_Donkey[@Bilibili](https://space.bilibili.com/179337056)
 
-![](https://luogu.vercel.app/practice?id=143771)
+![](https://luogu.wo3.cn.app/practice?id=143771)
 
-![](https://luogu.vercel.app/practice?id=306957)
+![](https://luogu.wo3.cn/practice?id=171851)
+
+![](https://luogu.wao3.cn/practice?id=306957)
+![](https://luogu.wao3.cn.app/practice?id=306982)
 
 ## 时间节点
 
@@ -75,6 +78,10 @@ $Julian~2459393$ `2021.6.27` 返校忽停文化课, 初闻下颚惊脱臼. 却�
 $Julian~2459396$ `2021.6.30` 尝试过的题目清零!!!!!
 
 $Julian~2459396$ `2021.6.30` 蓝题 AC $50$
+
+$Julian~???????$ `2021.8.26` 第一道黑题 ([CF573E](https://www.luogu.com.cn/problem/CF573E))
+
+$Julian~???????$ `2021.8.26` 紫题 AC $50$
 
 $$
 \boldsymbol{Wild\_Donkey}\\

@@ -168,3 +168,47 @@ void Qry(Node *x, unsigned L, unsigned R) {
 }
 ```
 
+> August.18th 2021 By WD
+
+## 中元节后
+
+如果出现了灵异现象 (比如用 `if` 实现了循环), 首先一定要坚定对科学的信任, 然后一定要检查函数返回值!
+
+- 错误示范
+
+这个函数的类型是 `Node*`, 但是我最后没有 `return`, 所以导致我用 `if` 实现了死循环......
+
+```cpp
+Node* Add(Node* x) {
+  ......
+  if (x->Size > 3) {
+    if ((x->LS->Size * 3) < x->RS->Size) {
+			......
+    }
+    if ((x->RS->Size * 3) < x->LS->Size) {
+      ......
+    }
+  }
+}
+```
+
+- 正确示范
+
+加上 `return` 就好了.
+
+```cpp
+Node* Add(Node* x) {
+  ......
+  if (x->Size > 3) {
+    if ((x->LS->Size * 3) < x->RS->Size) {
+			......
+    }
+    if ((x->RS->Size * 3) < x->LS->Size) {
+      ......
+    }
+  }
+  return x;
+}
+```
+
+> August.26th 2021 By WD
