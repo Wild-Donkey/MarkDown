@@ -1809,7 +1809,7 @@ int main() {
 }
 ```
 
-### [HEOI2021](https://www.luogu.com.cn/problem/P4600)
+### [HEOI2012](https://www.luogu.com.cn/problem/P4600)
 
 给 $n$ 个字符串, 由 $26$ 个小写字母组成.
 
@@ -3454,6 +3454,90 @@ $m$ 个询问, 每个询问规定总价不高于 $g$, 总体积不小于 $L$, �
 
 二分答案复杂度 $O(\log n)$, 二分查找复杂度 $O(\log n)$, 总复杂度 $O(n \log n + m \log^2 n)$
 
+```cpp
+unsigned a[100005], m, n, Cnt(0), t, Ans(0), Tmp(0);
+unsigned long long A, B, C, D;
+struct Juice {
+  unsigned Val, Cost, Limit;
+  inline const char operator< (const Juice& x)const {
+    return this->Val < x.Val;
+  }
+}J[100005];
+struct Node {
+  Node* LS, * RS;
+  unsigned long long Cost, V;
+}N[4000005], * Root[100005], * CntN(N);
+void Udt(Node* x) {
+  x->V = x->Cost = 0;
+  if (x->LS) x->V += x->LS->V, x->Cost += x->LS->Cost;
+  if (x->RS) x->V += x->RS->V, x->Cost += x->RS->Cost;
+}
+void Add(Node* x, Node* y, unsigned L, unsigned R) {
+  if (L == R) {
+    y->Cost = B * C;
+    y->V = C;
+    if (x) y->V += x->V, y->Cost += x->Cost;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if (A <= Mid) {
+    if (x) {
+      y->RS = x->RS;
+      Add(x->LS, y->LS = ++CntN, L, Mid);
+    }
+    else Add(NULL, y->LS = ++CntN, L, Mid);
+  }
+  else {
+    if (x) {
+      y->LS = x->LS;
+      Add(x->RS, y->RS = ++CntN, Mid + 1, R);
+    }
+    else Add(NULL, y->RS = ++CntN, Mid + 1, R);
+  }
+  return Udt(y);
+}
+void Qry(Node* x, unsigned L, unsigned R) {
+  if (L == R) {
+    C += A * x->Cost / x->V;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if (x->LS) {
+    if (x->LS->V >= A) return Qry(x->LS, L, Mid);
+    else {
+      A -= x->LS->V;
+      C += x->LS->Cost;
+    }
+  }
+  Qry(x->RS, Mid + 1, R);
+}
+signed main() {
+  n = RD(), m = RD(), Root[0] = N;
+  for (register unsigned i(1); i <= n; ++i)
+    J[i].Val = RD(), a[i] = J[i].Cost = RD(), J[i].Limit = RD();
+  sort(J + 1, J + n + 1), sort(a + 1, a + n + 1), Cnt = unique(a + 1, a + n + 1) - a - 1;
+  for (register unsigned i(n); i; --i)
+    A = lower_bound(a + 1, a + Cnt + 1, J[i].Cost) - a, B = J[i].Cost, C = J[i].Limit, Add(Root[i + 1], Root[i] = ++CntN, 1, Cnt);
+  for (register unsigned i(1); i <= m; ++i) {
+    B = RD(), D = RD();
+    register unsigned BL(0), BR(n), BMid;
+    while (BL ^ BR) {
+      BMid = (BL + BR + 1) >> 1, A = D, C = 0;
+      if (Root[BMid]->V < A) {
+        BR = BMid - 1;
+        continue;
+      }
+      Qry(Root[BMid], 1, Cnt);
+      if (C > B) BR = BMid - 1;
+      else BL = BMid;
+    }
+    if (!BL) printf("-1\n");
+    else printf("%u\n", J[BL].Val);
+  }
+  return Wild_Donkey;
+}
+```
+
 ### [P2839](https://www.luogu.com.cn/problem/P2839)
 
 给一个序列, 每次求序列的子区间, 满足左端点在 $[a, b]$ 之间, 右端点在 $[c, d]$ 之间的最大中位数. 和一般定义不同的是, 本题中偶数个元素的中位数定义为第 $\frac n2$ 个数.
@@ -3466,6 +3550,105 @@ $n \leq 20000, q \leq 25000$ 强制在线.
 
 发现左界右界对答案的影响是相独立的, 所以可以分别处理左右界, 将复杂度优化到 $O(qn\log n)$.
 
-突然发现可以以权值为时间轴, 以下标为序, 建立可持久化线段树, 然后在版本 $x$ 上进行线段树上二分即可 $O(\log n)$ 找出对应的 $l$ 和 $r$, 最终复杂度 $O(n \log n + q\log ^ 2 n)$.
+可以以权值为时间轴, 以下标为序, 建立可持久化线段树. 对于每次二分的答案 $x$, 数组中一个元素如果大于等于 $x$, 则它的权值是 $1$, 如果小于 $x$, 则权值是 $-1$. 所以权值的前缀和就代表了整个数组前缀区间中大于等于 $x$ 的元素数量减去小于 $x$ 的元素的数量的差. 这个值大于等于 $0$, 说明这个前缀的中位数大于等于 $x$.
+
+所以用可持久化线段树维护这个前缀和, 前缀和相减就能表示区间信息, 为了使区间权值和尽可能大, 需要右端点前缀和尽可能大, 左端点前面一个位置的前缀和尽可能小. 由于区间的左右端点不确定, 所以需要求出前缀和的区间最大和最小值.
+
+为了构造这棵线段树, 发现每次操作相当于将权值数组的一些 $-1$ 变成 $1$, 对应到前缀和数组就是将一个后缀增加 $2$, 在上一个版本的基础上区间修改即可.
+
+对于每个 $x$, 需要 $O(\log n)$ 求最值然后判断其正负, 每次询问判断 $\log n$ 个 $x$, 最终复杂度 $O(n \log n + q\log ^ 2 n)$.
 
 值域偏大, 不要忘了离散化.
+
+```cpp
+unsigned a[20005], b[20005], Pos[20005], Cnt[20005], Ask[4];
+unsigned m, n, Cntn, A, B, C, D, t, Tmp(0), Last(0);
+int QrySum, LMin, RMax;
+char QryMin(0);
+struct Node {
+  Node* LS, * RS;
+  int Max, Min, Tag;
+}N[10000005], * Order[20005], * CntN(N), * Lst(N);
+void Udt(Node* x) {
+  x->Max = x->Tag + max(x->LS->Max, x->RS->Max);
+  x->Min = x->Tag + min(x->LS->Min, x->RS->Min);
+}
+void Build(Node* x, unsigned L, unsigned R) {
+  if (L == R) {
+    x->Max = x->Min = -L;
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  Build(x->LS = ++CntN, L, Mid);
+  Build(x->RS = ++CntN, Mid + 1, R);
+  Udt(x);
+}
+Node* Add(Node* x, Node* y, unsigned L, unsigned R) {
+  if (A <= L) {
+    if (y > Lst) {
+      y->Tag += 2;
+      y->Max += 2;
+      y->Min += 2;
+    }
+    else {
+      y = ++CntN;
+      y->Tag = x->Tag + 2;
+      y->Max = x->Max + 2;
+      y->Min = x->Min + 2;
+      y->LS = x->LS;
+      y->RS = x->RS;
+    }
+    return y;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if (y <= Lst) y = ++CntN, y->Tag = x->Tag, y->LS = x->LS, y->RS = x->RS;
+  if (!(y->LS)) y->LS = x->LS;
+  if (A <= Mid) y->LS = Add(x->LS, y->LS, L, Mid);
+  y->RS = Add(x->RS, y->RS, Mid + 1, R);
+  Udt(y);
+  return y;
+}
+void Qry(Node* x, unsigned L, unsigned R, int TagSum) {
+  if ((A <= L) && (R <= B)) {
+    if (QryMin) QrySum = min(QrySum, TagSum + x->Min);
+    else QrySum = max(QrySum, TagSum + x->Max);
+    return;
+  }
+  register unsigned Mid((L + R) >> 1);
+  if (A <= Mid) Qry(x->LS, L, Mid, TagSum + x->Tag);
+  if (B > Mid) Qry(x->RS, Mid + 1, R, TagSum + x->Tag);
+}
+int main() {
+  n = RD();
+  for (register unsigned i(1); i <= n; ++i) a[i] = b[i] = RD();
+  sort(b + 1, b + n + 1);
+  Cntn = unique(b + 1, b + n + 1) - b - 1;
+  for (register unsigned i(1); i <= n; ++i) {
+    a[i] = lower_bound(b + 1, b + Cntn + 1, a[i]) - b;
+    ++Cnt[a[i]];
+  }
+  for (register unsigned i(1); i <= Cntn; ++i) Cnt[i] += Cnt[i - 1];
+  for (register unsigned i(1); i <= n; ++i) Pos[Cnt[a[i]]--] = i;
+  Build(Order[Cntn + 1] = ++CntN, 0, n), Cnt[Cntn + 1] = n;
+  for (register unsigned i(Cntn); i; --i) {
+    Lst = CntN, Order[i] = ++CntN;
+    for (register unsigned j(Cnt[i + 1]); j >= Cnt[i] + 1; --j)
+      A = Pos[j], Add(Order[i + 1], Order[i], 0, n);
+  }
+  m = RD();
+  for (register unsigned i(1); i <= m; ++i) {
+    for (register unsigned j(0); j < 4; ++j) Ask[j] = 1 + ((RD() + Last) % n);
+    sort(Ask, Ask + 4);
+    register unsigned BL(1), BR(Cntn), BMid;
+    while (BL ^ BR) {
+      BMid = (BL + BR + 1) >> 1;
+      QryMin = 1, A = Ask[0] - 1, B = Ask[1] - 1, QrySum = 0x3f3f3f3f, Qry(Order[BMid], 0, n, 0);
+      QryMin = 0, LMin = QrySum, QrySum = 0xafafafaf, A = Ask[2], B = Ask[3], Qry(Order[BMid], 0, n, 0);
+      if (QrySum >= LMin) BL = BMid;
+      else BR = BMid - 1;
+    }
+    Last = b[BL], printf("%u\n", Last);
+  }
+  return Wild_Donkey;
+}
+```
