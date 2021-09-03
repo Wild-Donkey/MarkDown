@@ -30,6 +30,8 @@ $$
 
 ![](https://statcard.vercel.app/api?id=306982&dark_mode=true)
 
+![](https://statcard.vercel.app/api?id=3501&dark_mode=true)
+
 ## 时间节点
 
 $\approx~Julian~2458040$ `2017.10` 开始学习OI
