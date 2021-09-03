@@ -22,12 +22,13 @@ $$
 
 > Wild_Donkey[@Bilibili](https://space.bilibili.com/179337056)
 
-![](https://luogu.wo3.cn.app/practice?id=143771)
+![](https://statcard.vercel.app/api?id=143771&dark_mode=true)
 
-![](https://luogu.wo3.cn/practice?id=171851)
+![](https://statcard.vercel.app/api?id=171851&dark_mode=true)
 
-![](https://luogu.wao3.cn/practice?id=306957)
-![](https://luogu.wao3.cn.app/practice?id=306982)
+![](https://statcard.vercel.app/api?id=306957&dark_mode=true)
+
+![](https://statcard.vercel.app/api?id=306982&dark_mode=true)
 
 ## 时间节点
 
