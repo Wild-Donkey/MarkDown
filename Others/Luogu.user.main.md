@@ -88,6 +88,8 @@ $Julian~???????$ `2021.8.26` 第一道黑题 ([CF573E](https://www.luogu.com.cn/
 
 $Julian~???????$ `2021.8.26` 紫题 AC $50$
 
+$Julian~???????$ `2021.9.17` 紫超红 (原因是过掉了三倍经验 ([UVA1108](https://www.luogu.com.cn/problem/UVA1108)+[HNOI2012](https://www.luogu.com.cn/problem/P3225)+[SP16185](https://www.luogu.com.cn/problem/SP16185)))
+
 $$
 \boldsymbol{Wild\_Donkey}\\
 \mathbf{Wild\_Donkey}\\
