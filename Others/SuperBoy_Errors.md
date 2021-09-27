@@ -262,4 +262,45 @@ else l = min(Ri - k + 1, f2[(m << 1) - k]);
 
 > September.12th 2021 By WD
 
-##
+## `inline`, 永远的神!
+
+- 错误示范
+
+```cpp
+void Tarjan(Node* x) {···}
+```
+
+- 正确示范
+
+```cpp
+inline void Tarjan(Node* x) {···}
+```
+
+在递归层数很多的时候, 我们必须注意栈空间占用带来的影响. 有时候, `inline` 可以节省栈空间, 所以貌似既能卡常又能卡空的 `inline` 确实应该好好利用起来
+
+> September.24th 2021 By WD
+
+## 树剖都能写错
+
+这是树剖的跳链顶环节, 一般是将链顶较深的点跳到链顶的父亲的位置.
+
+- 错误示范
+
+这里是按编号判断的跳哪个点, 显然是错的.
+
+```cpp
+if(x->Top < y->Top) swap(x, y);
+```
+
+- 正确示范
+
+应该根据深度判断.
+
+```cpp
+if(x->Top->Dep < y->Top->Dep) swap(x, y);
+```
+
+不过这个错误能过那么多大数据就离谱, 说明用脚造数据确实是可以助力每一个梦想的.
+
+> September.25th 2021 By WD
+
