@@ -171,9 +171,9 @@ signed main() {
 
 要想通过加强版, 我们这些凡人都需要用到一个算法, HLPP.
 
-HLPP Algorithm, 缩写源自于 Highest label Preflow Push Algirithm (最高标号预留推进算法)
+HLPP Algorithm, 缩写源自于 Highest label Preflow Push Algirithm (最高标号预流推进算法)
 
-在 Wikipedia 中, 预留推进算法的名称是: Push–relabel Maximum Flow Algorithm. 分析百科文本中对时间复杂度 $O(n^2\sqrt m)$ 的算法的描述, 最高标号预留推进算法的名称应该是 Variant of Push–relabel Maximum Flow Algorithm that Based on the Highest Label Node Selection Rule, 翻译过来就是:
+在 Wikipedia 中, 预流推进算法的名称是: Push–relabel Maximum Flow Algorithm. 分析百科文本中对时间复杂度 $O(n^2\sqrt m)$ 的算法的描述, 最高标号预流推进算法的名称应该是 Variant of Push–relabel Maximum Flow Algorithm that Based on the Highest Label Node Selection Rule, 翻译过来就是:
 
 $$
 "推流-标号"最大流算法\\
@@ -194,7 +194,7 @@ $$
 
 仍然是从 $T$ 为起点跑 BFS 给图分层, 记录每个点的深度作为高度 (标号).
 
-然后将 $S$ 的每一个出边的终点加入优先队列, 将流量拉满. 这个优先对流以高度为序.
+然后将 $S$ 的每一个出边的终点加入优先队列, 将流量拉满. 这个优先队列以高度为序.
 
 这时类似于 BFS, 每次弹出堆顶一个点, 这个点一定是之前有流量推过来的点, 用它的流量往高度比它小 $1$ 的点推, 这时会出现两种可能的情况:
 

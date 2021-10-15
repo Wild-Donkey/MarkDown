@@ -6,7 +6,7 @@ $$
 \bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459396}}
 $$
 
-# "你学OI $3.5$ 年"
+# "你学OI $4$ 年"
 
 # "当年的全省第六, 现在居然变成这个样子!"
 
@@ -91,6 +91,8 @@ $Julian~???????$ `2021.8.26` 紫题 AC $50$
 $Julian~???????$ `2021.9.24` 紫超红 ($63 > 62$)
 
 $Julian~???????$ `2021.9.29` AC $400$
+
+$Julian~???????$ `2021.10.12` 黑题 AC $10$
 
 $$
 \boldsymbol{Wild\_Donkey}\\

@@ -304,3 +304,54 @@ if(x->Top->Dep < y->Top->Dep) swap(x, y);
 
 > September.25th 2021 By WD
 
+## 帽子戏法
+
+- 错误示范
+
+这里 $k >> 1$ 是从 $1$ 开始的, 但是 `vector` 是从 $0$ 开始的, 所以会 RE.
+
+猥琐的是, 它不会当场 RE, 而是在某次 `push_back()` 时随机 RE, 甚至同一份程序几次运行在不同地方 RE.
+
+调了一天, 在贾正坤做小黄鸭的帮助下成功调了出来.
+
+```cpp
+for (unsigned i(1), k(2); i <= n; ++i) {
+  for (unsigned j(1); j <= m; ++j, ++k) {
+    Ans += (A = RD());
+    if((i ^ j) & 1) {
+      N->E.push_back((Edge){N + k, A, 0});
+      N[k].E.push_back((Edge){N, 0, 0});
+      N->E[k >> 1].Inv = 0;
+      N[k].E[0].Inv = k >> 1;
+    } else {
+      N[1].E.push_back((Edge){N + k, 0, 0});
+      N[k].E.push_back((Edge){N + 1, A, 0});
+      N[1].E[k >> 1].Inv = 0;
+      N[k].E[0].Inv = k >> 1;
+    }
+  }
+}
+```
+
+- 正确示范
+
+减去 $1$, 使得下标从 $0$ 开始, 并且, 由于 $N$ 和 $N[1]$ 的出边的 $Inv$ 在 `push_back()` 的适合就是 $0$, 所以就无需再赋一遍了.
+
+```cpp
+for (unsigned i(1), k(2); i <= n; ++i) {
+  for (unsigned j(1); j <= m; ++j, ++k) {
+    Ans += (A = RD());
+    if((i ^ j) & 1) {
+      N->E.push_back((Edge){N + k, A, 0});
+      N[k].E.push_back((Edge){N, 0, 0});
+      N[k].E[0].Inv = (k >> 1) - 1;
+    } else {
+      N[1].E.push_back((Edge){N + k, 0, 0});
+      N[k].E.push_back((Edge){N + 1, A, 0});
+      N[k].E[0].Inv = (k >> 1) - 1;
+    }
+  }
+}
+```
+
+> October.8th 2021 By WD
