@@ -1,3 +1,10 @@
 $$
-f_{i, S} += f_{i - 1, S - S'} (\prod_{j \in S'} 2^{b_{j, 2^n - 1 - S}}) (\prod_{j \in 2^n - 1 - S} 2^{b_{j, S'} - 1})
+\begin{aligned}
+& O(n(n - 2) + \sum_{i = 1}^{n}\sum_{j = 0}^{n - 2} \frac{j}{i})\\
+=& O(n^2 + \sum_{j = 0}^{n - 2}j\sum_{i = 1}^n\frac 1i)\\
+=& O(n^2 + \sum_{j = 0}^{n - 2}\ln n)\\
+=& O(n^2 + (n - 2)(n - 1)\ln n)\\
+=& O(n^2(1 + \ln n))\\
+=& O(n^2\ln n))\\
+\end{aligned}
 $$

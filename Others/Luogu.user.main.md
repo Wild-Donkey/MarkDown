@@ -3,7 +3,7 @@ freopen("julian3.in", "r", stdin);
 ```
 
 $$
-\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459396}}
+\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459560}}
 $$
 
 # "你学OI $4$ 年"
@@ -101,6 +101,8 @@ $Julian~2459539$ `2021.11.20` NOIP2021 $248'$ RK $18$
 $Julian~2459554$ `2021.12.5` [ICPC 青少年组](https://ac.nowcoder.com/acm/contest/23218#rank) AC $3$ 罚时 $409$ RK $39$ (Ag 第 $8$, 罚时少一点就 Au 了)
 
 $Julian~2459560$ `2021.12.11` CF 紫名祭
+
+$Julian~???????$ `2022.1.7` 总 AC $450$
 
 $$
 \boldsymbol{Wild\_Donkey}\\
