@@ -1,10 +1,8 @@
+
 $$
 \begin{aligned}
-& O(n(n - 2) + \sum_{i = 1}^{n}\sum_{j = 0}^{n - 2} \frac{j}{i})\\
-=& O(n^2 + \sum_{j = 0}^{n - 2}j\sum_{i = 1}^n\frac 1i)\\
-=& O(n^2 + \sum_{j = 0}^{n - 2}\ln n)\\
-=& O(n^2 + (n - 2)(n - 1)\ln n)\\
-=& O(n^2(1 + \ln n))\\
-=& O(n^2\ln n))\\
+f_{i, j, 0} &= \max_{k = 0}^j(f_{i, j, 0}, f_{i, j - k, 0} + f_{Son, k, 0/1/2})\\
+f_{i, j, 1} &= \max_{k = 0}^j(f_{i, j, 1}, f_{i, j - k, 1} + f_{Son, k, 0/1/2}, f_{i, j - k, 0} + f_{Son, k, 1} + V_{i, Son})\\
+f_{i, j, 2} &= \max_{k = 0}^j(f_{i, j, 2}, f_{i, j - k, 2} + f_{Son, k, 0/1/2}, f_{i, j - k + 1, 1} + f_{Son, k, 1} + V_{i, Son})\\
 \end{aligned}
 $$
