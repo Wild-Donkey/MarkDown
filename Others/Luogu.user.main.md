@@ -3,7 +3,7 @@ freopen("julian3.in", "r", stdin);
 ```
 
 $$
-\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459560}}
+\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459596}}
 $$
 
 # "你学OI $4$ 年"
@@ -102,7 +102,9 @@ $Julian~2459554$ `2021.12.5` [ICPC 青少年组](https://ac.nowcoder.com/acm/con
 
 $Julian~2459560$ `2021.12.11` CF 紫名祭
 
-$Julian~???????$ `2022.1.7` 总 AC $450$
+$Julian~2459587$ `2022.1.7` 总 AC $450$
+
+$Julian~2459596$ `2022.1.16` 紫题 $100$, 第 $100$ 道是 ExBSGS 模板
 
 $$
 \boldsymbol{Wild\_Donkey}\\
