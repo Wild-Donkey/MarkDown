@@ -158,15 +158,13 @@ ___
 
 - 图论: 虚树
 
-- 杂项数学: 莫比乌斯变换
+- 线性代数 高斯消元, 行列式
 
-- 多项式: 拉格朗日插值, 线性基, 高斯消元
+- 多项式: 拉格朗日插值, 线性基
 
 - 组合数学: 可重集, 错/圆排列, 斯特林数
 
-- 数论: 杜教筛, 狄利克雷卷积
-
-- 高等数学: 行列式
+- 数论: 杜教筛, 莫比乌斯反演
 
 - 计算几何: 凸包
 
@@ -174,7 +172,7 @@ ___
 
 - DP: 动态动态规划 (DDP), 插头 DP
 
-- 数据结构: 珂朵莉树, zkw线段树, 笛卡尔树, 析合树
+- 数据结构: 珂朵莉树, zkw 线段树, 笛卡尔树, 析合树
 
 - 字符串: 最小表示, Lyndon 分解, DFA, NFA.
 
@@ -204,25 +202,83 @@ ___
 
 - 图论: 一般图匹配, 最小树形图
 
-- 数论: 完全数
+- 数学: 完全数, 莫比乌斯变换
 
 ### 中一期
 
-#### DP `2021.12.26-2021.1.16`
+#### DP
 
-- 复习内容: 斜率优化, 四边形不等式
+- 复习内容: 斜率优化, 决策单调性优化, 数据结构优化, 前缀和优化
 
-- 主要内容: WQS 二分, CDQ 分治优化
+- 主要内容: 凸优化, CDQ 分治优化
 
 - 次要内容: 动态动态规划 (DDP), 插头 DP
 
-#### 数据结构 `2022.1.17-2022.1.28`
+| 出处                                                         | 题目                | 知识点                                  |
+| ------------------------------------------------------------ | ------------------- | --------------------------------------- |
+| [P3959 NOIP2017](https://www.luogu.com.cn/problem/P3959)     | 宝藏                | 状压 DP                                 |
+| [P3943](https://www.luogu.com.cn/problem/P3943)              | 星空                | 状压 DP, 最短路                         |
+| [P2150 NOI2015](https://www.luogu.com.cn/problem/P2150)      | 寿司晚宴            | 状压 DP, 根号分治, 容斥                 |
+| [P5933 THU2012](https://www.luogu.com.cn/problem/P5933)      | 串珠子              | 状压 DP, 避免重复统计的技巧             |
+| [P4363 NPOI2018](https://www.luogu.com.cn/problem/P4363)     | 一双木棋            | 状压 DP, 状压单调折线, 正反转移的区别   |
+| [AGC016F](https://atcoder.jp/contests/agc016/tasks/agc016_f) | Games on DAG        | 博弈论 DP                               |
+| [P4317](https://www.luogu.com.cn/problem/P4317)              | 花神的数论题        | 数位 DP                                 |
+| [P2235 HNOI2002](https://www.luogu.com.cn/problem/P2235)     | Kathy函数           | 数位 DP, 二进制回文数                   |
+| [P3281 SCOI2013](https://www.luogu.com.cn/problem/P3281)     | 数数                | 数位 DP                                 |
+| [P1040 NOIP2003](https://www.luogu.com.cn/problem/P1040)     | 加分二叉树          | 区间 DP ,决策记录                       |
+| [P1514 NOIP2010](https://www.luogu.com.cn/problem/P1514)     | 引水入城            | 记忆化搜索 DP, 贪心                     |
+| [P7606 THUPC2021](https://www.luogu.com.cn/problem/P7606)    | 混乱邪恶            | 记忆化搜索 DP, bitset 优化, 随机化      |
+| [P2585 ZJOI2006](https://www.luogu.com.cn/problem/P2585)     | 三色二叉树          | 树形 DP                                 |
+| [P5021 NOIP2018](https://www.luogu.com.cn/problem/P5021)     | 赛道修建            | 树形 DP, 二分答案                       |
+| [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
+| [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
+| [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
+| [P5307 COCI2019](https://www.luogu.com.cn/problem/P5307)     | Mobitel             | 计数 DP, 整除分块优化                   |
+| [P4491 HAOI2018](https://www.luogu.com.cn/problem/P4491)     | 染色                | 计数 DP, 二项式反演, 数论变换, 减法卷积 |
+| [P3188 HNOI2007](https://www.luogu.com.cn/problem/P3188)     | 梦幻岛宝珠          | 背包 DP, Lowbit 分治                    |
+| [P6775 NOI2020](https://www.luogu.com.cn/problem/P6775)      | 制作菜品            | 背包 DP, bitset 优化, 贪心              |
+| [P5454 THUPC2018](https://www.luogu.com.cn/problem/P5454)    | 城市地铁规划        | 背包 DP, 树的构造                       |
+| [P4027 NOI2007](https://www.luogu.com.cn/problem/P4027)      | 货币兑换            | 斜率优化 DP, 李超线段树                 |
+| [P4383 EPOI2018](https://www.luogu.com.cn/problem/P4383)     | 林克卡特树          | 凸优化 DP, 树形 DP                      |
+| [P4694 PA2013](https://www.luogu.com.cn/problem/P4694)       | Raper               | 凸优化 DP, 数据结构优化 DP              |
+| [P6246 IOI2000](https://www.luogu.com.cn/problem/P6246)      | 邮局(加强版)        | 凸优化 DP, 决策单调性优化 DP            |
+| [P2841](https://www.luogu.com.cn/problem/P2841)              | A*B Problem         | 高精度 DP                               |
+| [CF1416E](https://codeforces.com/problemset/problem/1416/E)  | Split               | 数据结构优化 DP, WBLT, 文艺宗法树       |
+| [CF506E](https://codeforces.com/problemset/problem/506/E)    | Mr. Kitayuta's Gift | 矩阵乘法优化 DP, 有限自动机, 自动机压缩 |
+
+#### 数学
+
+复习内容: 莫比乌斯反演, ExGCD
+
+主要内容: 快速傅里叶变换, 数论变换, 高斯消元, 行列式, 基尔霍夫定理
+
+次要内容: BSGS, ExBSGS, 矩阵求逆
+
+| 出处                                                     | 题目             | 知识点                   |
+| -------------------------------------------------------- | ---------------- | ------------------------ |
+| [P3803](https://www.luogu.com.cn/problem/P3803)          | 多项式乘法       | 快速傅里叶变换           |
+| [P3338 ZJOI2014](https://www.luogu.com.cn/problem/P3338) | 力               | 快速傅里叶变换, 减法卷积 |
+| [P6091](https://www.luogu.com.cn/problem/P6091)          | 原根             | 判原根存在性, 求原根     |
+| [P3803](https://www.luogu.com.cn/problem/P3803)          | 多项式乘法       | 数论变换                 |
+| [P1919](https://www.luogu.com.cn/problem/P1919)          | A*B Problem      | 数论变换                 |
+| [P3846 TJOI2007](https://www.luogu.com.cn/problem/P3846) | BSGS             | BSGS                     |
+| [P4195](https://www.luogu.com.cn/problem/P4195)          | ExBSGS           | ExBSGS                   |
+| [P1516](https://www.luogu.com.cn/problem/P1516)          | 青蛙的约会       | ExGCD                    |
+| [P1447 NOI2010](https://www.luogu.com.cn/problem/P1447)  | 能量采集         | 莫比乌斯反演             |
+| [P1829](https://www.luogu.com.cn/problem/P1829)          | 能量采集         | 莫比乌斯反演, 整除分块   |
+| [P3327 SDOI2015](https://www.luogu.com.cn/problem/P3327) | 约数个数和       | 莫比乌斯反演, 整除分块   |
+| [P3389](https://www.luogu.com.cn/problem/P3389)          | 高斯消元         | 高斯消元                 |
+| [P7112](https://www.luogu.com.cn/problem/P7112)          | 行列式           | 高斯消元, 辗转相减法     |
+| [P4783](https://www.luogu.com.cn/problem/P4783)          | 矩阵求逆         | 高斯消元                 |
+| [P6178](https://www.luogu.com.cn/problem/P6178)          | Matrix-Tree 定理 | 基尔霍夫定理, 行列式     |
+
+#### 数据结构
 
 - 复习内容: 左偏树, LCT
 
-- 推荐内容:
+- 主要内容: 李超树, 点分治
 
-- 次要内容: 李超树
+- 次要内容: 珂朵莉树, zkw 线段树, 笛卡尔树, 析合树
 
 - 学有余力内容: k-D Tree, Top Tree
 
