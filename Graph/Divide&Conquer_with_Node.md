@@ -83,5 +83,3 @@ signed main() {
   return Wild_Donkey;
 }
 ```
-
-##
