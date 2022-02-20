@@ -254,23 +254,26 @@ ___
 
 次要内容: BSGS, ExBSGS, 矩阵求逆
 
-| 出处                                                     | 题目             | 知识点                   |
-| -------------------------------------------------------- | ---------------- | ------------------------ |
-| [P3803](https://www.luogu.com.cn/problem/P3803)          | 多项式乘法       | 快速傅里叶变换           |
-| [P3338 ZJOI2014](https://www.luogu.com.cn/problem/P3338) | 力               | 快速傅里叶变换, 减法卷积 |
-| [P6091](https://www.luogu.com.cn/problem/P6091)          | 原根             | 判原根存在性, 求原根     |
-| [P3803](https://www.luogu.com.cn/problem/P3803)          | 多项式乘法       | 数论变换                 |
-| [P1919](https://www.luogu.com.cn/problem/P1919)          | A*B Problem      | 数论变换                 |
-| [P3846 TJOI2007](https://www.luogu.com.cn/problem/P3846) | BSGS             | BSGS                     |
-| [P4195](https://www.luogu.com.cn/problem/P4195)          | ExBSGS           | ExBSGS                   |
-| [P1516](https://www.luogu.com.cn/problem/P1516)          | 青蛙的约会       | ExGCD                    |
-| [P1447 NOI2010](https://www.luogu.com.cn/problem/P1447)  | 能量采集         | 莫比乌斯反演             |
-| [P1829](https://www.luogu.com.cn/problem/P1829)          | 能量采集         | 莫比乌斯反演, 整除分块   |
-| [P3327 SDOI2015](https://www.luogu.com.cn/problem/P3327) | 约数个数和       | 莫比乌斯反演, 整除分块   |
-| [P3389](https://www.luogu.com.cn/problem/P3389)          | 高斯消元         | 高斯消元                 |
-| [P7112](https://www.luogu.com.cn/problem/P7112)          | 行列式           | 高斯消元, 辗转相减法     |
-| [P4783](https://www.luogu.com.cn/problem/P4783)          | 矩阵求逆         | 高斯消元                 |
-| [P6178](https://www.luogu.com.cn/problem/P6178)          | Matrix-Tree 定理 | 基尔霍夫定理, 行列式     |
+| 出处                                                         | 题目             | 知识点                   |
+| ------------------------------------------------------------ | ---------------- | ------------------------ |
+| [P3803](https://www.luogu.com.cn/problem/P3803)              | 多项式乘法       | 快速傅里叶变换           |
+| [P3338 ZJOI2014](https://www.luogu.com.cn/problem/P3338)     | 力               | 快速傅里叶变换, 减法卷积 |
+| [P6091](https://www.luogu.com.cn/problem/P6091)              | 原根             | 判原根存在性, 求原根     |
+| [P3803](https://www.luogu.com.cn/problem/P3803)              | 多项式乘法       | 数论变换                 |
+| [P1919](https://www.luogu.com.cn/problem/P1919)              | A*B Problem      | 数论变换                 |
+| [P3846 TJOI2007](https://www.luogu.com.cn/problem/P3846)     | BSGS             | BSGS                     |
+| [P4195](https://www.luogu.com.cn/problem/P4195)              | ExBSGS           | ExBSGS                   |
+| [P1516](https://www.luogu.com.cn/problem/P1516)              | 青蛙的约会       | ExGCD                    |
+| [P1447 NOI2010](https://www.luogu.com.cn/problem/P1447)      | 能量采集         | 莫比乌斯反演             |
+| [P1829](https://www.luogu.com.cn/problem/P1829)              | 能量采集         | 莫比乌斯反演, 整除分块   |
+| [P3327 SDOI2015](https://www.luogu.com.cn/problem/P3327)     | 约数个数和       | 莫比乌斯反演, 整除分块   |
+| [P3389](https://www.luogu.com.cn/problem/P3389)              | 高斯消元         | 高斯消元                 |
+| [P7112](https://www.luogu.com.cn/problem/P7112)              | 行列式           | 高斯消元, 辗转相减法     |
+| [P4783](https://www.luogu.com.cn/problem/P4783)              | 矩阵求逆         | 高斯消元                 |
+| [P6178](https://www.luogu.com.cn/problem/P6178)              | Matrix-Tree 定理 | 基尔霍夫定理, 行列式     |
+| [P3812](https://www.luogu.com.cn/problem/P3812)              | 线性基           | 线性基                   |
+| [BZOJ4184](https://hydro.ac/d/bzoj/p/4184)                   | Shallot          | 线性基删除               |
+| [ABC223H](https://atcoder.jp/contests/abc223/tasks/abc223_h) | Xor Query        | 线性基                   |
 
 #### 数据结构
 
@@ -289,6 +292,7 @@ ___
 | [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors         | 整体二分, 主席树, 树状数组, 差分 |
 | [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法        | 整体二分                         |
 | [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ            | 分块, 树状数组                   |
+| [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列            | 东周平衡树                       |
 
 #### 图论
 
