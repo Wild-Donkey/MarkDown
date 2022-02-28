@@ -235,30 +235,87 @@ $$
 \end{aligned}
 $$
 
-如果默认 $x$ 为自然数, 还可以化简 $$
-
-## 写出来被优化掉了, 可是不想删
-
-设 $b_i = a_i\displaystyle{\prod_{j = 0}^{i - 1}} (x_i - x_j)$, 代入上面的式子:
+如果默认 $x$ 为自然数且 $x > n$, 还可以化简 $\displaystyle{\prod_{i = 0}^{n}} (x - i) = \dfrac {x!}{(x - n - 1)!}$.
 
 $$
 \begin{aligned}
-b_j &= y_j - \sum_{i = 0}^{j - 1} b_i\prod_{k = 0}^{i - 1} \frac{x_j - x_k}{x_i - x_k}\\
+L(x) &= \sum_{i = 0}^{n} \frac{x!f(i)}{(x - n - 1)!i!(n - i)!(-1)^{n - i}(x - i)}\\
+&= \frac {x!}{(x - n - 1)!} \sum_{i = 0}^{n} \frac{f(i)}{i!(n - i)!(-1)^{n - i}(x - i)}\\
+&= \frac {x!}{(x - n - 1)!} \sum_{i = 0}^{n}\frac {f(i)}{i!(n - i)!(-1)^{n - i}}\frac 1{x - i}\\
 \end{aligned}
 $$
 
-当 $a_i = \displaystyle{\sum_{j = 0}^{i - 1}} \dfrac{y_j}{\displaystyle{\prod_{k = 0, k \neq j}^{i}}(x_j - x_k)}$ 时, 有 $b_i = \displaystyle{\prod_{j = 0}^{i - 1}(x_i - x_j) \sum_{j = 0}^{i - 1}} \dfrac{y_j}{\displaystyle{\prod_{k = 0, k \neq j}^{i}}(x_j - x_k)}$.
+我们可以 $O(n)$ 处理 $\dfrac{f(i)}{i!(n - i)!(-1)^{n - i}}$, 和对于所有 $x$ 的 $\dfrac{x!}{(x - n - 1)!}$. 注意 $x$ 较大, 无法直接计算 $x!$, 所以我们可以先把 $x - n$ 到 $x$ 的数字相乘, 得到 $\dfrac{x!}{(x - n - 1)!}$ 然后枚举 $x$ 来递推.
 
-将 $b$ 代入:
+但是我们要想计算一个点值, 仍然需要 $O(n)$ 枚举 $i$.
+
+定义序列 $A_i = \dfrac{f(i)}{i!(n - i)!(-1)^{n - i}}$, $B_i = \dfrac 1{m + i - n}$, $C_i = \displaystyle \sum_{j = 0}^{i} A_jB_{i - j}$, 三个序列长度为 $2(n + 1)$, $A_i = 0\ (i > n)$.
 
 $$
-\begin{aligned}
-b_j &= y_j - \sum_{i = 0}^{j - 1} b_i\prod_{k = 0}^{i - 1} \frac{x_j - x_k}{x_i - x_k}\\
-b_j &= y_j - \sum_{i = 0}^{j - 1} (\prod_{k = 0}^{i - 1} (x_j - x_k)) \sum_{k = 0}^{i - 1} \dfrac{y_k}{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)}\\
-a_j\prod_{i = 0}^{j - 1} (x_j - x_i) &= y_j - \sum_{i = 0}^{j - 1} (\prod_{k = 0}^{i - 1} (x_j - x_k)) \sum_{k = 0}^{i - 1} \dfrac{y_k}{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)}\\
-a_j &= \dfrac{y_j}{\displaystyle{\prod_{i = 0}^{j - 1} (x_j - x_i)}} - \sum_{i = 0}^{j - 1} \dfrac{\displaystyle{\prod_{k = 0}^{i - 1} (x_j - x_k)}}{\displaystyle{\prod_{k = 0}^{j - 1} (x_j - x_k)}} \sum_{k = 0}^{i - 1} \dfrac{y_k}{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)}\\
-a_j &= \dfrac{y_j}{\displaystyle{\prod_{i = 0}^{j - 1} (x_j - x_i)}} - \sum_{i = 0}^{j - 1} \dfrac{\displaystyle{\sum_{k = 0}^{i - 1} \dfrac{y_k}{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)}}}{\displaystyle{\prod_{k = i}^{j - 1} (x_j - x_k)}}\\
-a_j &= \dfrac{y_j}{\displaystyle{\prod_{i = 0}^{j - 1} (x_j - x_i)}} - \sum_{i = 0}^{j - 1} \displaystyle{\sum_{k = 0}^{i - 1} \dfrac{y_k}{\displaystyle{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)\prod_{l = i}^{j - 1} (x_j - x_l)}}}\\
-a_j &= \dfrac{y_j}{\displaystyle{\prod_{i = 0}^{j - 1} (x_j - x_i)}} - \sum_{k = 0}^{j - 2} \sum_{i = k + 1}^{j - 1}  \dfrac{y_k}{\displaystyle{\prod_{l = 0, l \neq k}^{i}(x_k - x_l)\prod_{l = i}^{j - 1} (x_j - x_l)}}\\
-\end{aligned}
+L(x) = \frac{x!}{(x - n - 1)!}C_{x - m + n}
 $$
+
+我们用 $O(n\log n)$ 卷积算出 $C$, 然后就可以 $O(1)$ 查询点值.
+
+```cpp
+const unsigned long long Mod(998244353);
+unsigned long long C1[160005], IFac[160005], MFac[160005], A[530000], B[530000];
+unsigned long long Tmp(1), w;
+unsigned m, n, N(1);
+unsigned D, t;
+unsigned Cnt(0), Ans(0);
+inline void Mn(unsigned long long& x) { x -= ((x >= Mod) ? Mod : 0); }
+inline unsigned long long W(unsigned x) {
+  unsigned long long Now(3), Rt(1);
+  while (x) { if (x & 1) Rt = Rt * Now % Mod;  Now = Now * Now % Mod, x >>= 1; }
+  return Rt;
+}
+inline unsigned long long Inv(unsigned long long x) {
+  unsigned long long Rt(1);
+  unsigned y(998244351);
+  while (y) { if (y & 1) Rt = Rt * x % Mod;y >>= 1, x = x * x % Mod; }
+  return Rt;
+}
+inline void DIT(unsigned long long* f) {
+  unsigned long long Now(1), Tmpw[20];
+  unsigned Lg(0);
+  Tmpw[0] = w;
+  for (unsigned i(1); i < N; i <<= 1, ++Lg) Tmpw[Lg + 1] = Tmpw[Lg] * Tmpw[Lg] % Mod; --Lg;
+  for (unsigned i(1); i < N; i <<= 1, --Lg) {
+    for (unsigned j(0); j < N; ++j, Now = Now * Tmpw[Lg] % Mod) if (!(i & j)) {
+      unsigned long long TmpA(f[j]), TmpB(f[j ^ i] * Now % Mod);
+      f[j] = TmpA + TmpB, Mn(f[j]);
+      f[j ^ i] = Mod + TmpA - TmpB, Mn(f[j ^ i]);
+    }
+  }
+}
+inline void DIF(unsigned long long* f) {
+  unsigned long long Now(1);
+  for (unsigned i(N >> 1); i; i >>= 1, w = w * w % Mod) {
+    for (unsigned j(0); j < N; ++j, Now = Now * w % Mod) if (!(i & j)) {
+      unsigned long long TmpA(f[j]), TmpB(f[j ^ i]);
+      f[j] = TmpA + TmpB, Mn(f[j]);
+      f[j ^ i] = (Mod + TmpA - TmpB) * Now % Mod;
+    }
+  }
+}
+signed main() {
+  n = RD(), m = RD();
+  while (N <= n) { N <<= 1; } N <<= 1;
+  for (unsigned i(0); i <= n; ++i) A[i] = RD();
+  for (unsigned i(1); i <= n; ++i) Tmp = Tmp * i % Mod;
+  IFac[n] = Inv(Tmp);
+  for (unsigned i(n - 1); ~i; --i) IFac[i] = IFac[i + 1] * (i + 1) % Mod;
+  for (unsigned i(0); i <= n; ++i)
+    A[i] = ((((n - i) & 1) ? (Mod - A[i]) : A[i]) * IFac[n - i] % Mod) * IFac[i] % Mod;
+  C1[0] = 1;
+  for (unsigned i(m - n); i <= m; ++i) C1[0] = C1[0] * i % Mod;
+  for (unsigned i(1); i <= n; ++i) C1[i] = (C1[i - 1] * Inv(m - n + i - 1) % Mod) * (m + i) % Mod;
+  for (unsigned i(n << 1); ~i; --i) B[i] = Inv(m + i - n);
+  w = W(998244352 / N), DIF(A), w = W(998244352 / N), DIF(B);
+  for (unsigned i(0); i < N; ++i) A[i] = A[i] * B[i] % Mod;
+  w = Inv(W(998244352 / N)), DIT(A), w = Inv(N), N = (n << 1);
+  for (unsigned i(n); i <= N; ++i) printf("%llu ", (C1[i - n] * A[i] % Mod) * w % Mod); putchar(0x0A);
+  return Wild_Donkey;
+}
+```
