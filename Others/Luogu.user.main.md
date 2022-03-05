@@ -106,6 +106,8 @@ $Julian~2459587$ `2022.1.7` 总 AC $450$
 
 $Julian~2459596$ `2022.1.16` 紫题 $100$, 第 $100$ 道是 ExBSGS 模板
 
+$Julian~???????$ `2022.3.3` 总 AC $500$, 第 $500$ 道是[风暴之眼](https://www.luogu.com.cn/problem/P7727)
+
 $$
 \boldsymbol{Wild\_Donkey}\\
 \mathbf{Wild\_Donkey}\\

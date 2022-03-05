@@ -247,6 +247,7 @@ ___
 | [P7606 THUPC2021](https://www.luogu.com.cn/problem/P7606)    | 混乱邪恶            | 记忆化搜索 DP, bitset 优化, 随机化      |
 | [P2585 ZJOI2006](https://www.luogu.com.cn/problem/P2585)     | 三色二叉树          | 树形 DP                                 |
 | [P5021 NOIP2018](https://www.luogu.com.cn/problem/P5021)     | 赛道修建            | 树形 DP, 二分答案                       |
+| [P7727](https://www.luogu.com.cn/problem/P7727)              | 风暴之眼            | 树形 DP, 计数 DP                        |
 | [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
 | [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
 | [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
@@ -306,22 +307,24 @@ ___
 
 - 学有余力内容: k-D Tree, Top Tree
 
-| 出处                                                            | 题目            | 知识点                           |
-| --------------------------------------------------------------- | --------------- | -------------------------------- |
-| [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment         | 李超线段树                       |
-| [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司 | 李超线段树                       |
-| [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors         | 整体二分, 主席树, 树状数组, 差分 |
-| [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法        | 整体二分                         |
-| [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ            | 分块, 树状数组                   |
-| [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列            | 东周平衡树                       |
+| 出处                                                            | 题目                           | 知识点                           |
+| --------------------------------------------------------------- | ------------------------------ | -------------------------------- |
+| [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment                        | 李超线段树                       |
+| [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司                | 李超线段树                       |
+| [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors                        | 整体二分, 主席树, 树状数组, 差分 |
+| [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法                       | 整体二分                         |
+| [P5048 Ynoi2019](https://www.luogu.com.cn/problem/P5048)        | Yuno loves sqrt technology III | 分块                             |
+| [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ                           | 分块, 数组回滚                   |
+| [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                       |
 
 #### 图论
 
 - 主要内容: 虚树, 点分治
 
-| 出处                                            | 题目   | 知识点 |
-| ----------------------------------------------- | ------ | ------ |
-| [P3806](https://www.luogu.com.cn/problem/P3806) | 点分治 | 点分治 |
+| 出处                                            | 题目       | 知识点                   |
+| ----------------------------------------------- | ---------- | ------------------------ |
+| [P3806](https://www.luogu.com.cn/problem/P3806) | 点分治     | 点分治                   |
+| [P3806](https://www.luogu.com.cn/problem/P5236) | 静态仙人掌 | 仙人掌, 圆方树, 树链剖分 |
 
 ### 中二期
 
