@@ -120,7 +120,7 @@ ___
 | 出处                                              | 题目       | 知识点                     |
 | ------------------------------------------------- | ---------- | -------------------------- |
 | [P3378](https://www.luogu.com.cn/problem/P3378)   | 堆         | 动态开点堆                 |
-| [P7361](https://www.luogu.com.cn/problem/P7361)   | 春节十二响 | 树上启发式合并, 动态开点堆 |
+| [P5290](https://www.luogu.com.cn/problem/P5290)   | 春节十二响 | 树上启发式合并, 动态开点堆 |
 | [P4158](https://www.luogu.com.cn/problem/P4158)   | 粉刷匠     | DP (背包问题), 双层 DP     |
 | [SP9070](https://www.luogu.com.cn/problem/SP9070) | 避雷针     | 决策单调性, 分治优化 DP    |
 | [P4051](https://www.luogu.com.cn/problem/P4051)   | 字符加密   | SA-IS, 后缀数组            |
@@ -160,17 +160,17 @@ ___
 
 - DP: 动态动态规划 (DDP), 插头 DP
 
-- 数据结构: 珂朵莉树, zkw 线段树, 笛卡尔树, 析合树
+- 数据结构: zkw 线段树, 笛卡尔树, 析合树
 
 - 字符串: 最小表示, Lyndon 分解, DFA, NFA.
 
-- 图论: 最小直径生成树, 最优比率生成树,  支配集, 独立集, 覆盖集, 斯坦纳树, Prufer 序列, LGV 引理, 弦图, $k$ 短路
+- 图论: 最小直径生成树, 最优比率生成树, 支配集, 独立集, 覆盖集, 斯坦纳树, Prufer 序列, LGV 引理, 弦图, $k$ 短路
 
 - 最短路: 乘积最短路, 加和最短路, 同余最短路, 负环 (SPFA)
 
 - 杂项数学: 线性规划, 熵, $0/1$ 分数规划
 
-- 多项式: 牛顿迭代, FWT, 多项式除法, 多项式求逆, 多项式开根, 多项式求对数, 多项式指数函数
+- 多项式: 牛顿迭代, FMT, FWT, 多项式除法, 多项式求逆, 多项式开根, 多项式求对数, 多项式指数函数
 
 - 数论: 筛法(Min_25筛, 洲阁筛), 多项式反演 (拉格朗日反演), 威尔逊定理, 平方剩余, 二次同余式, 二次互反律
 
@@ -190,7 +190,7 @@ ___
 
 - 图论: 一般图匹配, 最小树形图
 
-- 数学: 完全数, 莫比乌斯变换 (黎曼几何)
+- 数学: 完全数
 
 ### 知识清单 (FYS 会)
 
@@ -213,6 +213,8 @@ ___
 - 计算几何: 凸包
 
 #### tyy 中立
+
+- 数据结构: 珂朵莉树
 
 - 多项式: FFT, NTT, 多项式快速幂, 生成函数
 
@@ -237,6 +239,8 @@ ___
 | [P2150 NOI2015](https://www.luogu.com.cn/problem/P2150)      | 寿司晚宴            | 状压 DP, 根号分治, 容斥                 |
 | [P5933 THU2012](https://www.luogu.com.cn/problem/P5933)      | 串珠子              | 状压 DP, 避免重复统计的技巧             |
 | [P4363 NPOI2018](https://www.luogu.com.cn/problem/P4363)     | 一双木棋            | 状压 DP, 状压单调折线, 正反转移的区别   |
+| [P2595 ZJOI2009](https://www.luogu.com.cn/problem/P2595)     | 多米诺骨牌          | 状压 DP, 轮廓线 DP, 容斥                |
+| [URAL1519 P5056](https://www.luogu.com.cn/problem/P5056)     | 插头 DP             | 插头 DP, 轮廓线 DP, 状压 DP             |
 | [AGC016F](https://atcoder.jp/contests/agc016/tasks/agc016_f) | Games on DAG        | 博弈论 DP                               |
 | [P4317](https://www.luogu.com.cn/problem/P4317)              | 花神的数论题        | 数位 DP                                 |
 | [P2235 HNOI2002](https://www.luogu.com.cn/problem/P2235)     | Kathy函数           | 数位 DP, 二进制回文数                   |
@@ -250,13 +254,15 @@ ___
 | [P7727](https://www.luogu.com.cn/problem/P7727)              | 风暴之眼            | 树形 DP, 计数 DP                        |
 | [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
 | [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
+| [ARC068F](https://atcoder.jp/contests/arc068/tasks/arc068_d) | Solitaire           | 二维前缀和优化 DP, 计数 DP              |
 | [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
 | [P5307 COCI2019](https://www.luogu.com.cn/problem/P5307)     | Mobitel             | 计数 DP, 整除分块优化                   |
 | [P4491 HAOI2018](https://www.luogu.com.cn/problem/P4491)     | 染色                | 计数 DP, 二项式反演, 数论变换, 减法卷积 |
 | [P3188 HNOI2007](https://www.luogu.com.cn/problem/P3188)     | 梦幻岛宝珠          | 背包 DP, Lowbit 分治                    |
 | [P6775 NOI2020](https://www.luogu.com.cn/problem/P6775)      | 制作菜品            | 背包 DP, bitset 优化, 贪心              |
 | [P5454 THUPC2018](https://www.luogu.com.cn/problem/P5454)    | 城市地铁规划        | 背包 DP, 树的构造                       |
-| [P4027 NOI2007](https://www.luogu.com.cn/problem/P4027)      | 货币兑换            | 斜率优化 DP, 李超线段树                 |
+| [P4027 NOI2007](https://www.luogu.com.cn/problem/P4027)      | 货币兑换            | 斜率优化 DP, 面向数据编程               |
+| [P2497 SDOI2012](https://www.luogu.com.cn/problem/P2497)     | 基站建设            | 斜率优化 DP                             |
 | [P4383 EPOI2018](https://www.luogu.com.cn/problem/P4383)     | 林克卡特树          | 凸优化 DP, 树形 DP                      |
 | [P4694 PA2013](https://www.luogu.com.cn/problem/P4694)       | Raper               | 凸优化 DP, 数据结构优化 DP              |
 | [P6246 IOI2000](https://www.luogu.com.cn/problem/P6246)      | 邮局(加强版)        | 凸优化 DP, 决策单调性优化 DP            |
@@ -309,6 +315,8 @@ ___
 
 | 出处                                                            | 题目                           | 知识点                           |
 | --------------------------------------------------------------- | ------------------------------ | -------------------------------- |
+| [P4515 COCI2009-2010](https://www.luogu.com.cn/problem/P4515)   | XOR                            | 扫描线                           |
+| [P4560 IOI2014](https://www.luogu.com.cn/problem/P4560)         | Wall                           | 线段树                           |
 | [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment                        | 李超线段树                       |
 | [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司                | 李超线段树                       |
 | [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors                        | 整体二分, 主席树, 树状数组, 差分 |
