@@ -158,7 +158,7 @@ ___
 
 #### tyy 中立
 
-- DP: 动态动态规划 (DDP), 插头 DP
+- DP: 动态动态规划 (DDP)
 
 - 数据结构: zkw 线段树, 笛卡尔树, 析合树
 
@@ -168,9 +168,9 @@ ___
 
 - 最短路: 乘积最短路, 加和最短路, 同余最短路, 负环 (SPFA)
 
-- 杂项数学: 线性规划, 熵, $0/1$ 分数规划
+- 杂项数学: 线性规划, $0/1$ 分数规划
 
-- 多项式: 牛顿迭代, FMT, FWT, 多项式除法, 多项式求逆, 多项式开根, 多项式求对数, 多项式指数函数
+- 多项式: 牛顿迭代, 多项式除法, 多项式求逆, 多项式开根, 多项式求对数, 多项式指数函数
 
 - 数论: 筛法(Min_25筛, 洲阁筛), 多项式反演 (拉格朗日反演), 威尔逊定理, 平方剩余, 二次同余式, 二次互反律
 
@@ -198,7 +198,7 @@ ___
 
 #### tyy 推荐
 
-- DP: 凸优化, CDQ 分治优化
+- DP: 凸优化, CDQ 分治优化, 插头 DP
 
 - 数据结构: 李超线段树
 
@@ -216,7 +216,9 @@ ___
 
 - 数据结构: 珂朵莉树
 
-- 多项式: FFT, NTT, 多项式快速幂, 生成函数
+- 多项式:  FMT, FWT, FFT, NTT, 多项式快速幂, 生成函数
+
+- 信息论: 熵
 
 - 数论: BSGS, 原根
 
@@ -234,6 +236,7 @@ ___
 
 | 出处                                                         | 题目                | 知识点                                  |
 | ------------------------------------------------------------ | ------------------- | --------------------------------------- |
+| [NOIP2022 P7962](https://www.luogu.com.cn/problem/P7962)     | 方差                | DP, 推式子                              |
 | [P3959 NOIP2017](https://www.luogu.com.cn/problem/P3959)     | 宝藏                | 状压 DP                                 |
 | [P3943](https://www.luogu.com.cn/problem/P3943)              | 星空                | 状压 DP, 最短路                         |
 | [P2150 NOI2015](https://www.luogu.com.cn/problem/P2150)      | 寿司晚宴            | 状压 DP, 根号分治, 容斥                 |
@@ -250,12 +253,14 @@ ___
 | [P1514 NOIP2010](https://www.luogu.com.cn/problem/P1514)     | 引水入城            | 记忆化搜索 DP, 贪心                     |
 | [P7606 THUPC2021](https://www.luogu.com.cn/problem/P7606)    | 混乱邪恶            | 记忆化搜索 DP, bitset 优化, 随机化      |
 | [P2585 ZJOI2006](https://www.luogu.com.cn/problem/P2585)     | 三色二叉树          | 树形 DP                                 |
+| [P8202](https://www.luogu.com.cn/problem/P8202)              | 染色                | 树形 DP, 二维树上背包                   |
 | [P5021 NOIP2018](https://www.luogu.com.cn/problem/P5021)     | 赛道修建            | 树形 DP, 二分答案                       |
 | [P7727](https://www.luogu.com.cn/problem/P7727)              | 风暴之眼            | 树形 DP, 计数 DP                        |
 | [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
 | [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
 | [ARC068F](https://atcoder.jp/contests/arc068/tasks/arc068_d) | Solitaire           | 二维前缀和优化 DP, 计数 DP              |
 | [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
+| [ARC059F](https://atcoder.jp/contests/arc059/tasks/arc059_d) | Unhappy Hacking     | 计数 DP, 卡塔兰数                       |
 | [P5307 COCI2019](https://www.luogu.com.cn/problem/P5307)     | Mobitel             | 计数 DP, 整除分块优化                   |
 | [P4491 HAOI2018](https://www.luogu.com.cn/problem/P4491)     | 染色                | 计数 DP, 二项式反演, 数论变换, 减法卷积 |
 | [P3188 HNOI2007](https://www.luogu.com.cn/problem/P3188)     | 梦幻岛宝珠          | 背包 DP, Lowbit 分治                    |
@@ -285,11 +290,13 @@ ___
 | [P6091](https://www.luogu.com.cn/problem/P6091)              | 原根             | 判原根存在性, 求原根     |
 | [P3803](https://www.luogu.com.cn/problem/P3803)              | 多项式乘法       | 数论变换                 |
 | [P1919](https://www.luogu.com.cn/problem/P1919)              | A*B Problem      | 数论变换                 |
+| [P4721](https://www.luogu.com.cn/problem/P4721)              | 分治 FFT         | 数论变换, 分治           |
+| [P4717](https://www.luogu.com.cn/problem/P4717)              | 或, 与, 异或卷积 | 快速沃尔什变换           |
 | [P3846 TJOI2007](https://www.luogu.com.cn/problem/P3846)     | BSGS             | BSGS                     |
 | [P4195](https://www.luogu.com.cn/problem/P4195)              | ExBSGS           | ExBSGS                   |
 | [P1516](https://www.luogu.com.cn/problem/P1516)              | 青蛙的约会       | ExGCD                    |
 | [P1447 NOI2010](https://www.luogu.com.cn/problem/P1447)      | 能量采集         | 莫比乌斯反演             |
-| [P1829](https://www.luogu.com.cn/problem/P1829)              | 能量采集         | 莫比乌斯反演, 整除分块   |
+| [P1829](https://www.luogu.com.cn/problem/P1829)              | Crash的数字表格  | 莫比乌斯反演, 整除分块   |
 | [P3327 SDOI2015](https://www.luogu.com.cn/problem/P3327)     | 约数个数和       | 莫比乌斯反演, 整除分块   |
 | [P3389](https://www.luogu.com.cn/problem/P3389)              | 高斯消元         | 高斯消元                 |
 | [P7112](https://www.luogu.com.cn/problem/P7112)              | 行列式           | 高斯消元, 辗转相减法     |
@@ -301,7 +308,10 @@ ___
 | [P4781](https://www.luogu.com.cn/problem/P4781)              | 拉格朗日插值     | 多项式插值               |
 | [P5667](https://www.luogu.com.cn/problem/P5667)              | 拉格朗日插值2    | 多项式插值, 数论变换     |
 | [P4213](https://www.luogu.com.cn/problem/P4213)              | 杜教筛           | 杜教筛                   |
+| [P3768](https://www.luogu.com.cn/problem/P3768)              | 简单的数学题     | 杜教筛, 莫比乌斯反演     |
 | [P5325](https://www.luogu.com.cn/problem/P5325)              | Min_25 筛        | Powerful Number 筛       |
+| [THUPC2019 P5377](https://www.luogu.com.cn/problem/P5377)    | 鸽鸽的分割       | 欧拉-笛卡尔公式          |
+| [THUPC2019 P5376](https://www.luogu.com.cn/problem/P5377)    | 过河卒二         | 卢卡斯定理, 容斥         |
 
 #### 数据结构
 
@@ -313,17 +323,22 @@ ___
 
 - 学有余力内容: k-D Tree, Top Tree
 
-| 出处                                                            | 题目                           | 知识点                           |
-| --------------------------------------------------------------- | ------------------------------ | -------------------------------- |
-| [P4515 COCI2009-2010](https://www.luogu.com.cn/problem/P4515)   | XOR                            | 扫描线                           |
-| [P4560 IOI2014](https://www.luogu.com.cn/problem/P4560)         | Wall                           | 线段树                           |
-| [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment                        | 李超线段树                       |
-| [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司                | 李超线段树                       |
-| [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors                        | 整体二分, 主席树, 树状数组, 差分 |
-| [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法                       | 整体二分                         |
-| [P5048 Ynoi2019](https://www.luogu.com.cn/problem/P5048)        | Yuno loves sqrt technology III | 分块                             |
-| [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ                           | 分块, 数组回滚                   |
-| [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                       |
+| 出处                                                            | 题目                           | 知识点                                                 |
+| --------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+| [P4515 COCI2009-2010](https://www.luogu.com.cn/problem/P4515)   | XOR                            | 扫描线                                                 |
+| [P4560 IOI2014](https://www.luogu.com.cn/problem/P4560)         | Wall                           | 线段树                                                 |
+| [P3688 ZJOI2017](https://www.luogu.com.cn/problem/P3688)        | 树状数组                       | 线段树套线段树                                         |
+| [P4899 IOI2018](https://www.luogu.com.cn/problem/P4899)         | Werewolf                       | Kruskal 重构树, 可持久化权值线段树                     |
+| [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment                        | 李超线段树                                             |
+| [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司                | 李超线段树                                             |
+| [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors                        | 整体二分, 主席树, 树状数组, 差分                       |
+| [SDOI2013 P3302](https://www.luogu.com.cn/problem/P3302)        | 森林                           | 树上差分, 可持久化权值线段树, 线段树上二分, 启发式合并 |
+| [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法                       | 整体二分                                               |
+| [P5048 Ynoi2019](https://www.luogu.com.cn/problem/P5048)        | Yuno loves sqrt technology III | 分块                                                   |
+| [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ                           | 分块, 数组回滚                                         |
+| [WC2022 P8078](https://www.luogu.com.cn/problem/P8078)          | 秃子酋长                       | 回滚莫队, 链表, 卡常                                   |
+| [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                                             |
+| [CQOI2011 P3157](https://www.luogu.com.cn/problem/P3157)        | 动态逆序对                     | 线段树套平衡树, Splay                                  |
 
 #### 图论
 

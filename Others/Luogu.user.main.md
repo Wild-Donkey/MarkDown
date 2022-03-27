@@ -108,6 +108,8 @@ $Julian~2459596$ `2022.1.16` 紫题 $100$, 第 $100$ 道是 ExBSGS 模板
 
 $Julian~???????$ `2022.3.3` 总 AC $500$, 第 $500$ 道是[风暴之眼](https://www.luogu.com.cn/problem/P7727)
 
+$Julian~???????$ `2022.3.21` 咕值排名 $84$, 进入前一百 (虽然没什么卵用)
+
 $$
 \boldsymbol{Wild\_Donkey}\\
 \mathbf{Wild\_Donkey}\\
