@@ -311,7 +311,7 @@ ___
 | [P3768](https://www.luogu.com.cn/problem/P3768)              | 简单的数学题     | 杜教筛, 莫比乌斯反演     |
 | [P5325](https://www.luogu.com.cn/problem/P5325)              | Min_25 筛        | Powerful Number 筛       |
 | [THUPC2019 P5377](https://www.luogu.com.cn/problem/P5377)    | 鸽鸽的分割       | 欧拉-笛卡尔公式          |
-| [THUPC2019 P5376](https://www.luogu.com.cn/problem/P5377)    | 过河卒二         | 卢卡斯定理, 容斥         |
+| [THUPC2019 P5376](https://www.luogu.com.cn/problem/P5376)    | 过河卒二         | 卢卡斯定理, 容斥         |
 
 #### 数据结构
 
@@ -348,6 +348,7 @@ ___
 | ----------------------------------------------- | ---------- | ------------------------ |
 | [P3806](https://www.luogu.com.cn/problem/P3806) | 点分治     | 点分治                   |
 | [P3806](https://www.luogu.com.cn/problem/P5236) | 静态仙人掌 | 仙人掌, 圆方树, 树链剖分 |
+| [P7515](https://www.luogu.com.cn/problem/P7515) | 矩阵游戏   | SPFA, 差分约束           |
 
 ### 中二期
 
