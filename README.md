@@ -243,6 +243,7 @@ ___
 | [P5933 THU2012](https://www.luogu.com.cn/problem/P5933)      | 串珠子              | 状压 DP, 避免重复统计的技巧             |
 | [P4363 NPOI2018](https://www.luogu.com.cn/problem/P4363)     | 一双木棋            | 状压 DP, 状压单调折线, 正反转移的区别   |
 | [P2595 ZJOI2009](https://www.luogu.com.cn/problem/P2595)     | 多米诺骨牌          | 状压 DP, 轮廓线 DP, 容斥                |
+| [P7519 PrSl2021](https://www.luogu.com.cn/problem/P7519)     | 滚榜                | 状压 DP, 贡献提前计算                   |
 | [URAL1519 P5056](https://www.luogu.com.cn/problem/P5056)     | 插头 DP             | 插头 DP, 轮廓线 DP, 状压 DP             |
 | [AGC016F](https://atcoder.jp/contests/agc016/tasks/agc016_f) | Games on DAG        | 博弈论 DP                               |
 | [P4317](https://www.luogu.com.cn/problem/P4317)              | 花神的数论题        | 数位 DP                                 |
@@ -337,6 +338,7 @@ ___
 | [P5048 Ynoi2019](https://www.luogu.com.cn/problem/P5048)        | Yuno loves sqrt technology III | 分块                                                   |
 | [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ                           | 分块, 数组回滚                                         |
 | [WC2022 P8078](https://www.luogu.com.cn/problem/P8078)          | 秃子酋长                       | 回滚莫队, 链表, 卡常                                   |
+| [PrSl2021 P7518](https://www.luogu.com.cn/problem/P7518)        | 宝石                           | 回滚并查集, 树上倍增                                   |
 | [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                                             |
 | [CQOI2011 P3157](https://www.luogu.com.cn/problem/P3157)        | 动态逆序对                     | 线段树套平衡树, Splay                                  |
 
@@ -344,11 +346,12 @@ ___
 
 - 主要内容: 虚树, 点分治
 
-| 出处                                            | 题目       | 知识点                   |
-| ----------------------------------------------- | ---------- | ------------------------ |
-| [P3806](https://www.luogu.com.cn/problem/P3806) | 点分治     | 点分治                   |
-| [P3806](https://www.luogu.com.cn/problem/P5236) | 静态仙人掌 | 仙人掌, 圆方树, 树链剖分 |
-| [P7515](https://www.luogu.com.cn/problem/P7515) | 矩阵游戏   | SPFA, 差分约束           |
+| 出处                                                     | 题目       | 知识点                   |
+| -------------------------------------------------------- | ---------- | ------------------------ |
+| [P3806](https://www.luogu.com.cn/problem/P3806)          | 点分治     | 点分治                   |
+| [P3806](https://www.luogu.com.cn/problem/P5236)          | 静态仙人掌 | 仙人掌, 圆方树, 树链剖分 |
+| [PrSl2021 P7515](https://www.luogu.com.cn/problem/P7515) | 矩阵游戏   | SPFA, 差分约束           |
+| [PrSl2021 P7516](https://www.luogu.com.cn/problem/P7516) | 图函数     | Floyd, 搜索, 邻接矩阵    |
 
 ### 中二期
 

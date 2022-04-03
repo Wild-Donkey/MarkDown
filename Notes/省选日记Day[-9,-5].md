@@ -505,29 +505,136 @@ T1 其实已经想出来了, 苦于没写过历史信息和就摆烂了.
 我们所做的就是在这个方案的基础上将相邻的段合并. 所以一个已经很明显的 DP 是这样的:
 
 $$
-f_{i, j} = \min(f_{i + 1, j} + a_{i + 1}l_i, f_{i + 1, j - 1} + a_iL_i)
+f_{i, j} = \min_{k = 0}^{j - 1}(f_{i - 1, k} + a_jL_{k + 1})
 $$
 
-其中, $f_{i, j}$ 意义是, 考虑了第 $i$ 到第 $n$ 段, 合并到 $j$ 组的最小代价. $a_i$ 表示的是第 $i$ 段的接水时间, 随着 $i$ 的增加而增加, $l_i$ 表示第 $i$ 段的长度, $L_i$ 是 $l_i$ 的后缀和.
+其中, $f_{i, j}$ 意义是, 将前 $j$ 段, 合并到 $i$ 组的最小代价. $a_i$ 表示的是第 $i$ 段的接水时间, 随着 $i$ 的增加而增加, $l_i$ 表示第 $i$ 段的长度, $L_i$ 是 $l_i$ 的后缀和.
 
-这个时候我们可以写一个 $O(nR)$ 的 DP.
+这个时候我们可以写一个 $O(n^2R)$ 的 DP, 一不小心拿到 $80'$ 的好成绩.
+
+如果我们把最优方案的 $i$ 输出会发现, 这个数不大, 一般不超过 $20$, 于是我们就把 $R$ 和 $30$ 取一个最小值, 发现瞬间通过了此题. 
 
 ```cpp
-
+unsigned a[500005], l[500005], L[500005];
+unsigned long long f[2][500005], Ans(0x3f3f3f3f3f3f3f3f);
+unsigned m, n(0), A, B, C, D, t;
+unsigned Cnt(0), Tmp(0);
+signed main() {
+  A = RD(), m = min((unsigned)30, RD()), B = 0;
+  for (unsigned i(1); i <= A; ++i)
+    if((C = RD()) > B) B = a[++n] = C, l[n] = 1;
+    else ++l[n]; 
+  for (unsigned i(n); i; --i) L[i] = L[i + 1] + l[i];
+  unsigned long long *Cur(f[1]), *Pre(f[0]);
+  memset(Pre, 0x3f, ((n + 1) << 3)), Pre[0] = 0;
+  for (unsigned i(1); i <= m; ++i, swap(Cur, Pre)) {
+    memset(Cur, 0x3f, ((n + 1) << 3));
+    for (unsigned j(1); j <= n; ++j) for (unsigned k(0); k < j; ++k)
+      Cur[j] = min(Cur[j], Pre[k] + (unsigned long long)a[j] * L[k + 1]);
+    Cur[0] = 0x3f3f3f3f3f3f3f3f; if(Ans > Cur[n]) Ans = min(Ans, Cur[n]), A = i;
+  }
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
 ```
 
-$$
-a_i,a_{i+1}
-$$
+我们思考减少 DP 阶段数的正确性. 如果一个方案中, 一个组被分成两个组, 假设分界线左边的长度为 $l$, 则分界线右边长度为 $n - l$. 左边组的接水时间是 $a_1$, 右边组接水时间是 $a_2$, 则分成两个组能使答案更优的条件是:
 
 $$
-a_isuf_i+a_{i+1}suf_{i+1} \le a_{i+1}suf_i
+\begin{aligned}
+a_1n + a_2(n - l) &< a_2n\\
+a_1n &< a_2l\\
+\frac{n}{l} &< \frac{a_2}{a_1}\\
+\end{aligned}
 $$
 
-$$
-a_isuf_i \le  a_{i+1}s_i
-$$
+每次决策分开, 都会使之后的 $a_1$ 最多是原来的 $\dfrac ln$ 倍, 而 $l$ 递减. 最坏的情况, 也就是贪心过程中使上面式子成立次数最多的情况. 我们需要使 $l$ 减少速度尽可能小, 也就是是从最后开始, 每次减少 $1$, 为了使 $a_1$ 减少次数尽可能小, 需要在 $l$ 越大的时候减少越好. 也就是每次让 $a_n$ 乘以 $\displaystyle \prod_{i = 1}^x\dfrac{n - i}n$, 直到为 $0$ 为止. 因此最多的组数便是使下面式子成立的最大的 $x$:
 
 $$
-\frac{a_i}{a_{i+1}} \le \frac{s_i}{suf_i}
+\begin{aligned}
+Maxa &\geq \prod_{i = 1}^{x} \frac {n}{n - i}\\
+\end{aligned}
 $$
+
+对于最大的 $n = 500000$, $Maxa = 10^9$, $Maxx = 4545$. 但是发现这个东西是整除意义下的, 所以这时的 $Maxx$ 变成了 $4050$. 因此我们把这个东西卡满, 有效的 $R$ 也只有 $4050$.
+
+为了证明有效 $R$ 的复杂度, 我们考虑最优方案第 $i$ 组接水时间是 $a_i$, 人数后缀和是 $L_i$, 那么总代价是:
+
+$$
+\sum_{i = 1}^n L_ia_i
+$$
+
+每次合并两个相邻的组相当于将答案减去 $a_iL_i + a_{i + 1}L_{i + 1}$, 加上 $a_{i + 1}L_{i}$, 因为方案最优, 则对于所有正整数 $i < n$ 有不等式:
+
+$$
+\begin{aligned}
+a_iL_i + a_{i + 1}L_{i + 1} &\leq a_{i + 1}L_{i}\\
+\frac{a_i}{a_{i + 1}} + \frac{L_{i + 1}}{L_i} &\leq 1
+\end{aligned}
+$$
+
+则 $L_i$ 比 $L_{i + 1}$ 增加多于一倍, $a_i$ 比 $a_{i + 1}$ 减少不少于 $\frac 12$ 两者至少发生一个. 因此组数不会多于 $\log_2(n) + \log_2(Maxa) = O(\log nMaxa)$.
+
+但是即使是这样, 我们用 $O(n^2 \log nMaxa)$ 的复杂度也无法通过特殊构造的数据. 发现每次 DP 可以使用斜率优化到 $O(n\log Maxa)$.
+
+$$
+f_{i, j} = \min_{k = 0}^{j - 1}(f_{i - 1, k} + a_jL_{k + 1})
+$$
+
+用李超树维护所有直线 $y = L_{k + 1}x + f_{i - 1, k}$, 直接查询 $x = a_j$ 时的最小值即可.
+
+这样即可 $O(n\log Maxa^2n)$ 地通过此题了.
+
+```cpp
+unsigned a[10005], l[10005], L[10005];
+unsigned long long f[10005], N, D, Ans(0x3f3f3f3f3f3f3f3f);
+unsigned m, n(0), C, t;
+unsigned Cnt(0), Tmp(0);
+struct Line {
+  unsigned long long K, B;
+  inline unsigned long long F(const unsigned long long y) const {return B + y * K;}
+  inline const char Com (const Line &x, const unsigned long long y) const {
+    return F(y) < x.F(y);
+  }
+}A;
+struct Node {
+  Node *LS, *RS;
+  Line Val;
+}T[100005], *CntT(T);
+inline void Ins(Node* x, unsigned L, unsigned R) {
+  if(L == R) {if(A.Com(x->Val, L)) x->Val = A; return; }
+  unsigned Mid((L + R) >> 1);
+  if(A.Com(x->Val, Mid)) swap(x->Val, A);
+  if(A.K > x->Val.K) {
+    if(!(x->LS)) x->LS = ++CntT, x->LS->Val = x->Val, x->LS->LS = x->LS->RS = NULL;
+    Ins(x->LS, L, Mid);
+  } else {
+    if(!x->RS) x->RS = ++CntT, x->RS->Val = x->Val, x->RS->LS = x->RS->RS = NULL;
+    Ins(x->RS, Mid + 1, R);
+  }
+  return;
+}
+inline void Find(Node* x, unsigned L, unsigned R) {
+  D = min(D, x->Val.F(C));
+  if(L == R) return;
+  unsigned Mid((L + R) >> 1);
+  if(C <= Mid) {if(x->LS) Find(x->LS, L, Mid);}
+  else {if(x->RS) Find(x->RS, Mid + 1, R);}
+}
+signed main() {
+  D = RD(), m = min((unsigned)20, RD()), N = 0;
+  for (unsigned i(1); i <= D; ++i)
+    if((C = RD()) > N) N = a[++n] = C, l[n] = 1;
+    else ++l[n];
+  for (unsigned i(n); i; --i) L[i] = L[i + 1] + l[i];
+  memset(f, 0x3f, ((n + 1) << 3)), f[0] = 0, Ans = 0x3f3f3f3f3f3f3f3f;
+  for (unsigned i(1); i <= m; ++i) {
+    T->LS = T->RS = NULL, CntT = T, T->Val = {0, 0x3f3f3f3f3f3f3f3f};
+    for (unsigned j(1); j <= n; ++j) A = {L[j], f[j - 1]}, Ins(T, 1, N);
+    for (unsigned j(1); j <= n; ++j) C = a[j], D = 0x3f3f3f3f3f3f3f3f, Find(T, 1, N), f[j] = min(D, f[j]);
+    Ans = min(f[n], Ans);
+  }
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
