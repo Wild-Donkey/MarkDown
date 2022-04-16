@@ -22,6 +22,10 @@ $$
 
 > Wild_Donkey[@Bilibili](https://space.bilibili.com/179337056)
 
+> WildDonkey______[@twitch](https://www.twitch.tv/wilddonkey______)
+> 
+> Wild Donkey[@youtube](https://www.youtube.com/channel/UC6Gcb8R8zgTGqDGRs61U51w)
+
 ![](https://statcard.vercel.app/api?id=143771&dark_mode=true)
 
 ![](https://statcard.vercel.app/api?id=171851&dark_mode=true)

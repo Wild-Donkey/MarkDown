@@ -379,3 +379,65 @@ for (unsigned i(1); i <= n; ++i) {
 ```
 
 > March.4th 2022 By WD
+
+## $316$ 不是 $100000$ 之因数
+
+- 错误示范
+
+取 $D = \lfloor \sqrt C \rfloor$, 从 $1$ 枚举到 $D - 1$, 找 $C$ 的因数, 特判 $D$. 因为当 $C$ 是完全平方数的时候, $D$ 和 $\frac CD$ 是同一个数, 会被统计两次, 所以我们判断 $D^2$ 是否为 $C$, 讨论是否统计 $\frac CD$ 即可.
+
+```cpp
+D = sqrt(C = RD());
+Edge[D].push_back(i); if((D * D) ^ C) Edge[C / D].push_back(i);
+for (unsigned j(D - 1); j; --j) if(!(C % j))
+  Edge[j].push_back(i), Edge[C / j].push_back(i);
+```
+
+- 正确示范
+
+应该判断 $D$ 是否整除 $C$.
+
+```cpp
+D = sqrt(C = RD());
+if(!(C % D)) {Edge[D].push_back(i); if((D * D) ^ C) Edge[C / D].push_back(i);}
+for (unsigned j(D - 1); j; --j) if(!(C % j))
+  Edge[j].push_back(i), Edge[C / j].push_back(i);
+```
+
+> April.11th 2022 By WD
+
+## 把 $0$ 丢进垃圾桶
+
+- 错误示范
+
+题意要求从 $1$ 开始枚举 $j$.
+
+```cpp
+for (unsigned i(1); i <= t; ++i) {
+  A = RD(), B = RD();
+  for (unsigned j(0); j < m; ++j) {
+    D = ((A + (unsigned long long)B * j) % m) + 1;
+    /*
+    Process
+    */
+  }
+}
+```
+
+- 正确示范
+
+所以就该从 $1$ 开始枚举 $j$. 审题...
+
+```cpp
+for (unsigned i(1); i <= t; ++i) {
+  A = RD(), B = RD();
+  for (unsigned j(1); j <= m; ++j) {
+    D = ((A + (unsigned long long)B * j) % m) + 1;
+    /*
+    Process
+    */
+  }
+}
+```
+
+> April.13th 2022 By WD

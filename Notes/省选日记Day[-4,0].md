@@ -530,18 +530,203 @@ signed main() {
 惊喜地发现 $n \leq 3000$, $m \leq 6000$, 因此我们枚举每个点被删除, 从 $1$ 开始搜索, 到不了的点就是被这个点支配的点. $O(nm)$ 可以连好边, 建出一棵树.
 
 ```cpp
+for (unsigned i(1); i <= m; ++i)
+  A = RD(), B = RD(), N[A].E.push_back(N + B), N[B].IE.push_back(N + A);
+for (unsigned i(2); i <= n; ++i) N[1].Control.push_back(N + i), ++(N[i].Bectrl);
+for (unsigned i(2); i <= n; ++i) {
+  for (unsigned j(1); j <= n; ++j) N[j].Ava = 0;
+  N[i].Ava = 1, N[1].DFS();
+  for (unsigned j(1); j <= n; ++j) if(!(N[j].Ava))
+    N[i].Control.push_back(N + j), ++(N[j].Bectrl);
+}
+for (unsigned i(1); i <= n; ++i) for (auto j:N[i].Control)
+  if(j->Bectrl == N[i].Bectrl + 1) T[i].Son.push_back(T + (j - N));
 ```
 
 对于每个询问考虑加边的情况, 发现起点和它的祖先的支配集不会有任何变化.
 
 如果终点是起点的祖先或儿子, 那么任何点的支配情况不会有任何变化.
 
+如果加边, 则支配一个点的点只会减少不会增加.
+
 但是有变化的时候我们却不知如何快速找到变化的点.
 
-事后发现建的树确实类似于支配树, 但是建出支配树我也不会做, 而支配树甚至有 $O(n + m)$ 的建法, 怒学.
+事后看题解发现建的树确实是支配树, 但是建出支配树我也不会做, 而支配树甚至有 Polylog 的建法, 怒学.
 
-#### 线性支配树
+#### Polylog 支配树
 
-由于一些原因, 支配树的中文条目和英文条目有一些出入, 中文词条和英文词条不同的地方是不能自恰的, 在这里提醒一下. 目前的版本是[这个](https://zh.wikipedia.org/w/index.php?title=%E6%94%AF%E9%85%8D_(%E5%9C%96%E8%AB%96)&oldid=70026716), 表格中 $5$ 号点没有 idom, 而按照左边的定义和英文条目
+> 支配树 (Dominator Tree)
 
-对于 $i$ 支配 $j$, 我们称 $i$ 是 $j$ 的必经点. 点 $i$ 的最近必经点 $Fa_i$ 必须满足除了它本身外不支配任何支配 $i$ 的节点.
+由于一些原因, 支配树的中文条目和英文条目有一些出入, 不同的地方在中文词条是不能自恰的, 在这里提醒一下. 写这段文字时的版本是[这个 (可能要复制链接访问而不是单击访问)](https://zh.wikipedia.org/w/index.php?title=%E6%94%AF%E9%85%8D_(%E5%9C%96%E8%AB%96)&oldid=70026716), 表格中 $5$ 号点没有 idom, 而按照左边的定义和英文条目来看, $5$ 号点的 idom 是 $2$, 也应该是 $2$.
+
+对于 $i$ 支配 $j$, 我们称 $i$ 是 $j$ 的必经点 (dom). 点 $i$ 的最近必经点 (idom) 必须满足除了它本身外不支配任何支配 $i$ 的节点. 记 $Fa_i$ 表示 $i$ 的 idom.
+
+我们一开始从 $1$ 点开始 DFS, 记录每个点的 DFS 序 (DFN).
+
+定义 $y$ 为 $x$ 的半必经点 (semi), 需要存在 $y$ 到 $x$ 的一条路径上除了两端的 $x$, $y$, 剩下的任何点 $i$ 都满足 $DFN_i > DFN_x$. 我们记 $Sem_i$ 表示 $i$ 的 DFN 最小的 semi.
+
+每个点 DFS 树上的父亲一定是它的一个 semi. 这样就可以推出 $Sem_i$ 一定是 $i$ 的一个祖先. 如果 $Sem_i$ 不是 $i$ 的父亲, 则它不是 $i$ 的祖先就是和 $i$ 无直系关系, 在另一棵更先搜索的子树上. 但是后者矛盾是因为如果存在一条路径从更先搜索的 $Sem_i$ 到 $i$, 那么 $i$ 也会比它的父亲更先搜索. 因此 $Sem_i$ 一定是祖先.  
+
+如果存在边 $x \rightarrow y$, 并且 $DFN_x < DFN_y$, 也就是说这是一条 DFS 树上的树边, $x$ 是 $y$ 的父亲, 则 $x$ 显然是 $y$ 的一个 semi.
+
+如果 $DFN_x > DFN_y$, 那么这是横叉边或回边, 那么 $x$ 和它满足 $DFN_i > DFN_y$ 的祖先 $i$ 的 $Sem$ 也是 $y$ 的 semi.
+
+设点 $i$ 是 $x$ 或它的祖先, 满足 $DFN_i > DFN_y$. 我们一定可以找到一条 $i$ 到 $x$ 的树边路径, 然后接上 $x \rightarrow y$ 变成 $i$ 到 $y$ 的路径, 根据定义能找到一条 $Sem_i$ 到 $i$ 的路径, 路径上其它点 $j$ 的 $DFN_j > DFN_i$. 拼接起来得到 $Sem_i$ 到 $y$ 的路径. 如果存在环, 那么我们只截取 $Sem_i$ 到 $y$ 的部分. 无论 $x \rightarrow y$ 是回边还是横叉边, 那么这路径中间的节点 $j$ 一定满足 $DFN_j > DFN_y$, 所以也是 $y$ 的 semi.
+
+推论可以简化为: $x$, $y$ 的 LCA 的子树中的 $x$ 的祖先 (包含 $x$, 不包含 LCA) 的 $Sem$ 中 DFN 最小的一个.
+
+为了求出每个点的 $Sem$, 我们按 DFS 序倒着枚举, 对每个点枚举它的所有入边, 如果是父亲, 那么就直接更新 $Sem$, 如果是横叉边或回边, 那么这个前驱点一直到 LCA 路径上所有点 (不包含 LCA) 的 $Sem$ 应该已经算完了, 并且 LCA 和它祖先的 $Sem$ 一定没算, 我们用并查集维护每个点到根的路径上, 所有确定 $Sem$ 值的点的 $Sem$ 最小值, 这样可以 $O(\log n)$ 对横叉边和回边进行查询.
+
+$Fa_i$ 一定是 $Sem_i$ 或它的祖先. 因为 $Fa_i$ 支配 $i$, 因此一定是 $i$ 的祖先.
+
+当 $Sem_i$ 是 $i$ 在 DFS 树上的父亲的时候, 同为 $i$ 祖先的 $Fa_i$ 一定满足不是 $Sem_i$ 就是它的祖先的条件.
+
+当 $Sem_i$ 不是 $i$ DFS 树上的父亲的时候, $Sem_i$ 可以找到包含非树边的路径到 $i$, 因此这时 $Fa_i$ 不可能是 $Sem_i$ 的后代.
+
+我们找到 $Sem_i$ 到 $i$ 路径上, 除 $Sem_i$ 以外的所有点, $Sem$ 最小的是 $j$.
+
+如果能够找到路径绕开 $Sem_i$, 则一定有 $DFN_{Sem_j} < DFN_{Sem_i}$. 所以如果 $Sem_j = Sem_i$ 的情况, 就有 $DFN_{Fa_i} \geq DFN_{Sem_i}$, 又因为 $Fa_i$ 是 $Sem_i$ 或它的祖先, 因此 $Fa_i = Sem_i$.
+
+如果真的可以绕开, 那么支配 $i$ 的必要条件就是支配 $j$. 又因为 $Sem_j$ 一定是绕开 $Sem_i$ 的路径中, 离开树边最早的点, 因此支配 $j$ 也是支配 $i$ 的充分条件. 综上, $Fa_i = Fa_j$.
+
+我们发现在求 $Sem$ 的时候我们也维护了树上一条链的 $DFN_{Sem_i}$ 最小的 $i$. 每次求 $x$ 的 $Sem$ 之前, 一定已经求出了 DFS 树上 $x$ 的所有后代的 $Sem$, 也就是说所有以 $x$ 作为 $Sem$ 的点都被求出来了. 这时遍历所有 $Sem_y = x$ 的 $y$, 用并查集查到的便是 $y$ 的 $j$ 值.
+
+最后通过每个点的 $j$ 值按 DFN 从小到大扫一遍, 进行上面对 $Sem$ 的判断然后给 $Fa$ 赋值即可.
+
+最后是代码, 这就是面向 `vector` 编程.
+
+```cpp
+unsigned m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Node;
+struct Set {
+  Set* Fa;
+  Node* Val;
+}S[200005], *Stack[200005], **STop(Stack);
+struct Node {
+  vector<Node*> E, IE, DFSSon, SemSon, Son;
+  Node *Sem, *Fa, *J;
+  unsigned DFN, Size;
+  inline void DFSforDFN();
+  inline void DFSforSize();
+  inline char Les(Node* x) {return Sem->DFN < x->Sem->DFN;}
+}N[200005], *Rk[200005];
+inline Node* Find(Set* x) {
+  while (x != x->Fa) *(++STop) = x, x = x->Fa;
+  Node* Cur(x->Val);
+  while (STop > Stack)
+    Cur = ((*STop)->Val = (Cur->Les((*STop)->Val)) ? Cur : (*STop)->Val), (*(STop--))->Fa = x;
+  return Cur;
+}
+inline void Node::DFSforDFN() {
+  Rk[DFN = ++Cnt] = this;
+  for (auto i:E) if(!(i->DFN)) DFSSon.push_back(i), i->DFSforDFN();
+}
+inline void Node::DFSforSize() {
+  Size = 1;
+  for (auto i:Son) i->DFSforSize(), Size += i->Size;
+}
+signed main() {
+  n = RD(), m = RD(); 
+  for (unsigned i(1); i <= m; ++i)
+    A = RD(), B = RD(), N[A].E.push_back(N + B), N[B].IE.push_back(N + A); 
+  N[1].DFSforDFN(), N[n + 1].DFN = 0x3f3f3f3f;
+  for (unsigned i(1); i <= n; ++i) S[i] = {S + i, N + i};
+  for (unsigned i(1); i <= n; ++i) N[i].J = N + i;
+  for (unsigned i(n); i; --i) {
+    Node* Cur(Rk[i]);
+    for (auto j:Cur->SemSon) {
+      Node* Get(Find(S + (j - N)));
+      if(Get->Les(j->J)) j->J = Get;
+    }
+    Cur->Sem = N + n + 1;
+    for (auto j:Cur->IE) {
+      if(j->DFN < Cur->DFN) Cur->Sem = (Cur->Sem->DFN > j->DFN) ? j : Cur->Sem;
+      else {
+        Node* Get(Find(S + (j - N)));
+        Cur->Sem = (Get->Les(Cur)) ? Get->Sem : Cur->Sem;
+      }
+    }
+    Cur->Sem->SemSon.push_back(Cur);
+    for (auto j:Cur->DFSSon) S[j - N].Fa = S + (Cur - N);
+  }
+  for (unsigned i(1); i <= n; ++i) {
+    Node* Cur(Rk[i]);
+    if(Cur->J->Sem == Cur->Sem) Cur->Fa = Cur->Sem;
+    else Cur->Fa = Cur->J->Fa;
+  }
+  for (unsigned i(2); i <= n; ++i) N[i].Fa->Son.push_back(N + i);
+  N[1].DFSforSize();
+  for (unsigned i(1); i <= n; ++i) printf("%u ", N[i].Size); putchar(0x0A);
+  return Wild_Donkey;
+}
+```
+
+#### 回到这个题
+
+显然即使 $O(1)$ 求出支配树和这个题也没有什么关系, 我们继续思考如何解决这个问题. 之前提到过受支配集只会减少, 也就是说我们需要求出受支配集减少的点.
+
+一个点的受支配集在支配树上就是这个点和它的所有祖先, 我们要找的是连边后可以找到一条不全是一个点 $x$ 的祖先的路径从 $1$ 到达 $x$ 的路径. 容易发现在支配树的定义下, 这种路径一定包含加入的这条边.
+
+我们发现一个点的支配情况发生改变, 它在支配树上的子树的所有点的受支配集一定都改变, 这是因为一个点的祖先也是它子树中所有点的祖先. 因此只要找出所有 $x$, 满足有一条不经过 $Fa_x$ 的路径从 $1$ 到达 $x$ 的路径.
+
+为了找出这种路径, 对于每个点 $x$, 在反图上删除 $Fa_x$, 然后找出它能到达的所有点的集合 $Accessible_x$. 对于 $Accessible_x$ 里的所有元素 $y$, 我们可以把 $x$ 加入 $y$ 的 $Available_y$ 集合中.
+
+对于每个询问 $x \rightarrow y$, 我们枚举 $Available_y$ 中的所有点. 对于 $i \in Available_y$, 只要存在 $1$ 到 $x$ 的不经过 $Fa_i$ 的路径我们就可以断定 $i$ 的子树都会发生变化. 我们发现从 $1$ 到 $x$ 只能走原图上的边, 因此只要 $Fa_i$ 是 $x$ 的祖先, 那我们就找不到这样的路径, 反之则可以找到.
+
+我们 $O(n)$ 将所有 $x$ 的祖先都打上标记, 然后对所有 $i \in Available_y$ 都判断 $Fa_i$ 是否有标记, 如果有, 那么就在 DFS 序列上对 $i$ 的子树进行覆盖, 最后 $O(n)$ 扫描序列得到所有的点.
+
+```cpp
+unsigned m, n, q;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Node {
+  vector<Node*> E, IE, Control;
+  unsigned Bectrl;
+  char Ava;
+  inline void DFS() {
+    Ava = 1;
+    for (auto i:E) if(!(i->Ava)) i->DFS();
+  }
+  inline void IDFS() {
+    Ava = 1;
+    for (auto i:IE) if(!(i->Ava)) i->IDFS();
+  }
+}N[3005];
+struct Tree {
+  bitset<3005> Available;
+  vector <Tree*> Son;
+  Tree *Fa;
+  unsigned DFN, Size;
+  char Ava;
+  inline void Init() {
+    DFN = ++Cnt, Size = 1;
+    for (auto i:Son) i->Fa = this, i->Init(), Size += i->Size;
+  }
+}T[3005];
+signed main() {
+  n = RD(), m = RD(), q = RD();
+  /*
+  Build Tree Here
+  */
+  T[1].Init();
+  for (unsigned i(2); i <= n; ++i) {
+    for (unsigned j(1); j <= n; ++j) N[j].Ava = 0;
+    N[T[i].Fa - T].Ava = 1, N[i].IDFS(), N[T[i].Fa - T].Ava = 0;
+    for (unsigned j(1); j <= n; ++j) if(N[j].Ava) T[j].Available[i] = 1;
+  }
+  int Delta[3005];
+  for (unsigned i(1); i <= q; ++i) {
+    Tree *Fr(T + RD()), *To(T + RD()), *TmpF(Fr);
+    while (Fr) Fr->Ava = 1, Fr = Fr->Fa;
+    memset(Delta, 0, (n + 1) << 2), Ans = 0;
+    for (unsigned i(2); i <= n; ++i) if(To->Available[i] && (!(T[i].Fa->Ava))) ++Delta[T[i].DFN], --Delta[T[i].DFN + T[i].Size];
+    int Cur(0);
+    for (unsigned i(1); i <= n; ++i) {if(Cur + Delta[i]) ++Ans; Cur += Delta[i];}
+    Fr = TmpF; while (Fr) Fr->Ava = 0, Fr = Fr->Fa;
+    printf("%u\n", Ans);
+  }
+  return Wild_Donkey;
+}
+```
