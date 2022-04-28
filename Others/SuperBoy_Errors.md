@@ -441,3 +441,35 @@ for (unsigned i(1); i <= t; ++i) {
 ```
 
 > April.13th 2022 By WD
+
+## 快毒: 快速中毒
+
+- 错误示范
+
+没错, 如果一个字符既小于 `0` 也大于 `9`, 那么跳过这个字符, 再读一个字符.
+
+```cpp
+inline unsigned RD() {
+  unsigned RTmp(0);
+  char ch(getchar()); 
+  while (ch < '0' && ch > '9') ch = getchar();
+  while (ch >= '0' && ch <= '9') RTmp = RTmp * 10 + ch - '0', ch = getchar(); 
+  return RTmp;
+}
+```
+
+- 正确示范
+
+没错, 如果一个字符既小于 `0` 或者大于 `9`, 那么跳过这个字符, 再读一个字符.
+
+```cpp
+inline unsigned RD() {
+  unsigned RTmp(0);
+  char ch(getchar()); 
+  while (ch < '0' || ch > '9') ch = getchar();
+  while (ch >= '0' && ch <= '9') RTmp = RTmp * 10 + ch - '0', ch = getchar(); 
+  return RTmp;
+}
+
+> April.19th 2022 By WD
+

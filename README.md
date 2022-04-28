@@ -279,6 +279,7 @@ ___
 | [P6246 IOI2000](https://www.luogu.com.cn/problem/P6246)      | 邮局(加强版)        | 凸优化 DP, 决策单调性优化 DP            |
 | [P2841](https://www.luogu.com.cn/problem/P2841)              | A*B Problem         | 高精度 DP                               |
 | [CF1416E](https://codeforces.com/problemset/problem/1416/E)  | Split               | 数据结构优化 DP, WBLT, 文艺宗法树       |
+| [P5359 SDOI2019](https://www.luogu.com.cn/problem/P5359)     | 染色                | 数据结构优化 DP                         |
 | [CF506E](https://codeforces.com/problemset/problem/506/E)    | Mr. Kitayuta's Gift | 矩阵乘法优化 DP, 有限自动机, 自动机压缩 |
 
 #### 数学
@@ -364,14 +365,15 @@ ___
 
 - 次要内容: 仙人掌, 支配树
 
-| 出处                                                     | 题目       | 知识点                   |
-| -------------------------------------------------------- | ---------- | ------------------------ |
-| [P3806](https://www.luogu.com.cn/problem/P3806)          | 点分治     | 点分治                   |
-| [P3806](https://www.luogu.com.cn/problem/P5236)          | 静态仙人掌 | 仙人掌, 圆方树, 树链剖分 |
-| [PrSl2021 P7515](https://www.luogu.com.cn/problem/P7515) | 矩阵游戏   | SPFA, 差分约束           |
-| [PrSl2021 P7516](https://www.luogu.com.cn/problem/P7516) | 图函数     | Floyd, 搜索, 邻接矩阵    |
-| [PrSl2021 P7520](https://www.luogu.com.cn/problem/P7520) | 支配       | 支配树, 树上差分         |
-| [P5180](https://www.luogu.com.cn/problem/P5180)          | 支配树     | 支配树                   |
+| 出处                                                     | 题目                   | 知识点                   |
+| -------------------------------------------------------- | ---------------------- | ------------------------ |
+| [SDOI2019 P5361](https://www.luogu.com.cn/problem/P5361) | 热闹的聚会和尴尬的聚会 | 最大独立集的线性近似算法 |
+| [P3806](https://www.luogu.com.cn/problem/P3806)          | 点分治                 | 点分治                   |
+| [P3806](https://www.luogu.com.cn/problem/P5236)          | 静态仙人掌             | 仙人掌, 圆方树, 树链剖分 |
+| [PrSl2021 P7515](https://www.luogu.com.cn/problem/P7515) | 矩阵游戏               | SPFA, 差分约束           |
+| [PrSl2021 P7516](https://www.luogu.com.cn/problem/P7516) | 图函数                 | Floyd, 搜索, 邻接矩阵    |
+| [PrSl2021 P7520](https://www.luogu.com.cn/problem/P7520) | 支配                   | 支配树, 树上差分         |
+| [P5180](https://www.luogu.com.cn/problem/P5180)          | 支配树                 | 支配树                   |
 
 ### 中二期
 
