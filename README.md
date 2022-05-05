@@ -152,8 +152,6 @@ ___
 
 #### tyy 推荐
 
-- 图论: 虚树
-
 - 组合数学: 可重集, 错排列
 
 #### tyy 中立
@@ -194,7 +192,7 @@ ___
 
 ### 知识清单 (FYS 会)
 
-以下这些都是 fys $2022$ 年 $Jan.1st$ 之后会的, 不一定都要学, 但是应该很全了, 不太可能会出现值得学的知识点fys不会且没出现在这个清单里的.
+以下这些都是 fys `01-01-2022` 之后会的, 不一定都要学, 但是应该很全了, 不太可能会出现值得学的知识点fys不会且没出现在这个清单里的.
 
 #### tyy 推荐
 
@@ -204,7 +202,7 @@ ___
 
 - 数据结构: 李超线段树
 
-- 图论: 点分治
+- 图论: 点分治, 虚树
 
 - 线性代数: 高斯消元, 行列式
 
@@ -315,6 +313,7 @@ ___
 | [BZOJ4184](https://hydro.ac/d/bzoj/p/4184)                   | Shallot          | 线性基删除                       |
 | [ABC223H](https://atcoder.jp/contests/abc223/tasks/abc223_h) | Xor Query        | 线性基                           |
 | [P4781](https://www.luogu.com.cn/problem/P4781)              | 拉格朗日插值     | 多项式插值                       |
+| [P8290](https://www.luogu.com.cn/problem/P8290)              | 填树             | 多项式插值, 树形 DP              |
 | [P5667](https://www.luogu.com.cn/problem/P5667)              | 拉格朗日插值2    | 多项式插值, 数论变换             |
 | [P4213](https://www.luogu.com.cn/problem/P4213)              | 杜教筛           | 杜教筛                           |
 | [P3768](https://www.luogu.com.cn/problem/P3768)              | 简单的数学题     | 杜教筛, 莫比乌斯反演             |
@@ -367,6 +366,8 @@ ___
 
 | 出处                                                     | 题目                   | 知识点                   |
 | -------------------------------------------------------- | ---------------------- | ------------------------ |
+| [SDOI2011 P2495](https://www.luogu.com.cn/problem/P2495) | 消耗战                 | 虚树, 树上倍增           |
+| [SDOI2019 P5360](https://www.luogu.com.cn/problem/P5360) | 世界地图               | 虚树, 最小生成树         |
 | [SDOI2019 P5361](https://www.luogu.com.cn/problem/P5361) | 热闹的聚会和尴尬的聚会 | 最大独立集的线性近似算法 |
 | [P3806](https://www.luogu.com.cn/problem/P3806)          | 点分治                 | 点分治                   |
 | [P3806](https://www.luogu.com.cn/problem/P5236)          | 静态仙人掌             | 仙人掌, 圆方树, 树链剖分 |
