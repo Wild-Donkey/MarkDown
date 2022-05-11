@@ -263,6 +263,7 @@ ___
 | [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
 | [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
 | [ARC068F](https://atcoder.jp/contests/arc068/tasks/arc068_d) | Solitaire           | 二维前缀和优化 DP, 计数 DP              |
+| [P5363 SDOI2019](https://www.luogu.com.cn/problem/P5363)    | 移动金币    | 计数 DP, 二进制分组优化             |
 | [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
 | [ARC059F](https://atcoder.jp/contests/arc059/tasks/arc059_d) | Unhappy Hacking     | 计数 DP, 卡塔兰数                       |
 | [P5307 COCI2019](https://www.luogu.com.cn/problem/P5307)     | Mobitel             | 计数 DP, 整除分块优化                   |
@@ -356,6 +357,7 @@ ___
 | [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                                                                             |
 | [CQOI2011 P3157](https://www.luogu.com.cn/problem/P3157)        | 动态逆序对                     | 线段树套平衡树, Splay                                                                  |
 | [PrSl2020 P6623](https://www.luogu.com.cn/problem/P6623)        | 树                             | Trie 维护全局自增查异或和, 树上启发式合并, Trie 合并, 树上差分                         |
+| [SDOI2018 P4605](https://www.luogu.com.cn/problem/P4605)        | 物理实验                             |数据结构维护计算几何                         |
 
 #### 图论
 
