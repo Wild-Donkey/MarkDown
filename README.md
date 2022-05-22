@@ -263,7 +263,7 @@ ___
 | [P1850 NOIP2016](https://www.luogu.com.cn/problem/P1850)     | 换教室              | 期望 DP                                 |
 | [P1941 NOIP2014](https://www.luogu.com.cn/problem/P1941)     | 飞扬的小鸟          | 前缀和优化 DP                           |
 | [ARC068F](https://atcoder.jp/contests/arc068/tasks/arc068_d) | Solitaire           | 二维前缀和优化 DP, 计数 DP              |
-| [P5363 SDOI2019](https://www.luogu.com.cn/problem/P5363)    | 移动金币    | 计数 DP, 二进制分组优化             |
+| [P5363 SDOI2019](https://www.luogu.com.cn/problem/P5363)     | 移动金币            | 计数 DP, 二进制分组优化                 |
 | [P5664 CSP-S2019](https://www.luogu.com.cn/problem/P5664)    | Emiya 家今天的饭    | 计数 DP, 记录状态差降维技巧             |
 | [ARC059F](https://atcoder.jp/contests/arc059/tasks/arc059_d) | Unhappy Hacking     | 计数 DP, 卡塔兰数                       |
 | [P5307 COCI2019](https://www.luogu.com.cn/problem/P5307)     | Mobitel             | 计数 DP, 整除分块优化                   |
@@ -305,6 +305,7 @@ ___
 | [P1447 NOI2010](https://www.luogu.com.cn/problem/P1447)      | 能量采集         | 莫比乌斯反演                     |
 | [P1829](https://www.luogu.com.cn/problem/P1829)              | Crash的数字表格  | 莫比乌斯反演, 整除分块           |
 | [P3327 SDOI2015](https://www.luogu.com.cn/problem/P3327)     | 约数个数和       | 莫比乌斯反演, 整除分块           |
+| [P4619 SDOI2018](https://www.luogu.com.cn/problem/P4619)     | 旧试题           | 莫比乌斯反演, 枚举三元环         |
 | [P3389](https://www.luogu.com.cn/problem/P3389)              | 高斯消元         | 高斯消元                         |
 | [P7112](https://www.luogu.com.cn/problem/P7112)              | 行列式           | 高斯消元, 辗转相减法             |
 | [P4783](https://www.luogu.com.cn/problem/P4783)              | 矩阵求逆         | 高斯消元                         |
@@ -348,7 +349,9 @@ ___
 | [P4097 HEOI2013](https://www.luogu.com.cn/problem/P4097)        | Segment                        | 李超线段树                                                                             |
 | [P4254 JSOI2008](https://www.luogu.com.cn/problem/P4254)        | Blue Mary开公司                | 李超线段树                                                                             |
 | [P3527 POI2011 SP10264](https://www.luogu.com.cn/problem/P3527) | Meteors                        | 整体二分, 主席树, 树状数组, 差分                                                       |
+| [P5367](https://www.luogu.com.cn/problem/P5367)                 | 康托展开                       | 树状数组                                                                               |
 | [SDOI2013 P3302](https://www.luogu.com.cn/problem/P3302)        | 森林                           | 树上差分, 可持久化权值线段树, 线段树上二分, 启发式合并                                 |
+| [P5055](https://www.luogu.com.cn/problem/P5055)                 | 可持久化文艺平衡树             | 可持久化文艺平衡树                                                                     |
 | [P1527 国家集训队](https://www.luogu.com.cn/problem/P1527)      | 矩阵乘法                       | 整体二分                                                                               |
 | [P5048 Ynoi2019](https://www.luogu.com.cn/problem/P5048)        | Yuno loves sqrt technology III | 分块                                                                                   |
 | [P8120 RdOIr3.5](https://www.luogu.com.cn/problem/P8120)        | RMSQ                           | 分块, 数组回滚                                                                         |
@@ -357,7 +360,8 @@ ___
 | [P5586 P5350](https://www.luogu.com.cn/problem/P5586)           | 序列                           | 东周平衡树                                                                             |
 | [CQOI2011 P3157](https://www.luogu.com.cn/problem/P3157)        | 动态逆序对                     | 线段树套平衡树, Splay                                                                  |
 | [PrSl2020 P6623](https://www.luogu.com.cn/problem/P6623)        | 树                             | Trie 维护全局自增查异或和, 树上启发式合并, Trie 合并, 树上差分                         |
-| [SDOI2018 P4605](https://www.luogu.com.cn/problem/P4605)        | 物理实验                             |数据结构维护计算几何                         |
+| [SDOI2018 P4605](https://www.luogu.com.cn/problem/P4605)        | 物理实验                       | 数据结构维护计算几何                                                                   |
+| [P5854](https://www.luogu.com.cn/problem/P5854)                 | 笛卡尔树                       | 笛卡尔树                                                                               |
 
 #### 图论
 
@@ -378,10 +382,16 @@ ___
 | [PrSl2021 P7516](https://www.luogu.com.cn/problem/P7516) | 图函数                 | Floyd, 搜索, 邻接矩阵    |
 | [PrSl2021 P7520](https://www.luogu.com.cn/problem/P7520) | 支配                   | 支配树, 树上差分         |
 | [P5180](https://www.luogu.com.cn/problem/P5180)          | 支配树                 | 支配树                   |
+| [P1989](https://www.luogu.com.cn/problem/P1989)          | 无向图三元环计数       | 无向图三元环计数         |
 
-### 中二期
+#### 字符串
 
-模拟赛.
+- 复习内容 SAM, GSAM, ACAM, SA
+
+| 出处                                                     | 题目       | 知识点                                      |
+| -------------------------------------------------------- | ---------- | ------------------------------------------- |
+| [12OI2019 P5284](https://www.luogu.com.cn/problem/P5284) | 字符串问题 | SA, 拓扑排序, ST 表, 可持久化线段树优化建图 |
+| [CTSC2012 P4022](https://www.luogu.com.cn/problem/P4022) | 熟悉的文章 | GSAM, 单调队列优化 DP                       |
 
 ## 后期(如果有的话)
 
