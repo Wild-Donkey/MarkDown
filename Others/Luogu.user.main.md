@@ -3,7 +3,7 @@ freopen("julian3.in", "r", stdin);
 ```
 
 $$
-\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459743}}
+\bold{\mathbb{Julian} \mathfrak{2458040} \Rightarrow \mathbb{Julian} \mathfrak{2459746}}
 $$
 
 # "你学OI $5$ 年"
@@ -27,7 +27,7 @@ $$
 > Wild_Donkey[@Bilibili](https://space.bilibili.com/179337056)
 
 > WildDonkey______[@twitch](https://www.twitch.tv/wilddonkey______)
-> 
+
 > Wild Donkey[@youtube](https://www.youtube.com/channel/UC6Gcb8R8zgTGqDGRs61U51w)
 
 ![](https://statcard.vercel.app/api?id=143771&dark_mode=true)
@@ -121,6 +121,8 @@ $Julian~2459660$ `2022.3.21` 咕值排名 $84$, 进入前一百 (虽然没什么
 $Julian~2459715$ `2022.5.15` SDOI2022 $162'$ RK $24$, 综合 RK $23$
 
 $Julian~2459728$ `2022.5.28` APIO2022 $151.36'$ RK $94$, 痛失 Ag
+
+$Julian~2459746$ `2022.6.14` 入选 D 类, 成为高二 D 类的大怨种
 
 $$
 \boldsymbol{Wild\_Donkey}\\
