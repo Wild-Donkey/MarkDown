@@ -444,9 +444,11 @@ ___
 
 ### 做题记录
 
-| 出处                                                     | 题目     | 知识点         |
-| -------------------------------------------------------- | -------- | -------------- |
-| [SDOI2022 P8349](https://www.luogu.com.cn/problem/P8349) | 整数序列 | 根号分治       |
-| [SDOI2022 P8349](https://www.luogu.com.cn/problem/P8349) | 无处存储 | 树分块, 码农   |
-| [APIO2022 P8374](https://www.luogu.com.cn/problem/P8374) | 火星     | 状态压缩, 插头 |
-| [APIO2022 P8376](https://www.luogu.com.cn/problem/P8376) | 排列     | 思维           |
+| 出处                                                     | 题目         | 知识点         |
+| -------------------------------------------------------- | ------------ | -------------- |
+| [SDOI2022 P8349](https://www.luogu.com.cn/problem/P8349) | 整数序列     | 根号分治       |
+| [SDOI2022 P8353](https://www.luogu.com.cn/problem/P8353) | 无处存储     | 树分块, 码农   |
+| [APIO2022 P8374](https://www.luogu.com.cn/problem/P8374) | 火星         | 状态压缩, 插头 |
+| [APIO2022 P8376](https://www.luogu.com.cn/problem/P8376) | 排列         | 思维           |
+| [P4238](https://www.luogu.com.cn/problem/P4238)          | 多项式乘法逆 | 多项式, NTT    |
+| [P4238](https://www.luogu.com.cn/problem/P4238)          | 多项式乘法逆 | 多项式, NTT    |
