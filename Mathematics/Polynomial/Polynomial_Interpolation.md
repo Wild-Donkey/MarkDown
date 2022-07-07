@@ -2,6 +2,8 @@
 
 > Keep away from polynomial.  ---- Wild_Donkey
 
+> Published on 2022-02-20, Updated on 2022-07-02
+
 给 $(x_0, y_0), (x_1, y_1),...,(x_n, y_n)$, 共 $n + 1$ 个点. 求一个 $n$ 次 $n + 1$ 项的多项式 $L$, 使得多项式的图像过每一个点. 这个多项式 $L$ 便是拉格朗日多项式 (Lagrange polynomial).
 
 ## 拉格朗日基本多项式 (插值基函数)
@@ -221,38 +223,96 @@ N(x) &= \sum_{i = 0}^{n} a_in_i(x)\\
 \end{aligned}
 $$
 
-## 例题
+## 横坐标为连续正整数时的线性插值
 
-有一个 $n$ 次以内的多项式 $f(x)$, 给 $n + 1$ 个点值, $f(0), f(1),..., f(n)$. 求 $f(m), f(m + 1),..., f(m + n)$.
-
-这个题 $O(n^2)$ 无法通过, 而且由于询问也是 $n + 1$ 个点值, 所以插出系数来也无法用正确的复杂度询问. 发现横坐标很特殊, $x_i = i$, 询问也很特殊, 横坐标也是连续的. 我们需要求出所以先把横坐标往插值公式里面带. 首先化简 $\displaystyle{\prod_{j = 0, j \neq i}^{n} (i - j)}$.
+尝试化简横坐标为连续正整数的拉格朗日多项式:
 
 $$
 \begin{aligned}
 \prod_{j = 0, j \neq i}^{n} (i - j) &= \Big(\prod_{j = 0}^{i - 1} (i - j)\Big)\Big(\prod_{j = i + 1}^n (i - j)\Big)\\
 &= \Big(\prod_{j = 0}^{i - 1} (i - j)\Big)\Big(\prod_{j = i + 1}^n (j - i)\Big) (-1)^{n - i}\\
-&= i!(n - i)!(-1)^{n - i}
+&= i!(n - i)!(-1)^{n - i}\\
 \end{aligned}
 $$
 
-如果默认 $x$ 为自然数且 $x > n$, 还可以化简 $\displaystyle{\prod_{i = 0}^{n}} (x - i) = \dfrac {x!}{(x - n - 1)!}$.
+记 $x^{\underline{i}} = \prod_{j = 0}^{i - 1} (x - j)$, 这种情况的拉格朗日多项式可以改写为:
 
 $$
 \begin{aligned}
 L(x) &= \sum_{i = 0}^{n} \frac{x!f(i)}{(x - n - 1)!i!(n - i)!(-1)^{n - i}(x - i)}\\
-&= \frac {x!}{(x - n - 1)!} \sum_{i = 0}^{n} \frac{f(i)}{i!(n - i)!(-1)^{n - i}(x - i)}\\
-&= \frac {x!}{(x - n - 1)!} \sum_{i = 0}^{n}\frac {f(i)}{i!(n - i)!(-1)^{n - i}}\frac 1{x - i}\\
+&= x^{\underline{n + 1}} \sum_{i = 0}^{n} \frac{f(i)}{i!(n - i)!(-1)^{n - i}(x - i)}
 \end{aligned}
 $$
 
-我们可以 $O(n)$ 处理 $\dfrac{f(i)}{i!(n - i)!(-1)^{n - i}}$, 和对于所有 $x$ 的 $\dfrac{x!}{(x - n - 1)!}$. 注意 $x$ 较大, 无法直接计算 $x!$, 所以我们可以先把 $x - n$ 到 $x$ 的数字相乘, 得到 $\dfrac{x!}{(x - n - 1)!}$ 然后枚举 $x$ 来递推.
+可以发现这个时候如果只需要求一个点值, 可以直接线性求出, 求多个点值也会有很优秀的性质, 接下来用两道题来分别实现一下单点插值和多点插值的情况.
+
+## [CF622F The Sum of the k-th Powers](http://codeforces.com/problemset/problem/622/F)
+
+求前 $n$ 个正整数的 $k$ 次方和对 $10^9 + 7$ 取模的结果. $(n \leq 10^9, k \leq 10^6)$
+
+在 $n \leq k + 1$ 的时候, 我们可以直接快速幂在 $O(n\log k)$ 的时间内得到答案. 我们知道自然数的 $k$ 次方和公式是一个 $k + 1$ 次的多项式, 所以在 $n > k + 1$ 的时候, 我们只要想办法插出这个多项式直接求 $x = n$ 的值即可. 我们可以自己选择点值的横坐标, 前面已经推出来, 拉格朗日多项式在点的横坐标为连续的自然数的时候是这样的形式:
+
+$$
+\begin{aligned}
+L(x) &= x^{\underline{n + 1}}\sum_{i = 0}^{n}\frac {i^k}{i!(n - i)!(-1)^{n - i}(x - i)}\\
+L(x) &= \sum_{i = 0}^{n}\frac {i^kx^{\underline{i}}(x - n)^{\overline{n - i}}}{i!(n - i)!(-1)^{n - i}}
+\end{aligned}
+$$
+
+因此 $O(k\log k)$ 求出一些点值, 线性求出 $L(k)$ 即可.
+
+```cpp
+const unsigned long long Mod(1000000007);
+unsigned a[1000005], FacInv[1000005], Inv[1000005], Up[1000005], Down[1000005], m, n;
+unsigned A, B, C, D, t;
+unsigned long long Ans(0);
+inline void Mn(unsigned& x) { x -= ((x >= Mod) ? Mod : 0); }
+inline void Mn(unsigned long long& x) { x -= ((x >= Mod) ? Mod : 0); }
+inline unsigned long long Pow(unsigned long long x, unsigned y) {
+  unsigned long long Rt(1);
+  while (y) { if (y & 1) Rt = Rt * x % Mod; x = x * x % Mod, y >>= 1; }
+  return Rt;
+}
+signed main() {
+  n = RD(), m = RD();
+  if (n <= (m + 1)) {
+    for (unsigned i(1); i <= n; ++i) Mn(Ans += Pow(i, m));
+    printf("%llu\n", Ans);
+    return Wild_Donkey;
+  }
+  for (unsigned i(0); i <= m; ++i) Mn(a[i + 1] = a[i] + Pow(i + 1, m));
+  ++m, Up[0] = Down[0] = FacInv[0] = Inv[0] = Inv[1] = 1;
+  for (unsigned long long i(0); i < m; ++i) Up[i + 1] = Up[i] * (n - m + i) % Mod;
+  for (unsigned long long i(0); i < m; ++i) Down[i + 1] = Down[i] * (n - i) % Mod;
+  for (unsigned i(2); i <= m; ++i) Inv[i] = Inv[Mod % i] * (Mod - (Mod / i)) % Mod;
+  for (unsigned i(1); i <= m; ++i) FacInv[i] = (unsigned long long)FacInv[i - 1] * Inv[i] % Mod;
+  for (unsigned i(m); i < 0x3f3f3f3f; i -= 2)
+    Ans = (Ans + ((((unsigned long long)Down[i] * Up[m - i] % Mod) * FacInv[i] % Mod) * FacInv[m - i] % Mod) * a[i]) % Mod;
+  for (unsigned i(m - 1); i < 0x3f3f3f3f; i -= 2)
+    Ans = (Ans + ((((unsigned long long)Down[i] * Up[m - i] % Mod) * FacInv[i] % Mod) * FacInv[m - i] % Mod) * (Mod - a[i])) % Mod;
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+## [例题](https://www.luogu.com.cn/problem/P5667)
+
+有一个 $n$ 次以内的多项式 $f(x)$, 给 $n + 1$ 个点值, $f(0), f(1),..., f(n)$. 求 $f(m), f(m + 1),..., f(m + n)$.
+
+这个题 $O(n^2)$ 无法通过, 而且由于询问也是 $n + 1$ 个点值, 所以插出系数来也无法用正确的复杂度询问. 发现横坐标很特殊, $x_i = i$, 询问也很特殊, 横坐标也是连续的, 所以这时拉格朗日多项式是这样的:
+
+$$
+L(x) = x^{\underline{n + 1}}\sum_{i = 0}^{n}\frac {f(i)}{i!(n - i)!(-1)^{n - i}(x - i)}
+$$
+
+我们可以 $O(n)$ 处理 $\dfrac{f(i)}{i!(n - i)!(-1)^{n - i}}$, 和对于所有 $x$ 的 $x^{\underline{n + 1}}$.
 
 但是我们要想计算一个点值, 仍然需要 $O(n)$ 枚举 $i$.
 
 定义序列 $A_i = \dfrac{f(i)}{i!(n - i)!(-1)^{n - i}}$, $B_i = \dfrac 1{m + i - n}$, $C_i = \displaystyle \sum_{j = 0}^{i} A_jB_{i - j}$, 三个序列长度为 $2(n + 1)$, $A_i = 0\ (i > n)$.
 
 $$
-L(x) = \frac{x!}{(x - n - 1)!}C_{x - m + n}
+L(x) = x^{\underline{n + 1}}C_{x - m + n}
 $$
 
 我们用 $O(n\log n)$ 卷积算出 $C$, 然后就可以 $O(1)$ 查询点值.
