@@ -38,62 +38,20 @@ $$
 
 现在的压力给到了如何生成一个大质数, 基本思路是随机生成一个数, 然后判断它是否是质数, 因为 $n$ 以内大约有 $\frac n{\ln n}$ 个质数, 所以期望随机 $\ln n$ 次就可以得到一个质数. 因为大质数都可以写成 $6k - 1$ 或 $6k + 1$ 的形式, 我们还可以通过随机生成 $k$来减少期望得到质数的随机次数. 问题转化为如何快速判断一个数是否是质数, 我们肯定不能用试除法, 所以接下来考虑更加先进的素性测试.
 
-[Miller-Rabin 素数测试]()可以在广义黎曼猜想正确的前提下实现多项式事件的素性判断.
+[Miller-Rabin 素性测试](/Mathematics/Number_Theory/Miller_Rabin/)可以在广义黎曼猜想正确的前提下实现多项式时间的素性判断. 也可以在准确率和效率中做取舍, 减少测试数量, 牺牲准确率来换取效率.
 
-但是对于素性测试已经有确定性的, 不仰仗的多项式算法, 这就是印度的计算机科学家发表于 2002 年的 AKS 素性测试.
+但是对于素性测试已经有确定性的, 不仰仗未经证明的猜想的多项式算法, 这就是印度的计算机科学家发表于 2002 年的 [AKS 素性测试](/Mathematics/Number_Theory/AKS_Primality_Test/).
 
+但是 AKS 的效率还是达不到 Miller-Rabin 那么高, 所以可以采用测试次数被刻意减少的 Miller-Rabin 检测进行初筛, 然后用 AKS 进行确定性检测.
 
-## AKS Primality Test
+## 复合加密
 
-AKS 素性测试的基于这样一个结论:
-
-对于 $n \geq 2$, 有同余多项式:
-
-$$
-(x + a)^n \equiv (x^n + a) \pmod n
-$$
-
-当且仅当 $n$ 为质数时, 对所有 $\gcd(a, n) = 1$ 的 $a$ 成立.
-
-为了说明上面这个式子的正确性, 我们需要先证明如下式子, 对 $n \geq 2$ 当且仅当 $n$ 为质数时成立:
-
-$$
-\binom nk \equiv 0 \pmod n ~~~~ (0 < k < n)
-$$
-
-整理式子:
-
-$$
-\begin{aligned}
-\binom nk &\equiv 0 \pmod n\\
-\frac{n^{\underline{k}}}{k!} &\equiv 0 \pmod n\\
-\end{aligned}
-$$
-
-对于质数 $n$, 我们知道 $k!$ 一定不含因数 $n$, 而 $n^{\underline{k}}$ 一定含因数 $n$, 因此对于所有 $k$ 都有 $n | \dfrac{n^{\underline{k}}}{k!}$. 因此该结论成立是 $n$ 是质数的必要条件.
-
-对于合数 $n$, 我们取它的一个质因子 $p$, 假设 $n$ 中有 $s$ 个 $p$, 那么一定有 $k = p^s$ 时, 上式不成立. 我们知道 $p^s!$ 中 $p$ 的次数为 $\displaystyle{\sum_{i = 0}^{s - 1} p^i}$, 而 $n^{\underline{k}}$ 中 $p$ 的次数也是 $\displaystyle{\sum_{i = 0}^{s - 1} p^i}$, 因此 $\dfrac{n^{\underline{k}}}{k!}$ 中 $p$ 的次数为 $0$, 而 $n$ 中 $p$ 的次数为 $s$, 因为 $p$ 是 $n$ 的质因数, 所以 $s > 0$. 因此这时 $\dfrac{n^{\underline{k}}}{k!} \equiv 0 \pmod n$ 不成立, 该结论成立时 $n$ 是质数的必要条件.
-
-综上, 对于 $n \geq 2$. 对所有 $0 < k < n$, 满足 $\dbinom nk \equiv 0 \pmod n$ 是 $n$ 为质数的充要条件.
-
-因此可以证明一开始的结论:
-
-$$
-\begin{aligned}
-(x + a)^n &\equiv (x^n + a) \pmod n\\
-\sum_{i = 0}^n \binom ni x^ia^{n - i} &\equiv (x^n + a) \pmod n\\
-x^n + a^n + \sum_{i = 1}^{n - 1} \binom ni x^ia^{n - i} &\equiv (x^n + a) \pmod n\\
-a^n + \sum_{i = 1}^{n - 1} \binom ni x^ia^{n - i} &\equiv a \pmod n\\
-\end{aligned}
-$$
-
-当 $n$ 是质数的时候, 这个式子的正确性是显然的, 因为我们已经证明了这些二项式系数在 $n$ 为质数的时候为 $0$, 而且根据费马小定理有 $a^n \equiv a \pmod n$, 因此满足这个结论是 $n$ 为质数的必要条件.
-
-当 $n$ 不是质数的时候, 情况有些复杂, 我思考了好久也没有证明出来. 而且这个证明在中英文维基百科上都没有写, 所以 我们可以将式子 因此满足这个结论是 $n$ 为质数的充分条件.
+因为 RSA 的加密和解密都需要多次对大整数做乘方和取模运算, 所以效率较低, 不适合进行流量大的通讯, 所以应用中可以通过和别的加密方式结合的方式来使用. 比如我们可以用 RSA 和对称密钥加密结合, 用 RSA 来传输密钥, 加密的密文由两部分组成, 前一部分是由 RSA 加密的密钥, 后一部分是对称加密的密文, 这样可以做到每条信息都使用不同的密钥, 达到和 RSA 不相上下的安全度和更高的效率.
 
 ## 参考文献
 
-- [Wikipedia - AKS primality test](https://en.wikipedia.org/wiki/AKS_primality_test)
-- [Wikipedia - AKS 素性测试](https://zh.wikipedia.org/wiki/AKS%E8%B3%AA%E6%95%B8%E6%B8%AC%E8%A9%**A6**)
-- 清华大学出版社 - 信息安全数学基础
+- [Wikipedia - 密码学](https://zh.wikipedia.org/wiki/%E5%AF%86%E7%A0%81%E5%AD%A6)
+- [Wikipedia - 对称密钥加密](https://zh.wikipedia.org/wiki/%E5%B0%8D%E7%A8%B1%E5%AF%86%E9%91%B0%E5%8A%A0%E5%AF%86)
+- [Wikipedia - 公开密钥加密](https://zh.wikipedia.org/wiki/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95)
+- [Wikipedia - RSA加密算法](https://zh.wikipedia.org/wiki/RSA%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95)
 - 哈尔滨工业大学出版社 - ACM-ICPC 程序设计系列 数论及应用
