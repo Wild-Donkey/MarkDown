@@ -454,14 +454,19 @@ ___
 
 ### 做题记录
 
-| 出处                                                     | 题目                       | 知识点             |
-| -------------------------------------------------------- | -------------------------- | ------------------ |
-| [SDOI2022 P8349](https://www.luogu.com.cn/problem/P8349) | 整数序列                   | 根号分治           |
-| [SDOI2022 P8353](https://www.luogu.com.cn/problem/P8353) | 无处存储                   | 树分块, 码农       |
-| [APIO2022 P8374](https://www.luogu.com.cn/problem/P8374) | 火星                       | 状态压缩, 插头     |
-| [APIO2022 P8376](https://www.luogu.com.cn/problem/P8376) | 排列                       | 思维               |
-| [P4238](https://www.luogu.com.cn/problem/P4238)          | 多项式乘法逆               | 多项式, NTT        |
-| [P4225](https://www.luogu.com.cn/problem/P4225)          | 多项式对数函数             | 多项式, NTT        |
-| [P4226](https://www.luogu.com.cn/problem/P4226)          | 多项式指数函数             | 泰勒级数, 牛顿迭代 |
-| [CF622F](http://codeforces.com/problemset/problem/622/F) | The Sum of the k-th Powers | 多项式插值, 阶乘幂 |
-| [CF622F](http://codeforces.com/problemset/problem/622/F) | The Sum of the k-th Powers | 多项式插值, 阶乘幂 |
+| 出处                                                         | 题目                       | 知识点                   |
+| ------------------------------------------------------------ | -------------------------- | ------------------------ |
+| [SDOI2022 P8349](https://www.luogu.com.cn/problem/P8349)     | 整数序列                   | 根号分治                 |
+| [SDOI2022 P8353](https://www.luogu.com.cn/problem/P8353)     | 无处存储                   | 树分块, 码农             |
+| [APIO2022 P8374](https://www.luogu.com.cn/problem/P8374)     | 火星                       | 状态压缩, 插头           |
+| [APIO2022 P8376](https://www.luogu.com.cn/problem/P8376)     | 排列                       | 思维                     |
+| [P4238](https://www.luogu.com.cn/problem/P4238)              | 多项式乘法逆               | 多项式, NTT              |
+| [P4225](https://www.luogu.com.cn/problem/P4225)              | 多项式对数函数             | 多项式, NTT              |
+| [P4226](https://www.luogu.com.cn/problem/P4226)              | 多项式指数函数             | 泰勒级数, 牛顿迭代       |
+| [CF622F](http://codeforces.com/problemset/problem/622/F)     | The Sum of the k-th Powers | 多项式插值, 阶乘幂       |
+| [NOIP2020 P7114](https://www.luogu.com.cn/problem/P7114)     | 字符串统计                 | KMP, 位运算              |
+| [NOI2021 P7737](https://www.luogu.com.cn/problem/P7737)      | 庆典                       | 虚树, 轻重链剖分, Tarjan |
+| [NOI2021 P7738](https://www.luogu.com.cn/problem/P7738)      | 量子通信                   | 抽屉原理                 |
+| [NOI2021 P7735](https://www.luogu.com.cn/problem/P7735)      | 轻重边                     | 树链剖分, 线段树         |
+| [AGC001D](https://atcoder.jp/contests/agc001/tasks/agc001_d) | Arrays and Palindrome      | 思维                     |
+| [AGC006F](https://atcoder.jp/contests/agc001/tasks/agc006_f) | Blackout                   | 染色                     |
