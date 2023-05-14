@@ -1,0 +1,507 @@
+<!DOCTYPE html><html><head>
+      <title>Minimum_Cost_Flow_Problem</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\Wild_Donkey\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.6.8\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      <style>
+      /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+
+  -moz-tab-size: 8;
+  -o-tab-size: 8;
+  tab-size: 8;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: .8em;
+  overflow: auto;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  /* background: #fff; */
+  background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+  color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+  color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+  color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+  color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+  color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+  color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+  color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+  color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+  color: #63a35c;
+}
+
+code.language-yaml {
+  color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+  color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+  color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+  color: #795da3;
+}
+
+.language-makefile .token.variable {
+  color: #183691;
+}
+
+.language-makefile .token.builtin {
+  color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+  color: #0086b3;
+}
+
+/* highlight */
+pre[data-line] {
+  position: relative;
+  padding: 1em 0 1em 3em;
+}
+pre[data-line] .line-highlight-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  display: block;
+  width: 100%;
+}
+
+pre[data-line] .line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: inherit 0;
+  margin-top: 1em;
+  background: hsla(24, 20%, 50%,.08);
+  background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
+  pointer-events: none;
+  line-height: inherit;
+  white-space: pre;
+}
+
+pre[data-line] .line-highlight:before, 
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-start);
+  position: absolute;
+  top: .4em;
+  left: .6em;
+  min-width: 1em;
+  padding: 0 .5em;
+  background-color: hsla(24, 20%, 50%,.4);
+  color: hsl(24, 20%, 95%);
+  font: bold 65%/1.5 sans-serif;
+  text-align: center;
+  vertical-align: .3em;
+  border-radius: 999px;
+  text-shadow: none;
+  box-shadow: 0 1px white;
+}
+
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-end);
+  top: auto;
+  bottom: .4em;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p,html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div{display:inline}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  300px/2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview  ">
+      <h1 class="mume-header" id="%E6%9C%80%E5%B0%8F%E8%B4%B9%E7%94%A8%E6%9C%80%E5%A4%A7%E6%B5%81%E9%97%AE%E9%A2%98">&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x95EE;&#x9898;</h1>
+
+<h2 class="mume-header" id="%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86">&#x524D;&#x7F6E;&#x77E5;&#x8BC6;</h2>
+
+<p>&#x5173;&#x4E8E;&#x7F51;&#x7EDC;&#x6700;&#x5927;&#x6D41;, &#x8FD9;&#x662F;&#x672C;&#x535A;&#x5BA2;&#x9700;&#x8981;&#x7528;&#x5230;&#x7684;&#x4E24;&#x4E2A;&#x7B97;&#x6CD5;: <a href="https://www.luogu.com.cn/blog/Wild-Donkey/p3376-mu-ban-wang-lao-zui-tai-liu">&#x7F51;&#x7EDC;&#x6700;&#x5927;&#x6D41;&#xB7;&#x521D;&#x6B65;</a></p>
+<p>&#x53E6;&#x5916;&#x8FD8;&#x6709;&#x6548;&#x7387;&#x66F4;&#x9AD8;, &#x53EF;&#x662F;&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x4E0D;&#x4F1A;&#x7528;&#x5230;&#x7684;&#x4E24;&#x4E2A;&#x7B97;&#x6CD5;: <a href="https://www.luogu.com.cn/blog/Wild-Donkey/wang-lao-zui-tai-liu-suan-fa-xiao-shuai-jun-bei-jing-sai">&#x7F51;&#x7EDC;&#x6700;&#x5927;&#x6D41;&#xB7;&#x8FDB;&#x9636;</a></p>
+<p>&#x524D;&#x7F6E;&#x77E5;&#x8BC6;&#x5C31;&#x53EA;&#x6709;&#x7B2C;&#x4E00;&#x7BC7;&#x535A;&#x5BA2;&#x7684;&#x5185;&#x5BB9;, &#x9700;&#x8981;&#x63D0;&#x524D;&#x5B66;&#x4E60;&#x5B8C;&#x518D;&#x6765;&#x770B;&#x8D39;&#x7528;&#x6D41;.</p>
+<h2 class="mume-header" id="%E7%AE%80%E4%BB%8B">&#x7B80;&#x4ECB;</h2>
+
+<p>&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x95EE;&#x9898;, &#x7B80;&#x79F0;&#x8D39;&#x7528;&#x6D41;&#x95EE;&#x9898;, Wikipedia &#x4E2D;&#x7684;&#x540D;&#x79F0;&#x662F;: &quot;Minimum-cost flow problem&quot;, &#x7F29;&#x5199;&#x4E3A; &quot;MCFP&quot;.</p>
+<p>&#x95EE;&#x9898;&#x7ED9;&#x51FA;&#x4E00;&#x4E2A;&#x7F51;&#x7EDC;, &#x6BCF;&#x6761;&#x8FB9;&#x9664;&#x4E86;&#x6709;&#x5BB9;&#x91CF;&#x5C5E;&#x6027;&#x5916;, &#x8FD8;&#x6709;&#x4E00;&#x4E2A;&#x5C5E;&#x6027;: &#x5355;&#x4F4D;&#x6D41;&#x91CF;&#x8D39;&#x7528;. &#x4E5F;&#x5C31;&#x662F;&#x8BF4;, &#x4E00;&#x6761;&#x8FB9;&#x7684;&#x8D39;&#x7528;&#x662F;&#x6D41;&#x7ECF;&#x8FD9;&#x6761;&#x8FB9;&#x7684;&#x6D41;&#x91CF;&#x548C;&#x8FD9;&#x6761;&#x8FB9;&#x5355;&#x4F4D;&#x6D41;&#x91CF;&#x8D39;&#x7528;&#x7684;&#x4E58;&#x79EF;. &#x8981;&#x6C42;&#x7ED9;&#x51FA;&#x4FDD;&#x8BC1;&#x6700;&#x5927;&#x6D41;&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#x7684;&#x6700;&#x5C0F;&#x8D39;&#x7528;.</p>
+<h2 class="mume-header" id="ek%E6%94%B9">EK&#xB7;&#x6539;</h2>
+
+<p>EK &#x7B97;&#x6CD5;&#x5C31;&#x662F;&#x6BCF;&#x6B21;&#x7528; BFS &#x5728;&#x6B8B;&#x91CF;&#x7F51;&#x7EDC;&#x4E0A;&#x627E;&#x5230;&#x4E00;&#x6761;&#x53EF;&#x4EE5;&#x589E;&#x5E7F;&#x7684;&#x8DEF;&#x5E76;&#x4E14;&#x589E;&#x5E7F;&#x5B83;. &#x4E3A;&#x4E86;&#x9632;&#x6B62;&#x53CD;&#x590D;&#x6A2A;&#x8DF3;, &#x6211;&#x4EEC;&#x4F7F;&#x7528; BFS &#x800C;&#x4E0D;&#x662F; DFS &#x5BFB;&#x627E;&#x589E;&#x5E7F;&#x8DEF;, &#x5355;&#x6761;&#x589E;&#x5E7F;&#x8DEF;&#x5BFB;&#x627E;&#x590D;&#x6742;&#x5EA6; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n + m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>.</p>
+<p>&#x6240;&#x4EE5;&#x4FDD;&#x8BC1;&#x6700;&#x5927;&#x6D41;, &#x4E0D;&#x9700;&#x8981;&#x8003;&#x8651;&#x589E;&#x5E7F;&#x8DEF;&#x662F;&#x600E;&#x4E48;&#x627E;&#x7684;, &#x53EA;&#x8981;&#x627E;&#x5230;&#x5C31;&#x53EF;&#x4EE5;, &#x6240;&#x4EE5;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x6700;&#x77ED;&#x8DEF;&#x7B97;&#x6CD5;, &#x6BCF;&#x6B21;&#x4EE5; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x4E3A;&#x8D77;&#x70B9;, &#x4EE5;&#x5355;&#x4F4D;&#x82B1;&#x8D39;&#x4E3A;&#x8FB9;&#x6743;, &#x6BCF;&#x6B21;&#x6C42; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x5230; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span></span></span></span> &#x7684;&#x6700;&#x77ED;&#x8DEF;, &#x8FD9;&#x4E2A;&#x6700;&#x77ED;&#x8DEF;&#x957F;&#x5EA6;&#x4E58;&#x4E0A;&#x8FD9;&#x6761;&#x589E;&#x5E7F;&#x8DEF;&#x7684;&#x6D41;&#x91CF;&#x8BA1;&#x5165;&#x7B54;&#x6848;, &#x7136;&#x540E;&#x8FDB;&#x884C;&#x4E0B;&#x4E00;&#x8F6E;&#x7684;&#x589E;&#x5E7F;.</p>
+<p>&#x7B97;&#x6CD5;&#x9009;&#x62E9;&#x65B9;&#x9762;, &#x56E0;&#x4E3A;&#x4E00;&#x6761;&#x8FB9;&#x7684;&#x56DE;&#x8FB9;&#x7684;&#x8FB9;&#x6743;&#x662F;&#x5B83;&#x7684;&#x8FB9;&#x6743;&#x7684;&#x76F8;&#x53CD;&#x6570;, &#x6240;&#x4EE5;&#x6B8B;&#x91CF;&#x7F51;&#x7EDC;&#x5B58;&#x5728;&#x8D1F;&#x6743;, &#x5BF9;&#x4E8E;&#x6709;&#x8D1F;&#x6743;&#x7684;&#x56FE;&#x7684;&#x6700;&#x77ED;&#x8DEF;, &#x6211;&#x4EEC;&#x4F7F;&#x7528; SPFA &#x7B97;&#x6CD5;.</p>
+<h2 class="mume-header" id="dinic%E6%94%B9">Dinic&#xB7;&#x6539;</h2>
+
+<p>Dinic &#x4E00;&#x6B21;&#x6C42;&#x591A;&#x6761;&#x589E;&#x5E7F;&#x8DEF;, &#x800C; SPFA &#x4E5F;&#x662F;&#x4E00;&#x6B21;&#x6C42; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x5230;&#x6240;&#x6709;&#x70B9;&#x7684;&#x6700;&#x77ED;&#x8DEF;, &#x6240;&#x4EE5;&#x4E24;&#x8005;&#x4E5F;&#x53EF;&#x4EE5;&#x7ED3;&#x5408;.</p>
+<p>&#x5177;&#x4F53;&#x64CD;&#x4F5C;&#x662F;&#x6BCF;&#x6B21; BFS &#x5206;&#x5C42;&#x7684;&#x8FC7;&#x7A0B;&#x6539;&#x4E3A;&#x6C42; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x7684;&#x5355;&#x6E90;&#x6700;&#x77ED;&#x8DEF;&#x7684;&#x8FC7;&#x7A0B;. &#x5728; DFS &#x65F6;&#x7684;&#x89C4;&#x5219;&#x4E5F;&#x6709;&#x6240;&#x6539;&#x53D8;, &#x4F20;&#x7EDF;&#x7684; Dinic &#x4E2D;, &#x6211;&#x4EEC;&#x53EA;&#x5141;&#x8BB8;&#x6D41;&#x4ECE;&#x4E00;&#x4E2A;&#x70B9;, &#x6D41;&#x5411;&#x6DF1;&#x5EA6;&#x6BD4;&#x5B83;&#x5927; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> &#x7684;&#x70B9;, &#x662F;&#x4E3A;&#x4E86;&#x4FDD;&#x8BC1;&#x6D41;&#x4E0D;&#x4F1A;&#x53CD;&#x590D;&#x6A2A;&#x8DF3; (&#x6211;&#x4EEC;&#x8BBE;&#x5B9A;&#x7684;&#x4E00;&#x5207;&#x89C4;&#x5219;&#x90FD;&#x662F;&#x4E3A;&#x4E86;&#x89C4;&#x8303;&#x6D41;&#x7684;&#x65B9;&#x5411;&#x800C;&#x907F;&#x514D;&#x53CD;&#x590D;&#x6A2A;&#x8DF3;, &#x4ECE;&#x7B97;&#x6CD5;&#x65B9;&#x9762;&#x5370;&#x8BC1;&#x4E86;&#x89C4;&#x5219;&#x4E4B;&#x4E8E;&#x81EA;&#x7531;&#x7684;&#x91CD;&#x8981;&#x6027;). &#x5728;&#x6539;&#x8FDB;&#x7248;&#x7B97;&#x6CD5;&#x4E2D;, &#x6211;&#x4EEC;&#x4F7F;&#x7528;&#x6700;&#x77ED;&#x8DEF;&#x6765;&#x89C4;&#x8303;&#x6D41;&#x7684;&#x6D41;&#x52A8;, &#x53EA;&#x8981;&#x4FDD;&#x8BC1;&#x4E00;&#x6761;&#x8FB9;&#x662F; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x5230;&#x8FD9;&#x6761;&#x8FB9;&#x7684;&#x7EC8;&#x70B9;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x7684;&#x4E00;&#x90E8;&#x5206;, &#x8FD9;&#x6761;&#x8DEF;&#x5C31;&#x80FD;&#x8D70;.</p>
+<p>&#x8FD9;&#x4E2A;&#x89C4;&#x5219;&#x65E2;&#x4FDD;&#x8BC1;&#x4E86;&#x6211;&#x4EEC;&#x7684;&#x9009;&#x62E9;&#x4E00;&#x5B9A;&#x662F;&#x6700;&#x77ED;&#x8DEF;, &#x53C8;&#x4FDD;&#x8BC1;&#x4E86;&#x6D41;&#x7684;&#x6709;&#x5E8F;&#x6027;, &#x800C;&#x4E14;&#x4E0D;&#x7834;&#x574F; Dinic &#x7684;&#x7279;&#x6027;: &#x591A;&#x8DEF;&#x589E;&#x5E7F;.</p>
+<p>&#x5B9E;&#x73B0;&#x8D77;&#x6765;&#x4E5F;&#x53EF;&#x4EE5;&#x8BF4;&#x6BD4;&#x8F83;&#x5199;&#x610F;, &#x4F46;&#x662F;&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;, DFS &#x7684;&#x8FC7;&#x7A0B;&#x548C;&#x4E00;&#x822C;&#x7684; Dinic &#x76F8;&#x6BD4;&#x589E;&#x52A0;&#x4E86;&#x4E00;&#x4E2A; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><mi>Q</mi><mi>u</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">InQue</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal">n</span><span class="mord mathnormal">Q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">e</span></span></span></span> &#x6807;&#x8BB0;.</p>
+<p>&#x8FD9;&#x662F;&#x56E0;&#x4E3A;&#x6700;&#x77ED;&#x8DEF;&#x4E3A;&#x5E8F;&#x76F8;&#x6BD4;&#x6DF1;&#x5EA6;&#x4E3A;&#x5E8F;&#x6765;&#x8BF4;, &#x8FB9;&#x6743;&#x5BF9;&#x987A;&#x5E8F;&#x662F;&#x6709;&#x5F71;&#x54CD;&#x7684;, &#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#x5F53;&#x4E00;&#x6761;&#x8FB9;&#x548C;&#x5B83;&#x7684;&#x56DE;&#x8FB9;&#x90FD;&#x6709;&#x6D41;&#x91CF;&#x7684;&#x65F6;&#x5019;, &#x5B83;&#x4EEC;&#x6784;&#x6210;&#x4E00;&#x4E2A; <code>&#x96F6;&#x73AF;</code>, &#x610F;&#x601D;&#x662F;&#x6D41;&#x91CF;&#x5728;&#x8FD9;&#x4E24;&#x70B9;&#x4E4B;&#x95F4;&#x65E0;&#x8BBA;&#x8D70;&#x51E0;&#x4E2A;&#x6765;&#x56DE;, &#x82B1;&#x8D39;&#x90FD;&#x4E0D;&#x53D8;.</p>
+<p>&#x4E3A;&#x4E86;&#x907F;&#x514D;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;, &#x6211;&#x4EEC;&#x50CF; SPFA &#x4E00;&#x6837;&#x4F7F;&#x7528; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>n</mi><mi>Q</mi><mi>u</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">InQue</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal">n</span><span class="mord mathnormal">Q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">e</span></span></span></span> &#x6807;&#x8BB0;, &#x9632;&#x6B62;&#x589E;&#x5E7F;&#x8DEF;&#x5F84;&#x4E0A;&#x4E00;&#x4E2A;&#x70B9;&#x51FA;&#x73B0;&#x4E24;&#x6B21;.</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token keyword keyword-unsigned">unsigned</span> m<span class="token punctuation">,</span> n<span class="token punctuation">,</span> Hd<span class="token punctuation">,</span> Tl<span class="token punctuation">;</span> 
+<span class="token keyword keyword-int">int</span> C<span class="token punctuation">,</span> D<span class="token punctuation">,</span> <span class="token function">Flow</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">Cost</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">Tmp</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Node</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Edge</span> <span class="token punctuation">{</span>
+  Node <span class="token operator">*</span>To<span class="token punctuation">;</span>
+  Edge <span class="token operator">*</span>Nxt<span class="token punctuation">;</span>
+  <span class="token keyword keyword-int">int</span> Value<span class="token punctuation">,</span> Contain<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>E<span class="token punctuation">[</span><span class="token number">100005</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">*</span><span class="token function">CntE</span><span class="token punctuation">(</span>E <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Node</span> <span class="token punctuation">{</span>
+  Edge <span class="token operator">*</span>Fst<span class="token punctuation">;</span>
+  <span class="token keyword keyword-int">int</span> Dist<span class="token punctuation">;</span>
+  <span class="token keyword keyword-char">char</span> InQue<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>N<span class="token punctuation">[</span><span class="token number">5005</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">*</span>S<span class="token punctuation">,</span> <span class="token operator">*</span>T<span class="token punctuation">,</span> <span class="token operator">*</span>A<span class="token punctuation">,</span> <span class="token operator">*</span>B<span class="token punctuation">,</span> <span class="token operator">*</span>Q<span class="token punctuation">[</span><span class="token number">5005</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-char">char</span> <span class="token function">SPFA</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  Tl <span class="token operator">=</span> Hd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> N<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>Dist <span class="token operator">=</span> <span class="token number">0x3f3f3f3f</span><span class="token punctuation">;</span>
+  Q<span class="token punctuation">[</span><span class="token operator">++</span>Tl<span class="token punctuation">]</span> <span class="token operator">=</span> S<span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>Dist <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> Node <span class="token operator">*</span>x<span class="token punctuation">;</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Hd <span class="token operator">^</span> Tl<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token operator">++</span>Hd<span class="token punctuation">;</span> <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Hd <span class="token operator">&gt;</span> <span class="token number">5000</span><span class="token punctuation">)</span> Hd <span class="token operator">-=</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+    x <span class="token operator">=</span> Q<span class="token punctuation">[</span>Hd<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-register">register</span> Edge <span class="token operator">*</span><span class="token function">Sid</span><span class="token punctuation">(</span>x<span class="token operator">-&gt;</span>Fst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Sid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">&amp;&amp;</span> Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>Dist <span class="token operator">&gt;</span> x<span class="token operator">-&gt;</span>Dist <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>Dist <span class="token operator">=</span> x<span class="token operator">-&gt;</span>Dist <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value<span class="token punctuation">;</span>
+        <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token operator">++</span>Tl<span class="token punctuation">;</span> <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Tl <span class="token operator">&gt;</span> <span class="token number">5000</span><span class="token punctuation">)</span> Tl <span class="token operator">-=</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+          Q<span class="token punctuation">[</span>Tl<span class="token punctuation">]</span> <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>To<span class="token punctuation">;</span>
+          Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      Sid <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Nxt<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword keyword-return">return</span> <span class="token punctuation">(</span>T<span class="token operator">-&gt;</span>Dist <span class="token operator">&lt;</span> <span class="token number">0x3f3f3f3f</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword keyword-int">int</span> <span class="token function">DFS</span><span class="token punctuation">(</span>Node <span class="token operator">*</span>x<span class="token punctuation">,</span> <span class="token keyword keyword-int">int</span> Come<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>x <span class="token operator">==</span> T<span class="token punctuation">)</span> <span class="token keyword keyword-return">return</span> Come<span class="token punctuation">;</span>
+  x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> Edge <span class="token operator">*</span><span class="token function">Sid</span><span class="token punctuation">(</span>x<span class="token operator">-&gt;</span>Fst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> Go<span class="token punctuation">,</span> <span class="token function">Flew</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Sid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>Dist <span class="token operator">==</span> x<span class="token operator">-&gt;</span>Dist <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value <span class="token operator">&amp;&amp;</span> Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      Go <span class="token operator">=</span> <span class="token function">DFS</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token punctuation">,</span> <span class="token function">min</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>Contain<span class="token punctuation">,</span> Come<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">-=</span> Go<span class="token punctuation">;</span>
+      Come <span class="token operator">-=</span> Go<span class="token punctuation">;</span>
+      E<span class="token punctuation">[</span><span class="token punctuation">(</span>Sid <span class="token operator">-</span> E<span class="token punctuation">)</span> <span class="token operator">^</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>Contain <span class="token operator">+=</span> Go<span class="token punctuation">;</span>
+      Cost <span class="token operator">+=</span> Sid<span class="token operator">-&gt;</span>Value <span class="token operator">*</span> Go<span class="token punctuation">;</span>
+      Flew <span class="token operator">+=</span> Go<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span><span class="token operator">!</span>Come<span class="token punctuation">)</span> <span class="token keyword keyword-break">break</span><span class="token punctuation">;</span>
+    Sid <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Nxt<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-return">return</span> Flew<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-int">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  n <span class="token operator">=</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">=</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> S <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> T <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> m<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    A <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> B <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> C <span class="token operator">=</span> <span class="token function">RDsg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> D <span class="token operator">=</span> <span class="token function">RDsg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token operator">++</span>CntE<span class="token punctuation">)</span><span class="token operator">-&gt;</span>Nxt <span class="token operator">=</span> A<span class="token operator">-&gt;</span>Fst<span class="token punctuation">;</span>
+    A<span class="token operator">-&gt;</span>Fst <span class="token operator">=</span> CntE<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Contain <span class="token operator">=</span> C<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Value <span class="token operator">=</span> D<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>To <span class="token operator">=</span> B<span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token operator">++</span>CntE<span class="token punctuation">)</span><span class="token operator">-&gt;</span>Nxt <span class="token operator">=</span> B<span class="token operator">-&gt;</span>Fst<span class="token punctuation">;</span>
+    B<span class="token operator">-&gt;</span>Fst <span class="token operator">=</span> CntE<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Value <span class="token operator">=</span> <span class="token operator">-</span>D<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>To <span class="token operator">=</span> A<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span><span class="token function">SPFA</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> Flow <span class="token operator">+=</span> <span class="token function">DFS</span><span class="token punctuation">(</span>S<span class="token punctuation">,</span> <span class="token number">0x7fffffff</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">&quot;%d %d\n&quot;</span><span class="token punctuation">,</span> Flow<span class="token punctuation">,</span> Cost<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-return">return</span> Wild_Donkey<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre><h2 class="mume-header" id="%E6%94%B9%E6%94%B9">&#x6539;&#xB7;&#x6539;</h2>
+
+<p>&#x5B9E;&#x9645;&#x4E0A;&#x53EB;&#x505A; &quot;Primal-Dual Algorithm&quot; (&#x539F;&#x59CB;&#x5BF9;&#x5076;&#x7B97;&#x6CD5;).</p>
+<p>&#x5C31;&#x50CF; <code>59&#xB7;&#x6539;</code> &#x548C; <code>59</code> &#x5173;&#x7CFB;&#x4E0D;&#x5927;&#x4E00;&#x6837;, &#x8FD9;&#x4E2A;&#x7B97;&#x6CD5;&#x867D;&#x7136;&#x540D;&#x5B57;&#x539F;&#x59CB;, &#x4F46;&#x662F;&#x6211;&#x65E0;&#x8BBA;&#x5982;&#x4F55;&#x4E5F;&#x4E0D;&#x660E;&#x767D;&#x5B83;&#x548C;&#x5BF9;&#x5076;&#x6709;&#x4EC0;&#x4E48;&#x5173;&#x7CFB;, &#x5982;&#x679C;&#x8BA9;&#x6211;&#x4E3A;&#x4ED6;&#x53D6;&#x540D;, &#x6211;&#x89C9;&#x5F97;&#x5E94;&#x8BE5;&#x53EB;&#x505A;:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>&#x961F;&#x5217;&#x4F18;&#x5316;&#x7684;</mtext><mi>B</mi><mi>e</mi><mi>l</mi><mi>l</mi><mi>m</mi><mi>a</mi><mi>n</mi><mi mathvariant="normal">_</mi><mi>F</mi><mi>o</mi><mi>r</mi><mi>d</mi><mtext>&#x548C;</mtext><mi>D</mi><mi>i</mi><mi>j</mi><mi>k</mi><mi>s</mi><mi>t</mi><mi>r</mi><mi>a</mi><mtext>&#x6700;&#x77ED;&#x8DEF;&#x53D8;&#x5316;&#x91CF;&#x7D2F;&#x52A0;&#x6C42;&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x8054;&#x5408;&#x7B97;&#x6CD5;</mtext></mrow><annotation encoding="application/x-tex">&#x961F;&#x5217;&#x4F18;&#x5316;&#x7684; Bellman\_Ford &#x548C; Dijkstra &#x6700;&#x77ED;&#x8DEF;&#x53D8;&#x5316;&#x91CF;&#x7D2F;&#x52A0;&#x6C42;&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x8054;&#x5408;&#x7B97;&#x6CD5;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em;"></span><span class="mord cjk_fallback">&#x961F;&#x5217;&#x4F18;&#x5316;&#x7684;</span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">ll</span><span class="mord mathnormal">man</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal">d</span><span class="mord cjk_fallback">&#x548C;</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord mathnormal" style="margin-right:0.03148em;">ijk</span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord cjk_fallback">&#x6700;&#x77ED;&#x8DEF;&#x53D8;&#x5316;&#x91CF;&#x7D2F;&#x52A0;&#x6C42;&#x6700;&#x5C0F;&#x8D39;&#x7528;&#x6700;&#x5927;&#x6D41;&#x8054;&#x5408;&#x7B97;&#x6CD5;</span></span></span></span></span></p>
+<p>&#x7531;&#x4E8E; SPFA &#x7684;&#x6700;&#x574F;&#x590D;&#x6742;&#x5EA6;&#x53EF;&#x4EE5;&#x8FBE;&#x5230; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(nm)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span>, &#x6240;&#x4EE5;&#x76F8;&#x5F53;&#x4E8E;&#x5728;&#x539F;&#x7B97;&#x6CD5;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#x589E;&#x52A0;&#x4E86;&#x4E00;&#x4E2A;&#x56E0;&#x5B50; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>, &#x53EF;&#x4EE5;&#x8BF4;&#x6BEB;&#x65E0;&#x6548;&#x7387;&#x53EF;&#x8A00;.</p>
+<p>&#x6240;&#x4EE5;&#x8003;&#x8651;&#x4F7F;&#x7528; Dijkstra, &#x4F46;&#x662F;&#x56FE;&#x4E2D;&#x6709;&#x8D1F;&#x6743;, Dijkstra &#x5F88;&#x96BE;&#x5F97;&#x5230;&#x6B63;&#x786E;&#x7ED3;&#x679C;.</p>
+<p>&#x7B97;&#x6CD5;&#x6548;&#x7387;&#x4F4E;&#x662F;&#x56E0;&#x4E3A;&#x8FD0;&#x884C;&#x4E86;&#x591A;&#x6B21; SPFA, &#x4F46;&#x662F;&#x5982;&#x679C;&#x6211;&#x4EEC;&#x53EA;&#x8FD0;&#x884C;&#x4E00;&#x6B21; SPFA, &#x7B97;&#x6CD5;&#x6548;&#x7387;&#x4E5F;&#x662F;&#x4E0D;&#x53D7;&#x5F71;&#x54CD;&#x7684;.</p>
+<p>&#x4E00;&#x5F00;&#x59CB;&#x8DD1;&#x4E00;&#x904D; SPFA, &#x5C06; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x5230;&#x6BCF;&#x4E2A;&#x70B9;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x6C42;&#x51FA;, &#x8BB0;&#x4E3A; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span>, &#x6211;&#x4EEC;&#x79F0; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">h_x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> &#x4E3A;&#x70B9; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> &#x7684; <code>&#x52BF;</code>.</p>
+<p>&#x6BCF;&#x6B21;&#x8DD1;&#x6700;&#x77ED;&#x8DEF;, &#x53D1;&#x73B0;&#x56E0;&#x4E3A;&#x6B8B;&#x91CF;&#x7F51;&#x7EDC;&#x8D8A;&#x6765;&#x8D8A; <code>&#x6B8B;</code>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> &#x5230;&#x5176;&#x5B83;&#x70B9;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x53EA;&#x80FD;&#x53D8;&#x5F97;&#x66F4;&#x957F;, &#x4E0D;&#x80FD;&#x53D8;&#x5F97;&#x66F4;&#x77ED;.</p>
+<p>&#x6BCF;&#x6B21;&#x8DD1; Dijkstra &#x4E4B;&#x524D;, &#x5047;&#x8BBE;&#x6211;&#x4EEC;&#x5DF2;&#x7ECF;&#x6C42;&#x51FA;&#x4E86;&#x6BCF;&#x4E2A;&#x70B9;&#x7684;&#x52BF;, &#x4E5F;&#x5C31;&#x662F;&#x8FD9;&#x4E2A;&#x6B8B;&#x91CF;&#x7F51;&#x7EDC;&#x53D8;&#x5F97;&#x8FD9;&#x4E48;&#x6B8B;&#x4E4B;&#x524D;&#x7684;&#x6700;&#x77ED;&#x8DEF;, &#x90A3;&#x4E48;&#x89C4;&#x5B9A;&#x6BCF;&#x6761;&#x8FB9; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(a, b)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span></span></span></span> &#x7684;&#x6743;&#x503C; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><msup><mi mathvariant="normal">&#x2223;</mi><mo mathvariant="normal" lspace="0em" rspace="0em">&#x2032;</mo></msup><mo>=</mo><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mi mathvariant="normal">&#x2223;</mi><mo>+</mo><msub><mi>h</mi><mi>a</mi></msub><mo>&#x2212;</mo><msub><mi>h</mi><mi>b</mi></msub></mrow><annotation encoding="application/x-tex">|(a, b)|&apos; = |(a, b)| + h_a - h_b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord"><span class="mord">&#x2223;</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">&#x2032;</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord">&#x2223;</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">&#x2212;</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>.</p>
+<p>&#x56E0;&#x4E3A;&#x4E0A;&#x4E00;&#x6B21; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(a, b)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span></span></span></span> &#x4E4B;&#x95F4;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x4E00;&#x5B9A;&#x4E0D;&#x4F1A;&#x6BD4; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mi mathvariant="normal">&#x2223;</mi></mrow><annotation encoding="application/x-tex">|(a, b)|</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord">&#x2223;</span></span></span></span> &#x66F4;&#x957F;, &#x5426;&#x5219;&#x6700;&#x77ED;&#x8DEF;&#x5C31;&#x53D8;&#x6210; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mi mathvariant="normal">&#x2223;</mi></mrow><annotation encoding="application/x-tex">|(a, b)|</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord">&#x2223;</span></span></span></span> &#x4E86;, &#x6240;&#x4EE5;&#x5BB9;&#x6613;&#x77E5;&#x9053; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>b</mi></msub><mo>&#x2212;</mo><msub><mi>h</mi><mi>a</mi></msub><mo>&#x2264;</mo><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mi mathvariant="normal">&#x2223;</mi></mrow><annotation encoding="application/x-tex">h_b - h_a \leq |(a, b)|</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">&#x2212;</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&#x2264;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord">&#x2223;</span></span></span></span>, &#x6574;&#x7406;&#x5F97; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><msup><mi mathvariant="normal">&#x2223;</mi><mo mathvariant="normal" lspace="0em" rspace="0em">&#x2032;</mo></msup><mo>=</mo><mi mathvariant="normal">&#x2223;</mi><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo stretchy="false">)</mo><mi mathvariant="normal">&#x2223;</mi><mo>+</mo><msub><mi>h</mi><mi>a</mi></msub><mo>&#x2212;</mo><msub><mi>h</mi><mi>b</mi></msub><mo>&#x2265;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">|(a, b)|&apos; = |(a, b)| + h_a - h_b \geq 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord"><span class="mord">&#x2223;</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">&#x2032;</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">&#x2223;</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mord">&#x2223;</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">&#x2212;</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&#x2265;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, &#x8FD9;&#x6837;, &#x8FB9;&#x6743;&#x5927;&#x4E8E; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, &#x6211;&#x4EEC;&#x5C31;&#x80FD;&#x4F7F;&#x7528; Dijkstra &#x4E86;.</p>
+<p>&#x4E00;&#x6761;&#x8DEF;&#x5F84;&#x7684;&#x6743;&#x503C;&#x548C;&#x5C31;&#x53D8;&#x6210;&#x4E86;&#x5B83;&#x4EEC;&#x539F;&#x6765;&#x7684;&#x6743;&#x503C;&#x4E4B;&#x548C;&#x52A0;&#x4E0A;&#x8D77;&#x70B9;&#x7684;&#x52BF;&#x518D;&#x51CF;&#x53BB;&#x7EC8;&#x70B9;&#x7684;&#x52BF;, &#x5176;&#x610F;&#x4E49;&#x662F;&#x8FD9;&#x6761;&#x8DEF;&#x5F84;&#x7684;&#x8D77;&#x70B9;&#x7EC8;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x5728;&#x4E0A;&#x6B21;&#x589E;&#x5E7F;&#x4E4B;&#x540E;&#x589E;&#x957F;&#x4E86;&#x591A;&#x5C11;. &#x4E5F;&#x5C31;&#x662F;&#x8BF4;, &#x6211;&#x4EEC;&#x7528; Dijkstra &#x6C42;&#x7684;&#x662F;&#x4E00;&#x4E2A;&#x589E;&#x957F;&#x91CF;. <s>&#x662F;&#x6700;&#x77ED;&#x8DEF;&#x7684;&#x5BFC;&#x6570;</s></p>
+<p>&#x6240;&#x4EE5;&#x4ECE;&#x65B0;&#x7684;&#x6743;&#x503C;&#x6C42;&#x5F97;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x6C42;&#x771F;&#x6B63;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x7684;&#x65B9;&#x6CD5;&#x4E5F;&#x53D8;&#x5F97;&#x660E;&#x4E86;&#x4E86;, &#x5C31;&#x662F;&#x7528;&#x4E00;&#x5F00;&#x59CB; SPFA &#x6C42;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x52A0;&#x4E0A;&#x6BCF;&#x4E00;&#x6B21;&#x589E;&#x5E7F;&#x540E; Dijkstra &#x6C42;&#x7684;&#x6700;&#x77ED;&#x8DEF;&#x7684;&#x603B;&#x548C;, &#x5C31;&#x662F;&#x5F53;&#x524D;&#x771F;&#x6B63;&#x7684;&#x6700;&#x77ED;&#x8DEF;.</p>
+<p>&#x8FD9;&#x6837;&#x518D;&#x62C9;&#x53BB;&#x8DD1; Dinic/EK, &#x5C31;&#x548C;&#x4E0A;&#x9762;&#x4E24;&#x4E2A;&#x7B97;&#x6CD5;&#x4E00;&#x6837;&#x4E86;, &#x4F46;&#x662F;&#x7F51;&#x4E0A;&#x7684;&#x65B9;&#x6CD5;&#x8C8C;&#x4F3C;&#x90FD;&#x662F;&#x7528; EK, &#x4F46;&#x662F;&#x7406;&#x8BBA;&#x4E0A;&#x6211;&#x4EEC;&#x6709;&#x4E86;&#x6700;&#x77ED;&#x8DEF;, &#x5C31;&#x80FD;&#x50CF;&#x524D;&#x9762; <code>Dinic&#xB7;&#x6539;</code> &#x4E00;&#x6837;&#x591A;&#x8DEF;&#x589E;&#x5E7F;.</p>
+<p>&#x4E8E;&#x662F;&#x6211;&#x5C31;&#x628A; Dinic + Dijkstra + SPFA &#x5199;&#x51FA;&#x6765;&#x4E86;, &#x5F88;&#x9057;&#x61BE;, &#x5B83;&#x83B7;&#x5F97;&#x4E86;&#x6BD4;&#x4E0A;&#x9762;&#x7684;&#x7A0B;&#x5E8F;&#x66F4;&#x4F4E;&#x7684;&#x6548;&#x7387;.</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token keyword keyword-unsigned">unsigned</span> m<span class="token punctuation">,</span> n<span class="token punctuation">,</span> Hd<span class="token punctuation">,</span> Tl<span class="token punctuation">;</span> 
+<span class="token keyword keyword-int">int</span> C<span class="token punctuation">,</span> D<span class="token punctuation">,</span> <span class="token function">Flow</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">Cost</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">Tmp</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Node</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Edge</span> <span class="token punctuation">{</span>
+  Node <span class="token operator">*</span>To<span class="token punctuation">;</span>
+  Edge <span class="token operator">*</span>Nxt<span class="token punctuation">;</span>
+  <span class="token keyword keyword-int">int</span> Vnew<span class="token punctuation">,</span> Value<span class="token punctuation">,</span> Contain<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>E<span class="token punctuation">[</span><span class="token number">100005</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">*</span><span class="token function">CntE</span><span class="token punctuation">(</span>E <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Node</span> <span class="token punctuation">{</span>
+  Edge <span class="token operator">*</span>Fst<span class="token punctuation">;</span>
+  <span class="token keyword keyword-int">int</span> Dist<span class="token punctuation">,</span> h<span class="token punctuation">;</span>
+  <span class="token keyword keyword-char">char</span> InQue<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>N<span class="token punctuation">[</span><span class="token number">5005</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">*</span>S<span class="token punctuation">,</span> <span class="token operator">*</span>T<span class="token punctuation">,</span> <span class="token operator">*</span>A<span class="token punctuation">,</span> <span class="token operator">*</span>B<span class="token punctuation">,</span> <span class="token operator">*</span>Q<span class="token punctuation">[</span><span class="token number">5005</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-struct">struct</span> <span class="token class-name">Que</span> <span class="token punctuation">{</span>
+  Node <span class="token operator">*</span>P<span class="token punctuation">;</span>
+  <span class="token keyword keyword-inline">inline</span> <span class="token keyword keyword-const">const</span> <span class="token keyword keyword-char">char</span> <span class="token keyword keyword-operator">operator</span><span class="token operator">&lt;</span><span class="token punctuation">(</span><span class="token keyword keyword-const">const</span> Que <span class="token operator">&amp;</span>x<span class="token punctuation">)</span> <span class="token keyword keyword-const">const</span><span class="token punctuation">{</span>
+    <span class="token keyword keyword-return">return</span> <span class="token keyword keyword-this">this</span><span class="token operator">-&gt;</span>P<span class="token operator">-&gt;</span>Dist <span class="token operator">&gt;</span> x<span class="token punctuation">.</span>P<span class="token operator">-&gt;</span>Dist<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>QTmp<span class="token punctuation">;</span>
+priority_queue <span class="token operator">&lt;</span>Que<span class="token operator">&gt;</span> Qu<span class="token punctuation">;</span>
+<span class="token keyword keyword-void">void</span> <span class="token function">SPFA</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  Tl <span class="token operator">=</span> Hd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> N<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>h <span class="token operator">=</span> <span class="token number">0x3f3f3f3f</span><span class="token punctuation">;</span>
+  Q<span class="token punctuation">[</span><span class="token operator">++</span>Tl<span class="token punctuation">]</span> <span class="token operator">=</span> S<span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>h <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> Node <span class="token operator">*</span>x<span class="token punctuation">;</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Hd <span class="token operator">^</span> Tl<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token operator">++</span>Hd<span class="token punctuation">;</span> <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Hd <span class="token operator">&gt;</span> <span class="token number">5000</span><span class="token punctuation">)</span> Hd <span class="token operator">-=</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+    x <span class="token operator">=</span> Q<span class="token punctuation">[</span>Hd<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-register">register</span> Edge <span class="token operator">*</span><span class="token function">Sid</span><span class="token punctuation">(</span>x<span class="token operator">-&gt;</span>Fst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Sid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">&amp;&amp;</span> Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>h <span class="token operator">&gt;</span> x<span class="token operator">-&gt;</span>h <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>h <span class="token operator">=</span> x<span class="token operator">-&gt;</span>h <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value<span class="token punctuation">;</span>
+        <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token operator">++</span>Tl<span class="token punctuation">;</span> <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Tl <span class="token operator">&gt;</span> <span class="token number">5000</span><span class="token punctuation">)</span> Tl <span class="token operator">-=</span> <span class="token number">5000</span><span class="token punctuation">;</span>
+          Q<span class="token punctuation">[</span>Tl<span class="token punctuation">]</span> <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>To<span class="token punctuation">;</span>
+          Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      Sid <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Nxt<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword keyword-int">int</span> <span class="token function">DFS</span><span class="token punctuation">(</span>Node <span class="token operator">*</span>x<span class="token punctuation">,</span> <span class="token keyword keyword-int">int</span> Come<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>x <span class="token operator">==</span> T<span class="token punctuation">)</span> <span class="token keyword keyword-return">return</span> Come<span class="token punctuation">;</span>
+  x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> Edge <span class="token operator">*</span><span class="token function">Sid</span><span class="token punctuation">(</span>x<span class="token operator">-&gt;</span>Fst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> Go<span class="token punctuation">,</span> <span class="token function">Flew</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Sid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>h <span class="token operator">==</span> x<span class="token operator">-&gt;</span>h <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Value <span class="token operator">&amp;&amp;</span> Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      Go <span class="token operator">=</span> <span class="token function">DFS</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token punctuation">,</span> <span class="token function">min</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>Contain<span class="token punctuation">,</span> Come<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">-=</span> Go<span class="token punctuation">;</span>
+      Come <span class="token operator">-=</span> Go<span class="token punctuation">;</span>
+      E<span class="token punctuation">[</span><span class="token punctuation">(</span>Sid <span class="token operator">-</span> E<span class="token punctuation">)</span> <span class="token operator">^</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>Contain <span class="token operator">+=</span> Go<span class="token punctuation">;</span>
+      Cost <span class="token operator">+=</span> Sid<span class="token operator">-&gt;</span>Value <span class="token operator">*</span> Go<span class="token punctuation">;</span>
+      Flew <span class="token operator">+=</span> Go<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span><span class="token operator">!</span>Come<span class="token punctuation">)</span> <span class="token keyword keyword-break">break</span><span class="token punctuation">;</span>
+    Sid <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Nxt<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-return">return</span> Flew<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-char">char</span> <span class="token function">Dijkstra</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> N<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>Dist <span class="token operator">=</span> <span class="token number">0x3f3f3f3f</span><span class="token punctuation">;</span>
+  QTmp<span class="token punctuation">.</span>P <span class="token operator">=</span> S<span class="token punctuation">,</span> Qu<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>QTmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>Dist <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  S<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-register">register</span> Node <span class="token operator">*</span>x<span class="token punctuation">;</span>
+  <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Qu<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    x <span class="token operator">=</span> Qu<span class="token punctuation">.</span><span class="token function">top</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>P<span class="token punctuation">;</span>
+    Qu<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    x<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-register">register</span> Edge <span class="token operator">*</span><span class="token function">Sid</span><span class="token punctuation">(</span>x<span class="token operator">-&gt;</span>Fst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword keyword-while">while</span> <span class="token punctuation">(</span>Sid<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      Sid<span class="token operator">-&gt;</span>Vnew <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Value <span class="token operator">+</span> x<span class="token operator">-&gt;</span>h <span class="token operator">-</span> Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>h<span class="token punctuation">;</span>
+      <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>Contain <span class="token operator">&amp;&amp;</span> Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>Dist <span class="token operator">&gt;</span> x<span class="token operator">-&gt;</span>Dist <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Vnew<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>Dist <span class="token operator">=</span> x<span class="token operator">-&gt;</span>Dist <span class="token operator">+</span> Sid<span class="token operator">-&gt;</span>Vnew<span class="token punctuation">;</span>
+        <span class="token keyword keyword-if">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          QTmp<span class="token punctuation">.</span>P <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>To<span class="token punctuation">;</span>
+          Qu<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>QTmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          Sid<span class="token operator">-&gt;</span>To<span class="token operator">-&gt;</span>InQue <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      Sid <span class="token operator">=</span> Sid<span class="token operator">-&gt;</span>Nxt<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> N<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>h <span class="token operator">+=</span> N<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>Dist<span class="token punctuation">;</span>
+  <span class="token keyword keyword-return">return</span> <span class="token punctuation">(</span>T<span class="token operator">-&gt;</span>h <span class="token operator">&lt;</span> <span class="token number">0x3f3f3f3f</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword keyword-int">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  n <span class="token operator">=</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token operator">=</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> S <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> T <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span><span class="token keyword keyword-register">register</span> <span class="token keyword keyword-unsigned">unsigned</span> <span class="token function">i</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> m<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    A <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> B <span class="token operator">=</span> N <span class="token operator">+</span> <span class="token function">RD</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> C <span class="token operator">=</span> <span class="token function">RDsg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> D <span class="token operator">=</span> <span class="token function">RDsg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token operator">++</span>CntE<span class="token punctuation">)</span><span class="token operator">-&gt;</span>Nxt <span class="token operator">=</span> A<span class="token operator">-&gt;</span>Fst<span class="token punctuation">;</span>
+    A<span class="token operator">-&gt;</span>Fst <span class="token operator">=</span> CntE<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Contain <span class="token operator">=</span> C<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Value <span class="token operator">=</span> D<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>To <span class="token operator">=</span> B<span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token operator">++</span>CntE<span class="token punctuation">)</span><span class="token operator">-&gt;</span>Nxt <span class="token operator">=</span> B<span class="token operator">-&gt;</span>Fst<span class="token punctuation">;</span>
+    B<span class="token operator">-&gt;</span>Fst <span class="token operator">=</span> CntE<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>Value <span class="token operator">=</span> <span class="token operator">-</span>D<span class="token punctuation">;</span>
+    CntE<span class="token operator">-&gt;</span>To <span class="token operator">=</span> A<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token function">SPFA</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-do">do</span> <span class="token punctuation">{</span>
+    Flow <span class="token operator">+=</span> <span class="token function">DFS</span><span class="token punctuation">(</span>S<span class="token punctuation">,</span> <span class="token number">0x7fffffff</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword keyword-while">while</span><span class="token punctuation">(</span><span class="token function">Dijkstra</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">&quot;%d %d\n&quot;</span><span class="token punctuation">,</span> Flow<span class="token punctuation">,</span> Cost<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-return">return</span> Wild_Donkey<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre>
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
