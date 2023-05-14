@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <%
+  var title = page.title;
+
+  if (is_archive()){
+    title = __('archives');
+
+    if (is_month()){
+      title += ': ' + page.year + '/' + page.month;
+    } else if (is_year()){
+      title += ': ' + page.year;
+    }
+  } else if (is_category()){
+    title = __('category') + ': ' + page.category;
+  } else if (is_tag()){
+    if (theme.hashtag_prefix_before_tags) {
+      title = '#' + page.tag;
+    } else {
+      title = __('tag') + ': ' + page.tag;
+    }
+  }
+  %>
+  <title><% if (title){ %><%= title %> - <% } %><%= config.title %></title>
+  <% if (theme.favicon){ %>
+    <%- favicon_tag(theme.favicon) %>
+  <% } %>
+  <% if (theme.manifest) { %>
+    <link rel='manifest' href='<%= theme.manifest %>'>
+  <% } %>
+
+  <%- css('css/var') %>
+  <%- css('css/main') %>
+  <%- css('css/typography') %>
+  <%- css('css/code-highlighting') %>
+  <%- css('css/components') %>
+  <%- css('css/nav') %>
+  <%- css('css/paginator') %>
+  <%- css('css/footer') %>
+  <%- css('css/post-list') %>
+  <%- css('css/waline') %>
+  <%- css('css/giscus') %>
+  <% if (page.path == "index.html") { %>
+  <%- css('css/index') %>
+  <% } %>
+  <% if (page.path != "index.html") { %>
+  <%- css('css/post') %>
+  <% } %>
+  <% if (is_archive() || is_category() || is_tag()) { %>
+  <%- css('css/archive') %>
+  <% } %>
+
+  <% if (theme.show_color_scheme_toggle) { %>
+    <%- js('https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js') %> 
+  <% } %>
+
+  <% if (config.waline) { %>
+    <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+  <% } %>
+</head>

@@ -1,0 +1,79 @@
+# REMEMBER TO EDIT THIS BEFORE DEPLOYING!!!
+
+# the path to your blog's icon:
+favicon: /favicon.png
+
+# the path to manifest.json
+manifest: /manifest.json
+
+# show excerpt on post list
+show_excerpt: false
+
+# light/dark/auto color scheme
+color_scheme: auto
+
+# show floating color theme toggle
+show_color_scheme_toggle: true
+
+# uppercase categories
+uppercase_categories: true
+
+# capitalize tag names on tags page
+capitalize_tags: false
+
+# add hashtag prefix before tags
+hashtag_prefix_before_tags: true
+
+# navigation config
+nav:
+  # the title displays in the upper left corner which won't change
+  title: Blog
+  # the items displays in the upper right corner
+  items:
+    # these items will display as a link
+    Archives: /archives
+    Friends: /friends
+    Projects: /projects
+    About: /about
+    # these will be automatically be an icon
+    GitHub: https://github.com/MrWillCom
+    CodePen: https://codepen.io/mrwillcom
+    Patreon: https://www.patreon.com/MrWillCom
+    Mastodon: https://noc.social/@MrWillCom
+    Discord: https://discord.gg/UKuFDjcfY8
+
+# footer items
+footer:
+  # the title
+  Blog:
+    # the items after the title, display as links
+    Blog: /
+    Archives: /archives
+    Friends: /friends
+    Projects: /projects
+    Resume: /resume
+    About: /about
+    RSS: /atom.xml
+  # also the title
+  Projects:
+    # the items
+    RSA CLI: https://github.com/MrWillCom/rsa-cli
+    Hexo Theme Cupertino: https://github.com/MrWillCom/hexo-theme-cupertino
+    A Calendar: https://github.com/MrWillCom/a-calendar
+    Auto Mirroring Bucket: https://github.com/MrWillCom/auto-mirroring-bucket
+  # the title
+  Me:
+    # items
+    GitHub: https://github.com/MrWillCom
+    CodePen: https://codepen.io/mrwillcom
+    Patreon: https://www.patreon.com/MrWillCom
+    Mastodon: https://noc.social/@MrWillCom
+    Discord: https://discord.gg/UKuFDjcfY8
+    Email: mailto:mr.will.com@outlook.com
+
+# the license your posts under
+license: CC BY-NC 4.0
+# the link of your license
+license_link: https://creativecommons.org/licenses/by-nc/4.0
+
+# REMEMBER TO EDIT THIS BEFORE DEPLOY!!!

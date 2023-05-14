@@ -1,0 +1,473 @@
+---
+title: 省选日记 Day31~35
+date: 2022-05-09 23:24
+categories: Notes
+tags:
+  - Virtual_Tree
+  - Kruskal
+  - Splay
+  - Link_Cut_Tree
+  - Construction
+  - Factorial
+  - Matrix_Fast_Exponentiation
+thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC5.png
+---
+
+# 省选日记 Day $31$ - Day $35$
+
+## Day $31$ May 4, 2022, Wednesday
+
+### 还是 [SDOI2019 世界地图](https://www.luogu.com.cn/problem/P5360)
+
+五四青年节, 重温了一下历史然后发现是时候写 LCT 了. 其实去年的昨天, 我在图书馆第一次 AC 了 LCT 的模板, 记得那个时候刚放假, 我花了一大半假期把放假前对 LCT 的理解写成代码. 这痛苦的过程加上我对 Splay 的不屑让我一年以来没有再碰 LCT.
+
+回忆一下题目需要实现的操作: 链上求最大边, 断边, 连边, 求 LCA.
+
+重温 LCT 的原理, 用 Splay 维护树上的实链, 一个 Access 操作支撑了修改和查询的复杂度, 这个操作是将选中的点到根的路径拉成一条实链, 并且断开一些原有的不符合每个点最多只有一个实儿子性质的实边, 包括选中点的实儿子边. 多个 Splay 之间用虚边连接成一棵树: LCT.
+
+一个节点存储它在 LCT 上的父亲, 所在 Splay 上的两个儿子, 每棵 Splay 的根在 LCT 上的父亲是自己所在实链顶的父亲, 其它节点在 LCT 上的父亲是在自己所在 Splay 中的父亲. 在 Access 的时候, 先把对应节点 Splay, 然后将链顶的父亲 Splay, 把它的实儿子断开, 将 Access 的节点作为实儿子, 以此类推.
+
+当断边时, 我们先随意 Access 这条边的一个端点, 然后将另一个点 Splay. 这时如果 Splay 的那个节点没有父亲了, 说明这个点是另一个点的父亲, 此时它和儿子在一条实链上, 直接断开右儿子的实边即可; 如果 Splay 的点还有父亲, 说明这个点是另一个点的儿子, 它们不在一个实链中, 直接断开这个点的虚父亲边.
+
+连边操作需要一个操作换根. 换根的时候只有新根到旧根的父亲会改变, 所以直接 Access 新根, 然后将整个 Splay 都 Reverse 一下即可.
+
+连边时选一个连通块作为主连通块, 另一个连通块换根为选定边的端点, 直接从这个端点连一条虚边指向主连通块一侧新的父亲即可.
+
+最后是关于求 LCA 和查询链上信息的, 其实两者都是差不多的原理. 我们先后将两个点 Access 操作, 这样先 Access 的点所在的实链就是从这个点到 LCA 的儿子的链, 这个链顶虚边连接的父亲就是 LCA. 
+
+查询链上信息就先进行求 LCA 的操作, 将 LCA Splay, 如果是查询链上点的信息, 将 LCA 在 Splay 上右子树的信息, 先 Access 的点所在的实链信息, 还有 LCA 的信息合并即为所求. 查询链上边的信息却比较麻烦, 因为如果像一般的树上问题存储每个点到父亲的边的信息, 那么换根时就无法执行 Reverse 操作, 其实很容易想到一个比较暴力的解决方案是圆方树, 把边的信息转化为点的信息.
+
+在我疑惑众题解是否建立了毒瘤的圆方树的时候, 我惊恐地发现题解都没写 LCT, 所以我之前的做法就是脱了裤子放屁, 虽然理论上能过, 但是巨大难写加巨大常数. 本题根本不需要在任何时刻存储整个生成树, 如果只维护虚树, 那么这个规模可以直接每次暴力重构, 复杂度和 LCT 一样, 并且常数更小. 如果用基于更优秀的反阿克曼函数的并查集的 Kruskal 结合基排, 我们甚至可以做到更优秀的复杂度 $O(n(m + q)\alpha(n))$.
+
+不需要维护整棵树的原因是我们只会在关键点的位置加入新的边, 所以我们每次增加一列点之后, 不会使原来列的不在虚树中的点加入虚树. 感性理解可能比较直观, 接下来尝试说明原因: 如果审视一个非关键点存在于虚树中的条件, 就是它有至少两个子树包含关键点. 对于一个不在虚树中的点, 关键点和它的相对位置只有不在它子树中和在它的唯一的儿子的子树中两种. 
+
+- 如果某次将两个关键点相连, 然后删除一条环上最大的边, 这两个关键点都在它的唯一某个儿子的子树中或都不在它的子树中, 并不会影响它任何儿子的子树中关键点的存在性.
+- 如果是一个关键点在那个唯一的儿子的子树中, 另一个不在它子树中, 那么删除的边有三种情况:
+  - 如果删除的是不在子树中的关键点到两个关键点 LCA 的路径上的边. 那么这个关键点就会加入到那个儿子的子树中, 仍然只有一个儿子的子树中有关键点.
+  - 如果删除的是这个点到 LCA 路径上的边, 那么那唯一的子树含关键点的儿子就成了父亲, 原来的父亲变成了儿子, 而原来的父亲的子树中可能存在关键点, 成为了新的唯一的子树含关键点的儿子.
+  - 如果删除的是在子树中的关键点到这个点之间的一条边, 那么该关键点就会从此不在这个点的子树中, 不会增加子树含关键点的儿子.
+
+发现无论如何, 都不会出现原树中不在虚树上的点被加入虚树. 因此我们只维护虚树上的点是可行的.
+
+接下来讨论边, 如果把虚树上相邻两点间最大边删除, 这条边断开之后, 这条路径上的其它边就不会被删除了, 因为这两点间没有关键点, 因此这些边不会和新加入的边成环. 所以虚树上每条边只维护最大边是对的.
+
+因此问题更加简单的解法是: 维护 $O(m)$ 个版本的 $O(n)$ 规模的虚树, 每次合并两棵虚树时直接暴力 $O(n\log n)$ Kruskal.
+
+虚树不用使用正常的建法, 因为原树大小是 $O(n)$ 的, 所以 DFS 直接线性构造即可.
+
+因为封装比较多, 所以人傻常数大.
+
+```cpp
+unsigned m, n, Hor[105][10005], Ver[105][10005];
+unsigned long long Tmp(0);
+unsigned q, A, B, Cnt(0);
+namespace Gen {
+  unsigned SA, SB, SC, lim;
+  inline unsigned getweight() {
+    SA ^= (SA << 16), SA ^= (SA >> 5), SA ^= (SA << 1);
+    unsigned t(SA);
+    SA = SB, SB = SC, SC ^= (t ^ SA);
+    return SC % lim + 1;
+  }
+  inline void gen() {
+    n = RD(), m = RD(), SA = RD(), SB = RD(), SC = RD(), lim = RD();
+    for(unsigned i(1); i <= n; ++i) for(unsigned j(1); j <= m; ++j) Hor[i][j] = getweight();
+    for(unsigned i(1); i < n; ++i) for(unsigned j(1); j <= m; ++j) Ver[i][j] = getweight();
+  }
+  inline void Prt() {
+    printf("Hor:\n");
+    for (unsigned i(1); i <= n; ++i) {
+      for (unsigned j(1); j <= m; ++j) printf("%3u", Hor[i][j]); putchar(0x0A);
+    }
+    printf("Ver:\n");
+    for (unsigned i(1); i < n; ++i) {
+      for (unsigned j(1); j <= m; ++j) printf("%3u", Ver[i][j]); putchar(0x0A);
+    }
+  }
+}
+struct Node {
+  vector<pair<Node*, unsigned> > E;
+  Node* Bel;
+  inline unsigned GetCol();
+  inline Node* Find();
+  inline void DFS(Node* Fa);
+}N[1000005], *Stack[805], **STop(Stack), *Cur;
+inline Node* Node::Find() {
+  Node* x(this);
+  while (x->Bel != x) *(++STop) = x, x = x->Bel;
+  while (STop > Stack) (*(STop--))->Bel = x;
+  return x; 
+}
+inline unsigned Node::GetCol() { return 1 + ((this - N) / n); }
+struct Edge {
+  Node *End[2];
+  unsigned long long Val;
+  inline const char operator< (const Edge& x) const {return Val < x.Val;}
+  inline char Add() {
+    Node *Set[2];
+    Set[0] = End[0]->Find(), Set[1] = End[1]->Find();
+    if(Set[0] == Set[1]) return 0;
+    Set[0]->Bel = Set[1];
+    return 1;
+  }
+};
+vector<Edge> Greenwich;
+struct Block {
+  vector<Node*> Nd;
+  vector<Edge> Eg;
+  unsigned long long Val;
+  inline void Build() {
+    for (auto i:Nd) i->E.clear();
+    for (auto i:Eg) {
+      i.End[0]->E.push_back({i.End[1], i.Val});
+      i.End[1]->E.push_back({i.End[0], i.Val});
+    }
+  }
+  inline void Virtualize (unsigned L, unsigned R);
+}Pre[10005], Suf[10005], Ans;
+inline void Merge(Block* x, Block* y, Block* z) {
+  vector<Edge> AllEg;
+  vector<Node*> AllNd;
+  Cnt = 0;
+  for (auto i:x->Eg) AllEg.push_back(i);
+  for (auto i:y->Eg) AllEg.push_back(i);
+  if(z != y) for (auto i:z->Eg) AllEg.push_back(i);
+  sort(AllEg.begin(), AllEg.end());
+  for (auto i:x->Nd) i->Bel = i, AllNd.push_back(i);
+  for (auto i:y->Nd) i->Bel = i, AllNd.push_back(i);
+  z->Eg.clear(), Cnt = AllNd.size();
+  for (auto i:AllEg) {
+    if(i.Add()) --Cnt, z->Eg.push_back(i);
+    if(Cnt == 1) break;
+  }
+  z->Val = x->Val + y->Val, z->Nd.clear();
+  for (auto i:AllNd) z->Nd.push_back(i);
+}
+Block *Blc;
+inline void Block::Virtualize (unsigned L, unsigned R) {
+  Node* Root(N + (n * (L - 1)));
+  Build(), Cnt = 0, Blc = this, A = L, B = R;
+  Eg.clear(), Nd.clear(), Root->DFS(NULL);
+}
+Node* Down(NULL);
+unsigned Mx(0);
+inline void Node::DFS(Node* Fa) {
+  char Flg(0);
+  Node* SonDown(NULL);
+  unsigned SonMx(0), Col(GetCol());
+  Down = NULL, Mx = 0;
+  for (auto i:E) if(i.first != Fa) {
+    i.first->DFS(this);
+    if(Down) {
+      Blc->Val += min(Mx, i.second), Mx = max(i.second, Mx);
+      if(SonDown) Flg = 1, Blc->Eg.push_back({this, SonDown, SonMx});
+      SonDown = Down, SonMx = Mx;
+    } else Blc->Val += i.second;
+  }
+  if((Col == A) || (Col == B)) Flg = 1;
+  if(Flg) {
+    if(SonDown) Blc->Eg.push_back({this, SonDown, SonMx});
+    Blc->Nd.push_back(this), Down = this, Mx = 0;
+    return;
+  }
+  Down = SonDown, Mx = SonMx; 
+}
+signed main() {
+  Gen::gen();
+  for (unsigned i(1); i <= m; ++i) Pre[i].Val = 0;
+  Cur = N;
+  for (unsigned i(1); i <= m; ++i) {
+    for (unsigned j(1); j < n; ++j, ++Cur)
+      Pre[i].Nd.push_back(Cur), Pre[i].Eg.push_back({Cur, Cur + 1, Ver[j][i]});
+    Pre[i].Nd.push_back(Cur++);
+  }
+  Cur = N;
+  for (unsigned i(2); i <= m; ++i) {
+    for (unsigned j(1); j <= n; ++j, ++Cur) Pre[i].Eg.push_back({Cur, Cur + n, Hor[j][i - 1]});
+    Merge(Pre + i - 1, Pre + i, Pre + i), Pre[i].Virtualize(1, i);
+  }
+  for (unsigned i(1); i <= m; ++i) Suf[i].Val = 0;
+  Cur = N;
+  for (unsigned i(1); i <= m; ++i) {
+    for (unsigned j(1); j < n; ++j, ++Cur)
+      Suf[i].Nd.push_back(Cur), Suf[i].Eg.push_back({Cur, Cur + 1, Ver[j][i]});
+    Suf[i].Nd.push_back(Cur++);
+  }
+  Cur = N + (n * m) - 1;
+  for (unsigned i(m - 1); i; --i) {
+    for (unsigned j(n); j; --j, --Cur) Suf[i].Eg.push_back({Cur, Cur - n, Hor[j][i]});
+    Merge(Suf + i + 1, Suf + i, Suf + i), Suf[i].Virtualize(i, m);
+  }
+  for (unsigned i(0); i < n; ++i) 
+    Greenwich.push_back({N + i, N + (n * (m - 1)) + i, Hor[i + 1][m]});
+  for (unsigned i(RD()); i; --i) {
+    Ans.Eg.clear(); for (auto j:Greenwich) Ans.Eg.push_back(j);
+    A = RD() - 1, B = RD() + 1, Merge(Pre + A, Suf + B, &Ans);
+    Tmp = Ans.Val;
+    for (auto j:Ans.Eg) Tmp += j.Val;
+    printf("%llu\n", Tmp);
+  }
+  return Wild_Donkey;
+}
+```
+
+## Day $32$ May 5, 2022, Thursday
+
+昨天复习了 LCT, 但是没有用上, 所以找朋友推了一道 LCT 做.
+
+### [HNOI2022 弹飞绵羊](https://www.luogu.com.cn/problem/P3203)
+
+看了这道题之后发现它最精彩的是 LCT 之前把问题转化为树形结构的部分. 如果把每个点向从它出发到达的点连边, 如果从一个点出发后被弹飞, 那么向一个超级汇点连边. 除了超级汇点, 每个点都有一个出度, 有若干入度. 这是一个树形结构, 超级汇点是根.
+
+这样修改操作就变成断边, 连边. 查询就是查询点的深度. 可以直接使用 LCT 维护.
+
+没想到一遍过了, 从新建文件到 AC 只用了一小时整.
+
+```cpp
+unsigned m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Node {
+  Node *Son[2], *Fa, *Father;
+  unsigned Size;
+  inline void Udt() {
+    Size = 1 + (Son[0] ? Son[0]->Size : 0) + (Son[1] ? Son[1]->Size : 0);
+  }
+  inline void Rotate() {
+    char Chirality(this == Fa->Son[1]);
+    Node* Cur(Fa);
+    Fa = Cur->Fa;
+    if(Cur->Fa) {
+      char ChiraC(Cur == Fa->Son[1]);
+      if(Fa->Son[ChiraC] == Cur) Fa->Son[ChiraC] = this;
+    }
+    Cur->Son[Chirality] = Son[Chirality ^ 1];
+    if(Son[Chirality ^ 1]) Son[Chirality ^ 1]->Fa = Cur;
+    Son[Chirality ^ 1] = Cur, Cur->Fa = this;
+    Cur->Udt(), Udt();
+  }
+  inline void Splay() {
+    while (Fa && Fa->Fa) {
+      char Chira1(this == Fa->Son[1]), Chira2(Fa == Fa->Fa->Son[1]);
+      if((Fa->Son[Chira1] != this) || (Fa->Fa->Son[Chira2] != Fa)) break;
+      if(Chira1 ^ Chira2) Rotate(); else Fa->Rotate();
+      Rotate();
+    }
+    if((Fa) && ((Fa->Son[0] == this) || (Fa->Son[1] == this))) Rotate();
+  }
+  inline void Access() {
+    Splay(), Son[1] = NULL, Udt();
+    while (Fa) Fa->Splay(), Fa->Son[1] = this, Rotate();
+  }
+}N[200005];
+signed main() {
+  n = RD();
+  for (unsigned i(0); i < n; ++i) N[i].Father = N[i].Fa = N + min(i + RD(), n);
+  m = RD();
+  for (unsigned i(1); i <= m; ++i) {
+    A = RD();
+    Node* Cur(N + RD());
+    if(A & 1) {
+      Cur->Access();
+      printf("%u\n", Cur->Size - 1);
+    } else {
+      Cur->Father->Access(), Cur->Splay();
+      Cur->Father = Cur->Fa = min(Cur + RD(), N + n);
+    }
+  }
+  return Wild_Donkey;
+}
+```
+
+## Day $33$ May 6, 2022, Friday
+
+进行了一天两次模拟赛的尝试, 但是错过了第一场.
+
+## Day $34$ May 7, 2022, Saturday
+
+### 一道构造 
+
+给一个可重集合, 每次操作将一个元素 $i$ 变成 $i + 1$ 个元素 $i + 1$. 初始集合为 $\{1\}$, 对于每个输入的 $n$, 要求若干次操作之后集合中有 $n$ 个元素. 输出一个方案操作结束后集合中每个值的元素的数量.
+
+因为比赛下发 Judger, 因此一开始骗出了无解的情况, 在 $10000$ 以内, 只有 $3$, $5$, $8$ 无解.
+
+发现元素最多是 $\sqrt n$ 级别的, 因为出现一个大小为 $x$ 的元素, 最少需要对小于 $x$ 的每一个数字各进行一次操作, 而这样做会导致从 $2$ 到 $x - 1$, 数字 $i$ 有 $i - 1$ 个, $x$ 有 $x$ 个, 共 $1 + \frac {x(x - 1)}2$ 个元素, 定义 $f_{x} = 1 + \frac {x(x - 1)}2$. 
+
+我们知道每个 $f_x$ 是如何构造的, 并且如果对一个 $i$ 进行操作, 不考虑数字, 只考虑元素总数, 相当于是增加了 $i$ 个元素. 如果这时找一个最大的 $x$, 使得 $f_x \leq n$, 分类讨论可以构造出除了 $3$, $5$, $8$ 之外所有数的解.
+
+- $n = f_x$
+
+这时直接输出 $f_x$ 的方案即可.
+
+- $n = f_x + 1$
+
+除了 $x = 1$ 的情况, 不存在元素 $1$, 因为 $f_{x - 1} + x = f_x + 1$, 所以我们可以在 $f_{x - 1}$ 的基础上增加 $x$ 得到. 可以对 $2$ 和 $x - 2$ 操作, 得到 $f_{x - 1} + x$. 但是当 $x = 2$ 时, $x - 2 = 0$, 当 $x = 3$ 时, $x - 2 = 1$, 我们无法找到这样的元素进行操作. 当 $x = 4$ 时, $x - 2 = 2$, 但是只有一个 $2$, 所以 $x$ 为 $2, 3, 4$ 时方案不能被构造, 这时的 $n$ 即为 $3, 5, 8$.
+
+- $n = f_x + y$
+
+这里的 $y \in [2, x)$. 因此只要在 $f_x$ 的基础上对 $y$ 进行一次操作即可.
+
+发现部分分还有 $n = x!$, 只要每次都对集合里所有元素进行操作即可得到 $x!$ 个 $x$, 找到 $x$ 后直接输出即可. 结合上面根号构造可以拿到 $52'$.
+
+正解是两种构造方式的结合, 如果取一个初始态 $f_x$, $n < f_x$ 的时候直接使用上面的根号构造方案. 其它情况下, 我们尝试把所有 $x$ 都进行操作, 每次对最大的数字所有元素执行操作, 直到再操作元素数超限为止. 假设这时有 $n - y$ 个元素, 最大的元素是 $a$, 记 $ab + c = y$, 一定有 $b$ 小于 $a$ 的数量. 仍然是分类讨论.
+
+- $c = 0$
+
+取 $b$ 个 $a$ 执行操作即可.
+
+- $c = 1$
+
+取 $b - 1$ 个 $a$ 执行操作, 然后用 $[2, x)$ 的元素凑出 $a + 1$, 如果 $b = 0$, 则将 $a$ 个 $a$ 缩为 $a - 1$, 用小元素凑出 $a$.
+
+- Else
+
+取 $b$ 个 $a$ 执行操作, 用 $[2, x)$ 的元素凑出 $c$.
+
+发现这个 $a$ 是可以做到非常小的, 因此 $x$ 只要取 $6$ 就可以满足要求.
+
+```cpp
+namespace Solve {
+  unsigned a[10];
+  inline void Init() {
+    a[0] = 1;
+    for (unsigned i(1); i <= 9; ++i) a[i] = a[i - 1] + i;
+  }
+  inline void Work(unsigned x) {
+    if(x == 3 || x == 5 || x == 8) {printf("-1\n"); return;}
+    if(x == 1) {printf("1\n1 1\n"); return;}
+    if(x == 2) {printf("1\n2 2\n"); return;}
+    if(x == 6) {printf("1\n3 6\n"); return;}
+    unsigned B(upper_bound(a + 0, a + 10, x) - a - 1);
+    if(x == a[B] + 1) {
+      if(x == 12) {printf("2\n3 4\n4 8\n"); return;}
+      printf("%u\n3 5\n", B - 2);
+      for (unsigned i(4); i <= B - 2; ++i) printf("%u %u\n", i, i - 1);
+      printf("%u %u\n%u %u\n", B - 1, B - 3, B, B << 1);
+      return;
+    }
+    if(x == a[B] + 2) {
+      printf("%u\n3 5\n", B - 1);
+      for (unsigned i(3); i < B; ++i) printf("%u %u\n", i + 1, i);
+      printf("%u %u\n", B + 1, B + 1); return;
+    }
+    printf("%u\n", B);
+    if(x == a[B]) {
+      for (unsigned i(1); i < B; ++i) printf("%u %u\n", i + 1, i);
+      printf("%u %u\n", B + 1, B + 1); return;
+    }
+    x -= a[B];
+    for (unsigned i(1); i + 2 <= x; ++i) printf("%u %u\n", i + 1, i);
+    if(x == B) {printf("%u %u\n%u %u\n", B, B - 2, B + 1, (B + 1) << 1);return;}
+    printf("%u %u\n%u %u\n", x, x - 2, x + 1, 1 + (x << 1));
+    for (unsigned i(x + 1); i < B; ++i) printf("%u %u\n", i + 1, i);
+    printf("%u %u\n", B + 1, B + 1);
+  }
+}
+vector<unsigned> List[25];
+unsigned long long a[25];
+unsigned long long n, A, B, C;
+inline void Do (unsigned x, unsigned long long y) {
+  a[x] -= y, a[x + 1] += (x + 1) * y;
+}
+inline void Do (unsigned x) {return Do(x, 1);}
+inline void Add(unsigned x) {for (auto i:List[x]) Do(i);}
+inline void Prt() {
+  unsigned Cnt(0);
+  for (unsigned i(2); i <= 24; ++i) if(a[i]) ++Cnt;
+  printf("%u\n", Cnt);
+  for (unsigned i(2); i <= 24; ++i) if(a[i]) printf("%u %llu\n", i, a[i]);
+}
+signed main() {
+  for (unsigned i(2); i <= 5; ++i) List[i].push_back(i);
+  for (unsigned i(6); i <= 10; ++i) 
+    List[i].push_back(i >> 1), List[i].push_back(i - List[i][0]);
+  for (unsigned i(11); i <= 15; ++i) 
+    List[i].push_back(i / 3), List[i].push_back((i - List[i][0]) >> 1),
+    List[i].push_back(i - List[i][0] - List[i][1]);
+  List[16].push_back(3), List[16].push_back(5);
+  List[16].push_back(4), List[16].push_back(4);
+  List[17].push_back(4), List[17].push_back(5);
+  List[17].push_back(4), List[17].push_back(4);
+  List[18].push_back(4), List[18].push_back(5);
+  List[18].push_back(4), List[18].push_back(5);
+  List[19].push_back(4), List[19].push_back(5);
+  List[19].push_back(5), List[19].push_back(5);
+  List[20].push_back(5), List[20].push_back(5);
+  List[20].push_back(5), List[20].push_back(5);
+  List[21].push_back(3), List[21].push_back(3);
+  List[21].push_back(5), List[21].push_back(5), List[21].push_back(5);
+  List[22].push_back(3), List[22].push_back(4);
+  List[22].push_back(5), List[22].push_back(5), List[22].push_back(5);
+  List[23].push_back(4), List[23].push_back(4);
+  List[23].push_back(5), List[23].push_back(5), List[23].push_back(5);
+  Solve::Init(), n = RD();
+  for (unsigned i(1); i <= n; ++i) {
+    A = RD();
+    if(A < 40) {Solve::Work(A); continue;}
+    memset(a, 0, sizeof(a));
+    for (unsigned i(2); i <= 5; ++i) a[i] = i - 1; C = a[6] = 6, B = 10, A -= B;
+    while ((C + 1) * a[C] <= A) Do(C, a[C]), ++C; A -= a[C];
+    if((A % C) == 1) {
+      B = A / C;
+      if(B) Do(C, B - 1), Add(C + 1);
+      else a[C] -= C, ++a[C - 1], Add(C);
+    } else Do(C, A / C), Add(A % C);
+    Prt();
+  }
+  return Wild_Donkey;
+}
+```
+
+## Day $35$ May 8, 2022, Sunday
+
+### [K 维斐波那契](http://ybt.ssoier.cn:8088/problem_show.php?pid=1797)
+
+有一个 $k$ 维数组 $f$, 每一维下标都从 $1$ 到 $n$, 其中 $f_{i_1, i_2,...,i_k}$ 是斐波那契数列的第 $\displaystyle{(\sum_{j = 1}^k i_j) - k + 1}$ 项. 求数组每一项的总和.
+
+其实我们可以先求 $f_{1, i_2, i_3,...,i_k}$, $f_{2, i_2, i_3,...,i_k}$ 的总和, 然后把这两个值作为前两项求一个斐波那契数列, 得到总和. 我们知道, 斐波那契数列的前 $n$ 项总和是第 $n + 2$ 项减去第 $2$ 项的差.
+
+根据这个策略, 我们可以先求出 $f_{1,1,...,1,1}$, $f_{1,1,...,1,2}$ 两个值, 通过矩阵快速幂求出第一行和第二行的总和, 然后继续快速幂升维, 最后得到数组总和.
+
+```cpp
+const unsigned long long Mod(1000000007);
+unsigned m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Matrix {
+  unsigned long long Nu[4];
+  inline Matrix operator* (Matrix x) {
+    Matrix Rt;
+    Rt.Nu[0] = (Nu[0] * x.Nu[0] + Nu[1] * x.Nu[2]) % Mod;
+    Rt.Nu[1] = (Nu[0] * x.Nu[1] + Nu[1] * x.Nu[3]) % Mod;
+    Rt.Nu[2] = (Nu[2] * x.Nu[0] + Nu[3] * x.Nu[2]) % Mod;
+    Rt.Nu[3] = (Nu[2] * x.Nu[1] + Nu[3] * x.Nu[3]) % Mod;
+    return Rt;
+  }
+  inline Matrix Pow(unsigned x) {
+    Matrix Rt(*this), X(*this);
+    --x;
+    while (x) {if(x & 1) Rt = Rt * X; X = X * X, x >>= 1;}
+    return Rt;
+  }
+  inline void Minus() {
+    if(Nu[1]) --Nu[1]; else Nu[1] = 1000000006;
+    if(Nu[2]) --Nu[2]; else Nu[2] = 1000000006;
+    if(Nu[3]) --Nu[3]; else Nu[3] = 1000000006;
+  }
+}Ma, a;
+inline void Clr() {
+  n = RD(), m = RD();
+  Ma.Nu[0] = 0, Ma.Nu[1] = Ma.Nu[2] = Ma.Nu[3] = 1;
+  Ma = Ma.Pow(n + 1), Ma.Minus();
+  a.Nu[0] = a.Nu[1] = 1, a.Nu[2] = a.Nu[3] = 0;
+}
+signed main() {
+  t = RD();
+  for (unsigned T(1); T <= t; ++T){
+    Clr();
+    a = a * Ma.Pow(m);
+    printf("%llu\n", a.Nu[0]);
+  }
+  return Wild_Donkey;
+}
+```

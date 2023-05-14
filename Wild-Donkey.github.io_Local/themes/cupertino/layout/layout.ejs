@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="<%= config.language %>">
+    <%- partial('_partial/head') %>
+    <body data-color-scheme="<%= theme.color_scheme %>">
+        <%- partial('_partial/nav') %>
+        <%- body %>
+        <%- partial('_partial/footer') %>
+
+        <%- js('js/main.js') %>
+        <% if (config.tidio) { %> 
+        <%- js(config.tidio) %> 
+        <% } %>
+        <% if (config.ackee) { %>
+        <%- config.ackee %>
+        <% } %>
+    </body>
+</html>

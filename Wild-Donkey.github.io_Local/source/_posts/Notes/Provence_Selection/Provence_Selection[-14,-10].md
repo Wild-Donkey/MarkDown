@@ -1,0 +1,814 @@
+---
+title: 省选日记 Day-14~-10
+date: 2022-03-25 12:35
+categories: Notes
+tags:
+  - Greedy_Algorithm
+  - Dynamic_Programming
+  - Pruning
+  - Fast_Walsh_Transform
+  - Heuristic_Merging
+  - Priority_Queue
+  - Data_Structure
+  - Binary_Lifting
+  - Floyd
+thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC16.png
+---
+
+# 省选日记 Day $-14$ - Day $-10$
+
+## Day $-14$ Mar 20, 2022, Sunday
+
+### [CSP-S 2021 回文](https://www.luogu.com.cn/problem/P7915)
+
+场上写的 $O(2^n)$, 拿了 $40$ 分. 同学加了个很强的剪枝可以拿 $48$.
+
+容易发现, 双端队列弹出序列中的一个后缀, 一定也是被这个双端队列中的一个子序列弹出得到的.
+
+需要生成的回文串的前半部分和后半部分一定都是 $n$ 的排列, 因此它的后半部分一定是由一个 $a$ 的排列子串弹出得到的.
+
+我们双指针扫描整个 $a$ 可以 $O(n)$ 找出所有是 $n$ 的排列的子串. 这个子串左边的前缀和右边的后缀弹出形成了序列的后半段. 接下来我们把这个前缀看成是一个从右往左弹出的栈, 后缀看成是从左往右弹出的栈, 中间仍然是双端队列. 我们想要判断的是两个栈弹出的序列和中间双端队列弹出序列相同的可行性.
+
+将中间的双端队列分成两个子序列, 元素分别和两个栈的元素相同. 这样只要两个栈分别和两个双端队列弹出序列相同即可. 判断一个栈和一个双端队列弹出序列是否可以相同, 需要保证每个时刻栈顶元素在队列端点上. 因为栈的弹出方式唯一, 所以我们可以模拟这个过程 $O(n)$ 判断.
+
+如果一个子序列可行, 我们应该如何构造字典序最小的方案呢. 最先弹出的一定是两个栈的栈底之一. 在确定了起点之后, 我们就可以以左端优先的原则, 在两端弹出 $b$ 的前半段内容的过程中, 从中间往外弹出 $b$ 后半段的内容. 因此以左边优先的原则, 同时在 $b$ 的两端往中间生成即可, 不用构造出具体的 $b$, 过程中只要维护 $4$ 个指针进行移动即可.
+
+这就是 $O(n^2)$ 的做法了, 可以拿到 $60'$ 的好成绩.
+
+我们发现弹出的第一个元素只有两种可能, $a_1$ 和 $a_{2n}$, 因此无需讨论中间子区间的界限, 只要按 $a_1$ 开始构造一次, 如果不能构造则以 $a_{2n}$ 开始构造一次. 如果都不能构造就无解, 否则直接输出构造就结果即可.
+
+```cpp
+unsigned a[1000005];
+char b[1000005], Flg(0);
+unsigned m, n, nn, A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+inline void Clr() {
+  nn = ((n = RD()) << 1);
+  A = 1, B = nn, Flg = 0;
+}
+signed main() {
+  t = RD();
+  for (unsigned T(1); T <= t; ++T){
+    Clr();
+    for (unsigned i(1); i <= nn; ++i) {a[i] = RD();if(a[i] == a[1]) C = D = i;}
+    b[1] = b[nn] = 'L', ++A, --C, ++D;
+    for (unsigned i(2), j(nn - 1); i <= n; ++i, --j) {
+      if((A < C) && (a[A] == a[C])) {b[i] = b[j] = 'L', ++A, --C; continue;}
+      if((D <= B) && (a[A] == a[D])) {b[i] = 'L', b[j] = 'R', ++A, ++D; continue;}
+      if((A <= C) && (a[B] == a[C])) {b[i] = 'R', b[j] = 'L', --B, --C; continue;}
+      if((D < B) && (a[B] == a[D])) {b[i] = b[j] = 'R', --B, ++D; continue;}
+      Flg = 1; break;
+    }
+    if(!Flg) {for (unsigned i(1); i <= nn; ++i) putchar(b[i]); putchar(0x0A); continue;}
+    for (unsigned i(1); i < nn; ++i) if(a[i] == a[nn]) {C = D = i; break;}
+    Flg = 0, b[1] = 'R', b[nn] = 'L', --C, ++D, A = 1, B = nn - 1;
+    for (unsigned i(2), j(nn - 1); i <= n; ++i, --j) {
+      if((A < C) && (a[A] == a[C])) {b[i] = b[j] = 'L', ++A, --C; continue;}
+      if((D <= B) && (a[A] == a[D])) {b[i] = 'L', b[j] = 'R', ++A, ++D; continue;}
+      if((A <= C) && (a[B] == a[C])) {b[i] = 'R', b[j] = 'L', --B, --C; continue;}
+      if((D < B) && (a[B] == a[D])) {b[i] = b[j] = 'R', --B, ++D; continue;}
+      Flg = 1; break;
+    }
+    if(!Flg) {for (unsigned i(1); i <= nn; ++i) putchar(b[i]); putchar(0x0A); continue;}
+    printf("-1\n");
+  }
+  return Wild_Donkey;
+}
+```
+
+## Day $-13$ Mar 21, 2022, Monday
+
+### [NOIP2021 方差](https://www.luogu.com.cn/problem/P7962)
+
+容易发现, 每次操作相当于将差分数组 $b$ 的两位交换了, 问题转化为重新排列 $b$ 使得 $b$ 的前缀和数组 $a$ 的方差最小. 输出方差的 $n^2$ 倍, 即为:
+
+$$
+\begin{aligned}
+Ans =&n^2 \frac 1n \sum_{i = 1}^n (a_i - \overline {a})^2\\
+=&n^2 \frac 1n \sum_{i = 1}^n ({a_i}^2 - 2a_i\overline {a} + \overline {a}^2)\\
+=&n^2 \frac 1n (\sum_{i = 1}^n {a_i}^2 - \sum_{i = 1}^n 2a_i\overline {a} + \sum_{i = 1}^n \overline {a}^2)\\
+=&n\sum_{i = 1}^n {a_i}^2 - n\sum_{i = 1}^n 2a_i\overline {a} + n\sum_{i = 1}^n \overline {a}^2\\
+\end{aligned}
+$$
+
+接下来用 $Sum$ 表示序列的总和, 可以得到:
+
+$$
+\begin{aligned}
+Sum =& \sum_{i = 1}^n\\
+\overline {a} =& \frac{Sum}n\\
+\end{aligned}
+$$
+
+继续推式子.
+
+$$
+\begin{aligned}
+Ans =&n^2 \frac 1n \sum_{i = 1}^n (a_i - \overline {a})^2\\
+=&n\sum_{i = 1}^n {a_i}^2 - n\sum_{i = 1}^n 2a_i\frac{Sum}n + n\sum_{i = 1}^n \bigg(\frac{Sum}n\bigg)^2\\
+=&n\sum_{i = 1}^n {a_i}^2 - 2Sum^2 + Sum^2\\
+=&n\sum_{i = 1}^n {a_i}^2 - Sum^2\\
+\end{aligned}
+$$
+
+我们知道 $a$ 是 $b$ 的前缀和, 因此 $a_i = \displaystyle{\sum_{j = 1}^i} b_j$
+
+$$
+\begin{aligned}
+Sum =& \sum_{i = 1}^n \sum_{j = 1}^i b_j\\
+=& \sum_{i = 1}^n b_i (n - i + 1)\\
+Ans =& n\sum_{i = 1}^n {a_i}^2 - Sum^2\\
+= &n\sum_{i = 1}^n \bigg(\sum_{j = 1}^i b_j\bigg)^2 - Sum^2\\
+= &n\sum_{i = 1}^n \sum_{j = 1}^i b_j \sum_{k = 1}^i b_k - Sum^2\\
+= &n\sum_{j = 1}^n b_j \sum_{k = 1}^n b_k (n - \max(j, k) + 1) - Sum^2\\
+= &n\sum_{j = 1}^n \sum_{k = 1}^n b_jb_k(n - \max(j, k) + 1) - \bigg(\sum_{i = 1}^n b_i (n - i + 1)\bigg)^2\\
+= &n\sum_{j = 1}^n \sum_{k = 1}^n b_jb_k(n - \max(j, k) + 1) - \sum_{i = 1}^n\sum_{j = 1}^n b_ib_j (n^2 + n(2 - j - i) + ij - i - j + 1)\\
+= &\sum_{j = 1}^n \sum_{i = 1}^n b_jb_i(n(n - \max(j, i) + 1) - (n^2 + n(2 - j - i) + ij - i - j + 1))\\
+= &\sum_{j = 1}^n \sum_{i = 1}^n b_jb_i(n^2 - n(\max(j, i) - 1) - (n^2 + n(2 - j - i) + ij - i - j + 1))\\
+= &\sum_{j = 1}^n \sum_{i = 1}^n b_jb_i(n(j + i - 1 - \max(j, i)) - (ij - i - j + 1))\\
+= &\sum_{j = 1}^n \sum_{i = 1}^n b_jb_i(n(\min(j, i) - 1) - ij + i + j - 1)\\
+\end{aligned}
+$$
+
+这样就找到了每一对 $b$ 中元素在答案中的贡献, 我们想办法去掉 $\min$ 然后继续分析.
+
+$$
+\begin{aligned}
+Ans = &2\sum_{i = 1}^n \sum_{j = 1}^i b_ib_j(n(j - 1) - ij + i + j - 1) - \sum_{i = 1}^n {b_i}^2(n(i - 1) - i^2 + 2i - 1)\\
+= &2\sum_{i = 1}^n \sum_{j = 1}^i b_ib_j(j - 1)(n - i + 1) - \sum_{i = 1}^n {b_i}^2(i - 1)(n - i + 1)\\
+= &2\sum_{i = 1}^n \sum_{j = 1}^{i - 1} b_ib_j(j - 1)(n - i + 1) + \sum_{i = 1}^n {b_i}^2(i - 1)(n - i + 1)\\
+= &2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j(n - i) + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i(n - i)\\
+= &2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j(n - i) + n\sum_{i = 1}^{n - 1} {b_{i + 1}}^2i -  \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i^2\\
+\end{aligned}
+$$
+
+发现 $b_1$ 对答案无影响.
+
+其实这样就可以去写爆搜了, 在搜索过程中维护答案, 复杂度 $O((n - 1)!)$. 拿到 $20'$.
+
+如果这时输出方案中 $a$ 的序列, 就会发现方案中的差分数组是单谷的. 然后就可以把爆搜优化到 $O(2^{n - 1})$. 但是为什么是单谷呢? 我们无从得知.
+
+对于 $i \in [1, n - 2]$, 假设有 $x = b_{i + 1}$, $y = b_{i + 2}$. 则如果交换它们的值, 会使得:
+
+$k < i$ 的 $yb_{k + 1}$ 的贡献乘 $\dfrac {n - i}{n - i - 1}$, 增加了 $\dfrac {2yb_{k + 1}k}{n - i - 1}$
+
+$k < i$ 的 $xb_{k + 1}$ 的贡献乘 $\dfrac{n - i - 1}{n - i}$, 减少了 $\dfrac {2xb_{k + 1}k}{n - i}$
+
+$k < i$ 的 $b_{k + 1}$ 的贡献一共增加 $2b_{k + 1}k(\dfrac y{n - i - 1} - \dfrac x{n - i})$
+
+$k > i + 1$ 的 $yb_{k + 1}$ 的贡献乘 $\dfrac {i}{i + 1}$, 减少了 $\dfrac {2yb_{k + 1}(n - k)}{i + 1}$
+
+$k > i + 1$ 的 $xb_{k + 1}$ 的贡献乘 $\dfrac {i + 1}{i}$, 增加了 $\dfrac {2xb_{k + 1}(n - k)}{i}$
+
+$k > i + 1$ 的 $b_{k + 1}$ 的贡献一共增加 $2b_{k + 1}(n - k)(\dfrac x{i} - \dfrac y{i + 1})$
+
+$xy$ 的贡献没有变化.
+
+$x^2$ 的贡献乘 $\dfrac{(i + 1)(n - i - 1)}{i(n - i)}$, 增加 $\dfrac {x^2((i + 1)(n - i - 1) - i(n - i))}{i(n - i)} = \dfrac {x^2(n - 1 - 2i)}{i(n - i)}$.
+
+$y^2$ 的贡献乘 $\dfrac{i(n - i)}{(i + 1)(n - i - 1)}$, 增加 $\dfrac {y^2(i(n - i) - (i + 1)(n - i - 1))}{(i + 1)(n - i - 1)} = \dfrac {y^2(1 + 2i - n)}{(i + 1)(n - i - 1)}$.
+
+事到如今, 这个式子已经过于复杂, 所以重新审视一开始的式子.
+
+$$
+Ans = n\sum_{i = 1}^n {a_i}^2 - Sum^2
+$$
+
+发现 $Sum$ 和 $b$ 的排列方案无关, 是个定值. $b_1$ 我们也动不了. 而且 $b_1$ 和方差也没关系.
+
+因此我们只要让 $Tmp = \displaystyle \sum_{i = 1}^{n - 1} ({a_{i + 1} - a_1})^2$ 最小即可.
+
+$$
+\begin{aligned}
+Tmp &= \sum_{i = 1}^{n - 1} ({a_{i + 1} - a_1})^2\\
+&= \sum_{i = 1}^{n - 1} (\sum_{j = 1}^{i} b_{j + 1})^2\\
+&= \sum_{i = 1}^{n - 1} (\sum_{j = 1}^{i}\sum_{k = 1}^i b_{j + 1}b_{k + 1})^2\\
+&= \sum_{i = 1}^{n - 1} \sum_{j = 1}^{n - 1} b_{i + 1}b_{j + 1}(n - \max(i, j))\\
+&= 2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}(n - i) + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2(n - i)\\
+\end{aligned}
+$$
+
+对于 $i \in [1, n - 2]$, 假设有 $x = b_{i + 1}$, $y = b_{i + 2}$. 则如果交换它们的值, 会使得:
+
+$k < i$ 的 $yb_{k + 1}$ 的贡献乘 $\dfrac {n - i}{n - i - 1}$, 增加了 $\dfrac {2yb_{k + 1}}{n - i - 1}$
+
+$k < i$ 的 $xb_{k + 1}$ 的贡献乘 $\dfrac{n - i - 1}{n - i}$, 减少了 $\dfrac {2xb_{k + 1}}{n - i}$
+
+$k < i$ 的 $b_{k + 1}$ 的贡献一共增加 $2(\dfrac y{n - i - 1} - \dfrac x{n - i})\displaystyle \sum_{k = 1}^{i - 1}b_{k + 1}$
+
+$k > i + 1$ 的 $b_{k + 1}$ 的贡献没有变化.
+
+$xy$ 的贡献没有变化.
+
+$x^2$ 的贡献乘 $\dfrac{n - i - 1}{n - i}$, 减少 $\dfrac{x^2}{n - i}$.
+
+$y^2$ 的贡献乘 $\dfrac{n - i}{n - i - 1}$, 增加 $\dfrac {y^2}{n - i - 1}$.
+
+$Tmp$ 增加 $\dfrac {y^2}{n - i - 1} - \dfrac{x^2}{n - i} + 2(\dfrac y{n - i - 1} - \dfrac x{n - i})\displaystyle \sum_{k = 1}^{i - 1}b_{k + 1} = \dfrac{y^2(n - i) - x^2(n - i - 1) + 2(y(n - i) - x(n - i - 1))\displaystyle \sum_{k = 1}^{i - 1}b_{k + 1}}{(n - i - 1)(n - i)}$.
+
+这个值是关于 $x$ 的二次函数和关于 $y$ 的二次函数相减. $y$ 所在的函数要更陡, 且它们的最右边交点是 $(0, 0)$, 因此对于 $x < y$ 的情况交换一定会使得 $Tmp$ 增加. 所以可以知道最优方案差分数组一定是递增的.
+
+不是说结论是单谷吗, 怎么成递增了? 用屁股想想都知道, 要是只需要让 $a$ 的平方和最小, 那差分数组必然只能递增啊.
+
+所以真相只能有一个, 就是我们的证明炸了. 还记得我们的推导是建立在 $b$ 的排列不影响 $Sum$ 的基础上的吗? 但是事情没有这么简单, 因为 $Sum$ 和 $b$ 是有关的.
+
+重新审视我们之前的式子.
+
+$$
+\begin{aligned}
+Ans = &2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j(n - i) + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i(n - i)\\
+\end{aligned}
+$$
+
+这时如果 $b_{i + 1}$ 增加 $x$, $Ans$ 会增加:
+
+$$
+\begin{aligned}
+&2\sum_{j = 1}^{i - 1} xb_{j + 1}j(n - i) + 2\sum_{j = i + 1}^{n - 1} xb_{j + 1}i(n - j) + (x^2 + 2xb_{i + 1})i(n - i)\\
+= &2x\bigg(\sum_{j = 1}^{i - 1} b_{j + 1}j(n - i) + \sum_{j = i + 1}^{n - 1} b_{j + 1}i(n - j)\bigg) + (x^2 + 2xb_{i + 1})i(n - i)\\
+= &2x\bigg(\sum_{j = 1}^{i} b_{j + 1}j(n - i) + \sum_{j = i}^{n - 1} b_{j + 1}i(n - j)\bigg) + x^2i(n - i)\\
+\end{aligned}
+$$
+
+容易发现...
+
+容易发现个 $\huge{J8}$.
+
+老子不证了. 奶奶滴. 这个题就是单谷, 怎么支吧, 你看 $i(n - i)$ 不就是越往中间越大吗, 所以我们把小的放在中间一看就很小啊. 焯!
+
+我再试图证明这种打表可知的东西, 我就是大傻逼.
+
+接下来考虑满足条件的情况下, 如何找出最小答案. 容易发现答案方案中的差分数组内, 最小的元素一定组成一个子区间. 所以我们只要以最小的 $i$ 个为一个子问题, DP 解决即可.
+
+不过问题又出现了, 我们如何保证 DP 正确呢? 或者说, 凭什么 $i + 1$ 状态的最优方案中, 前 $i$ 小的数字就必须排成 $i$ 状态中的顺序而不是其它什么顺序呢? 所以接下来让我们来证明这个问题的局部最优性.
+
+仍然审视之前的式子:
+
+$$
+\begin{aligned}
+Ans = &2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j(n - i) + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i(n - i)\\
+\end{aligned}
+$$
+
+我们假设增加一个点 $b_{n + 1}$, 那么答案会增加:
+
+$$
+\begin{aligned}
+&2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i + 2\sum_{i = 1}^{n - 1} b_{n + 1}b_{i + 1}i + {b_{n + 1}}^2n\\
+&2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i - 1} b_{i + 1}b_{j + 1}j + \sum_{i = 1}^{n - 1} {b_{i + 1}}^2i + 2\sum_{i = 1}^n b_{n + 1}b_{i + 1}i - {b_{n + 1}}^2n\\
+&2\sum_{i = 1}^{n - 1} \sum_{j = 1}^{i} b_{i + 1}b_{j + 1}j + 2b_{n + 1}\sum_{i = 1}^n b_{i + 1}i - {b_{n + 1}}^2n\\
+&2\sum_{i = 1}^n \sum_{j = 1}^i b_{i + 1}b_{j + 1}j - {b_{n + 1}}^2n\\
+\end{aligned}
+$$
+
+然后发现这个方法还 DP 个屁, 直接寄了.
+
+高端的食材往往只需要最朴素的烹饪方式. 俗话说的好, 打不过, 就摆烂. 如果不能确定局部最优性, 枚举所有情况不就好了吗.
+
+$$
+Ans = n\sum_{i = 1}^n {a_i}^2 - Sum^2\\
+$$
+
+以前 $i$ 小的差分值为阶段设计 DP. 新的差分值只可能插入到左端或右端.
+
+如果我们此时在后面加一个 $b_{n + 1}$, 相当于增加一个 $a_{n + 1} = a_n + b_{n + 1}$. 平方和增加 ${a_{n + 1}}^2$, $Sum$ 增加 $a_{n + 1}$.
+
+如果从前面加一个 $b_0$, 相当于在 $a_1$ 前面插入 $a_0$ 并且所有 $a$ 值增加 $b_0$. 平方和增加 ${b_0}^2 + \displaystyle \sum_{i = 1}^n({b_0}^2 + 2a_ib_0) = (n + 1){b_0}^2 + 2b_0Sum$, $Sum$ 增加 $b_0(n + 1)$.
+
+答案只和平方和和 $Sum$ 有关. 因此我们记录 $Sum$ 作为状态是足够的.
+
+我们发现 $n$ 不变时 $a_{n + 1}$ 是个定值, 因此 $Sum' = Sum + a_{n + 1}$ 和平方和都是可以 $O(1)$ 得到的. 我们用 $f_{i, j}$ 表示由前 $i$ 小的 $b$ 值生成的序列总和是 $j$ 时的最小平方和. 可以实现 $O(1)$ 转移:
+
+$$
+f_{i, Sum} = \min(f_{i - 1, Sum - Sumb_i} + {Sumb_i}^2, f_{i - 1, Sum - ib_i} + i{b_i}^2 + 2b_i(Sum - ib_i))
+$$
+
+我们知道 $j$ 的取值范围是 $O(nMaxa)$ 的, 阶段是 $O(n)$, 转移 $O(1)$, 因此直接 DP 的复杂度是 $O(n^2Maxa)$. 这样大概率可以拿到 $72'$, 甚至有希望拿到 $88'$.
+
+由于这个状态较为稀疏, 因此貌似这个做法可以顺利拿到 $88'$. 现在就剩下最后三个点了, 这三个点 $n$ 极大, $Maxa$ 极小.
+
+前面说过, $b_1$ 对答案没有任何贡献, 所以我们姑且认为它是 $0$.
+
+然后发现在 $n$ 较大的时候, $b$ 有相当一部分是 $0$, 这一部分可以直接忽略, 因为它们的平方和必为 $0$. 我们最多有 $Maxa$ 个非零的差分值, 因此阶段数就变成了 $min(n, Maxa)$. 所以至少现在的复杂度是 $O(nMaxa\min(n, Maxa))$.
+
+这样可以顺利通过 $23 \sim 25$ 号点了.
+
+```cpp
+unsigned long long f[1000005];
+unsigned a[10005], b[10005], m(0), n;
+unsigned long long Ans(0x3f3f3f3f3f3f3f3f);
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Tmp(0);
+signed main() {
+  n = RD() - 1, A = RD();
+  for (unsigned i(1); i <= n; ++i) b[i] = (B = RD()) - A, A = B;
+  sort(b + 1, b + n + 1);
+  memset(f, 0x3f, sizeof(f)), f[0] = 0;
+  for (unsigned i(1); i <= n; ++i) a[i] = a[i - 1] + b[i];
+  for (unsigned i(1); i <= n; ++i) {
+    Tmp = m + max(i * b[i], a[i]);
+    unsigned long long g[Tmp + 1];
+    memset(g, 0x3f, (Tmp + 1) << 3);
+    unsigned aa(a[i] * a[i]), bb(b[i] * b[i]);
+    for (unsigned j(0); j <= m; ++j) {
+      unsigned long long &To(g[j + a[i]]), &To1(g[j + i * b[i]]);
+      To = min(To, f[j] + aa);
+      To1 = min(To1, f[j] + (unsigned long long)i * bb + ((j * b[i]) << 1));
+    }
+    memcpy(f, g, (Tmp + 1) << 3), m = Tmp;
+  }
+  for (unsigned i(0); i <= m; ++i) if(f[i] < 0x3f3f3f3f3f3f3f3f) Ans = min(Ans, (n + 1) * f[i] - (unsigned long long)i * i);
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+题解里竟然真的有老哥写出证明来了. 很简单, 在平均数之上的, 我们需要 $a$ 尽可能靠近 $\overline{a}$, 所以这时差分数组从左到右递增, 在平均数之下, 我们需要 $a$ 尽可能靠近 $\overline{a}$, 所以这时差分数组从右到左递增.
+
+## Day $-12$ Mar 22, 2022, Tuesday
+
+### [快速莫比乌斯/沃尔什变换 (FMT/FWT)](https://www.luogu.com.cn/problem/P4717)
+
+求或卷积和与卷积都很好算, 算一下高维前缀和就好了.
+
+但是异或卷积有点困难.
+
+我们考虑类似于 FFT 那样分别考虑 $f \times g$ 的奇偶项的贡献.
+
+把 $f$ 偶数项提取出来作为 $f_0$, 偶数项提取出来作为 $f_1$, $g$ 和 $f \times g$ 同理. 容易发现, 偶数是由奇偶性相同的数字异或得到的, 因此 $(f \times g)_0 = f_0 \times g_0 + f_1 \times g_1$; 奇数是由奇偶性不同的数字异或得到的, 因此 $(g \times f)_1 = g_0 \times f_1 + g_1 \times f_0$.
+
+如果是这样递归计算的话, 复杂度 $T(n) = n + 4T(\frac n2)$, 仍然是 $O(n^2)$.
+
+考虑多项式 $a = f_0 + f_1$, $b = f_0 - f_1$, $c = g_0 + g_1$, $d = g_0 - g_1$.
+
+$$
+\begin{aligned}
+a \times c &= f_0 \times g_0 + f_0 \times g_1 + f_1 \times g_0 + f_1 \times g_1\\
+b \times d &= f_0 \times g_0 - f_0 \times g_1 - f_1 \times g_0 + f_1 \times g_1\\
+\frac {a \times c + b \times d}2 &= f_0 \times g_0 + f_1 \times g_1 = (f \times g)_0\\
+\frac {a \times c - b \times d}2 &= f_0 \times g_1 + f_1 \times g_0 = (f \times g)_1\\
+\end{aligned}
+$$
+
+如果我们对 $a$, $b$, $c$, $d$ 继续分下去, 直到长度为 $1$ 的时候直接点乘, 最后再合并起来, 时间复杂度 $T(n) = n + 2T(\frac n2)$, 也就是 $O(n\log n)$.
+
+我们发现递归的最后一层, $f$, $g$ 各分成了 $n$ 个长度为 $1$ 的多项式, 我们把 $f$ 的 $n$ 个长度为 $1$ 的多项式按从 $a$ 到 $b$ 的顺序递归的 DFS 树上中序遍历的顺序拼成一个多项式 $F$. (这个顺序可以认为是 $F$ 的前 $\frac n2$ 项是 $a$ 生成的多项式拼成的, 后 $\frac n2$ 项是 $b$ 生成的多项式拼成的, 以此类推). 同样 $G$ 也是由 $g$ 生成的 $n$ 个长度为 $1$ 的多项式拼成的.
+
+在递归底层做的就是把这些长度为 $1$ 的多项式乘起来.
+
+回溯时相当于是用 $n$ 个长度为 $1$ 的多项式合成一个长度为 $n$ 的多项式. 回溯时已知 $a \times c$, $b \times d$ 两个多项式, 用它们加减得到 $f \times g$ 的奇数位和偶数位.
+
+生成 $F$, $G$ 的过程便是快速沃尔什变换 (FWT): $F = \text{FWT}(f)$, $G = \text{FWT}(g)$. 而通过 $F \cdot G$ 合成 $f \times g$ 的过程便是 FWT 的逆变换, IFWT $f = \text{IFWT}(F)$.
+
+解决异或卷积问题的多项式运算, 定义为: 长度为 $1$ 的时候 $F = f$, 其他情况下满足:
+
+$$
+F_0 = \text{FWT}(f_0) + \text{FWT}(f_1)\\
+F_1 = \text{FWT}(f_0) - \text{FWT}(f_1)
+$$
+
+点乘后的多项式 $F \cdot G$ 也就是 $FWT(f \times g)$. 最后逆变换回去即可.
+
+逆变换 $f = \text{IFWT}(F)$ 也很简单.
+
+逆变换也很简单:
+
+$$
+\begin{aligned}
+\frac{F_0 + F_1}2 &= \text{FWT}(f_0)\\
+\text{IFWT}(\frac{F_0 + F_1}2) &= f_0\\
+\frac{F_0 - F_1}2 &= \text{FWT}(f_1)\\
+\text{IFWT}(\frac{F_0 - F_1}2) &= f_1\\
+\end{aligned}
+$$
+
+其实我们可以把 $\frac 12$ 提出来, 使得 $nf = \text{IFWT}(F)$ 整理出来就是:
+
+$$
+\begin{aligned}
+F_0 &= \text{FWT}(f_0) + \text{FWT}(f_1)\\
+F_1 &= \text{FWT}(f_0) - \text{FWT}(f_1)\\
+n f_0 &= \text{IFWT}(F_0 + F_1)\\
+n f_1 &= \text{IFWT}(F_0 - F_1)
+\end{aligned}
+$$
+
+对于或卷积和与卷积, 虽然可以认为是高维前缀和 (后缀和), 但是为了实现 FWT 大一统计划, 也可以进行同样的操作:
+
+$$
+\begin{aligned}
+(f \times g)_0 &= f_0 \times g_0\\
+(f \times g)_1 &= f_0 \times g_1 + f_1 \times g_0 + f_1 \times g_1\\
+\end{aligned}
+$$
+
+这个是或卷积的操作:
+
+$$
+\begin{aligned}
+a &= f_0\\
+b &= f_0 + f_1\\
+c &= g_0\\
+b &= g_0 + g_1\\
+(f \times g)_0 &= a \times b\\
+(f \times g)_1 &= c \times d - a \times b\\
+\end{aligned}
+$$
+
+解决或卷积的 FWT 和 IFWT 是这样的:
+
+$$
+\begin{aligned}
+F_0 &= \text{FWT}(f_0)\\
+F_1 &= \text{FWT}(f_0) + \text{FWT}(f_1)\\
+f_0 &= \text{IFWT}(F_0)\\
+f_1 &= \text{IFWT}(F_1 - F_0)
+\end{aligned}
+$$
+
+最后是与卷积:
+
+$$
+\begin{aligned}
+(f \times g)_0 &= f_0 \times g_0 + f_0 \times g_1 + f_1 \times g_0\\
+(f \times g)_1 &= f_1 \times g_1\\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+a &= f_1\\
+b &= f_0 + f_1\\
+c &= g_1\\
+b &= g_0 + g_1\\
+(f \times g)_0 &= a \times b - c \times d\\
+(f \times g)_1 &= c \times d\\
+\end{aligned}
+$$
+
+接下来是变换的式子:
+
+$$
+\begin{aligned}
+F_0 &= \text{FWT}(f_0) + \text{FWT}(f_1)\\
+F_1 &= \text{FWT}(f_1)\\
+f_0 &= \text{IFWT}(F_0 - F_1)\\
+f_1 &= \text{IFWT}(F_1)\\
+\end{aligned}
+$$
+
+然后我们就可以进行 DIF, DIT 计算了.
+
+```cpp
+const unsigned Mod(998244353);
+unsigned a[132005], b[132005], m, n;
+unsigned long long Iv;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+char Type(0);
+inline void Mn(unsigned& x) {x -= ((x >= Mod) ? Mod : 0);}
+inline unsigned long long Inv(unsigned long long x) {
+  unsigned long long Rt(1);
+  unsigned y(998244351);
+  while (y) { if(y & 1) Rt = Rt * x % Mod; x = x * x % Mod, y >>= 1; }
+  return Rt;
+}
+inline void DIF (unsigned *f) {
+  for (unsigned i(n >> 1); i; i >>= 1) {
+    for (unsigned j(0); j < n; ++j) if(!(j & i)) {
+      unsigned Tma(f[j]), Tmb(f[j ^ i]);
+      if(Type == 1) { Mn(f[j ^ i] += Tma); continue;}
+      if(Type == 2) { Mn(f[j] += Tmb); continue;}
+      Mn(f[j] += Tmb);
+      Mn(f[j ^ i] = Mod + Tma - Tmb);
+    }
+  }
+}
+inline void DIT (unsigned *f) {
+  for (unsigned i(1); i < n; i <<= 1) {
+    for (unsigned j(0); j < n; ++j) if(!(j & i)) {
+      unsigned Tma(f[j]), Tmb(f[j ^ i]);
+      if(Type == 1) { Mn(f[j ^ i] += Mod - Tma); continue;}
+      if(Type == 2) { Mn(f[j] += Mod - Tmb); continue;}
+      Mn(f[j] += Tmb);
+      Mn(f[j ^ i] = Mod + Tma - Tmb);
+    }
+  }
+}
+inline void Calc () {
+  unsigned Ta[n], Tb[n];
+  memcpy(Ta, a, n << 2);
+  memcpy(Tb, b, n << 2);
+  DIF(Ta), DIF(Tb);
+  for (unsigned i(0); i < n; ++i) Ta[i] = (unsigned long long)Ta[i] * Tb[i] % Mod;
+  DIT(Ta);
+  if(Type == 3) for (unsigned i(0); i < n; ++i) Ta[i] = Ta[i] * Iv % Mod;
+  for (unsigned i(0); i < n; ++i) printf("%u ", Ta[i]); putchar(0x0A);
+}
+signed main() {
+  Iv = Inv(n = (1 << (m = RD())));
+  for (unsigned i(0); i < n; ++i) a[i] = RD();
+  for (unsigned i(0); i < n; ++i) b[i] = RD();
+  Type = 1, Calc();
+  Type = 2, Calc();
+  Type = 3, Calc();
+  return Wild_Donkey;
+}
+```
+
+### CF
+
+掉大分, $10$ 分钟才干出 A, 又是 $10$ 分钟干出 B. 做 B 的时候一度质疑过贪心的正确性, 但是后来才发现能加不加是纯纯傻逼.
+
+C 我使用了 Manacher, 虽然写的时候很费劲但是很幸运一遍过了. 哥们告诉我这个题哪用什么傻逼 Manacher, 直接判断两端就完事了, 因为这个题判断的是字符集大小为 $2$ 的最短回文前缀.
+
+搞完 C 还剩 50min 了. D 匆匆忙忙读完题, 没有意识到一个怪只能选一种兵. 然后就 G 了, 想了半小时也没有进展. 好在有兄弟提醒我只能选一类, 发现血量和伤害就是在放屁.
+
+我们假设选择的兵的血是 $h$, 攻击力是 $d$, 打的怪的血是 $H$, 攻击力是 $D$, 那么我们需要在小于 $t = \frac hD$ 的时间内干掉怪, 假设买 $x$ 个兵, 那么干掉怪的时间是 $\frac H{dx}$, 于是有式子 $\frac hD > \frac H{dx}$, 也就是 $hdx > HD$. 设兵的战斗力是它的红蓝相乘, $a = hd$, 怪也是一样的 $b = HD$. 这就是为什么说血量和攻击力是放屁, 我们只记录战斗力即可.
+
+接下来就是对于一个怪, 找到一种兵, 使得 $xa > b$ 且 $xc$ 最小. 发现 $C$ 很小, 所以处理 $f_i$ 表示花不超过 $i$ 块钱, 可以凑出的最大战斗力. 每次插入一个兵, 就更新 $f_c = max(f_c, a)$. 插入完了扫一遍 $f$ 数组, 对于 $f_i$, 首先 $f_{i + 1} = max(f_{i + 1}, f_i)$, 然后枚举 $x$, 使得 $f_{ix} = max(f_{ix}, xf_i)$. 这个复杂度是调和级数求和, $O(C \ln C)$.
+
+询问时只要二分答案即可. 在比赛结束之后 4min 及时 AC 了此题.
+
+这次貌似掉了 $132$ 分. 再见了我的紫名.
+
+## Day $-11$ Mar 23, 2022, Wednesday
+
+### [CERC2013 Escape](https://www.luogu.com.cn/problem/P7011)
+
+这个题首先有几个比较明显的剪枝: 不加血的叶子是无用的, 统统删掉, 加血的节点可以和父亲合并.
+
+对于一个父亲加血的加血节点, 可以把它的儿子接到父亲上, 然后把它删除, 将父亲加血量加上它的加血量.
+
+对于一个父亲扣血的加血节点, 可以把它的儿子接到父亲上, 父亲节点开一个变量存储所有被删除的加血儿子的加血总量.
+
+假设我们现在在一个子树的根, 我们最想知道的是如何获得门槛最低的血量. 每个血包需要经过一些怪物, 我们一定是选择那些回血比掉血多的血包, 所以我们每个血包可以记录两个量, 取得它的门槛和取得它的净赚.
+
+我们对于每个子树, 处理一个堆, 里面按门槛顺序存储了每个血包的净赚. 把当前血量所有可以吃的血包都吃了, 直到不能吃为止.
+
+我们把从起点到终点路径上的点单独拉出来, 变成一条链, 链上每个点挂着一个子树, 每个子树维护一个堆. 我们从起点到终点扫, 路上吃掉所有可吃的血包, 中途不能走了就寄了, 走到终点就可以输出 `escaped`.
+
+为了维护堆, 我们使用 `map` 加上启发式合并, 对于每个点, 如果它没有净赚, 那么我们强行提高它的门槛以掠夺更多子树内的血包使它能够净赚, 如果把子树内所有血包都吃了也不能回本, 说明这棵子树就是个垃圾, 直接删除即可.
+
+调了一天, 多亏了好兄弟来给我当小黄鸭才调出来.
+
+```cpp
+long long CurC(0);
+unsigned m, n, A, B, t;
+char No(0);
+struct St {
+  map <long long, long long> S;
+}SC[200005], * CntS(SC);
+inline St* Mrg(St* x, St* y) {
+  if (x->S.size() < y->S.size()) swap(x, y);
+  for (auto i : y->S)
+    if (x->S.find(i.first) != x->S.end()) x->S[i.first] += i.second;
+    else x->S.insert(i);
+  return x;
+}
+struct Node {
+  vector <Node*> E;
+  St* My;
+  long long Val, Earn;
+  char Im;
+}N[200005], * Link[200005], * Des;
+inline void Clr() {
+  while (CntS > SC) CntS->S.clear(), --CntS;
+  for (unsigned i(1); i <= n; ++i) N[i].E.clear();
+  n = RD(), Des = N + RD(), No = m = CurC = 0;
+}
+inline char DFS1(Node* x, Node* Fa) {
+  x->Earn = 0;
+  unsigned Lim(x->E.size());
+  for (unsigned i(0); i < Lim; ++i) if ((x->E[i] != Fa) && (!(x->E[i]->Im))) {
+    Node* Cur(x->E[i]);
+    if (Cur->Val >= 0) {
+      if (Cur == Des) Des = x;
+      Cur->Im = 1;
+      if (x->Val >= 0) x->Val += Cur->Val;
+      else x->Earn += Cur->Val;
+      for (auto j : Cur->E) if (j != x) x->E.push_back(j), ++Lim;
+    }
+  }
+  vector <Node*> Son;
+  for (auto i : x->E) if ((i != Fa) && (!(i->Im))) Son.push_back(i);
+  x->E.clear();
+  char Flg(0);
+  for (auto i : Son) {
+    if (DFS1(i, x)) Flg = 1;
+    else x->E.push_back(i);
+  }
+  if (x == Des) Flg = 1;
+  if (Flg) Link[++m] = x;
+  return Flg;
+}
+inline void DFS2(Node* x) {
+  if(x->Val < 0) x->Val = -(x->Val);
+  else x->Earn = x->Val, x->Val = 0;
+  x->My = ++CntS;
+  for (auto i : x->E) DFS2(i), x->My = Mrg(x->My, i->My);
+  long long Need(x->Earn - x->Val);
+  for (map<long long, long long>::iterator i(x->My->S.begin()); x->My->S.size(); i = x->My->S.begin()) {
+    if ((Need <= 0) || (i->first <= x->Earn)) {
+      if (x->Earn >= i->first) x->Earn += i->second;
+      else x->Val += i->first - x->Earn, x->Earn += i->first - x->Earn + i->second;
+      Need += i->second, x->My->S.erase(i);
+    }
+    else break;
+  }
+  if (Need > 0) x->My->S[x->Val] = Need;
+  else x->My->S.clear();
+}
+signed main() {
+  t = RD();
+  for (unsigned T(1); T <= t; ++T) {
+    Clr();
+    for (unsigned i(1); i <= n; ++i) N[i].Val = RDsg(), N[i].Im = 0;
+    CurC = 0;
+    for (unsigned i(1); i < n; ++i) {
+      A = RD(), B = RD();
+      N[A].E.push_back(N + B);
+      N[B].E.push_back(N + A);
+    }
+    St* All(SC);
+    All->S.clear(), DFS1(N + 1, NULL), CurC = 0;
+    for (unsigned i(m); i; --i) {
+      if (CurC < (-(Link[i]->Val))) { No = 1; break; }
+      CurC += Link[i]->Val + Link[i]->Earn, Link[i]->Val = Link[i]->Earn = 0, DFS2(Link[i]);
+      All = Mrg(All, Link[i]->My);
+      for (map<long long, long long>::iterator j(All->S.begin()); All->S.size(); j = All->S.begin()) {
+        if (j->first <= CurC) CurC += j->second, All->S.erase(j);
+        else break;
+      }
+    }  
+    printf(No ? "trapped\n" : "escaped\n");
+  }
+  return Wild_Donkey;
+}
+```
+
+### [PrSl2021 卡牌游戏](https://www.luogu.com.cn/problem/P7514)
+
+满足每个数互不相同, 离散化使得所有值分布在 $[1, 2n]$ 中.
+
+一个容易想到的想法是规定一个最小值 $x$, 然后在所有数都大于等于这个 $x$ 并且让最大值尽可能小.
+
+如果存在 $a_i < x$, $b_i < x$ 同时成立的情况, 那么 $x$ 是不合法的最小值. 因此 $x$ 的取值范围即为 $[1, \min_{i = 1}^n(\max(a_i, b_i))]$.
+
+一个卡牌必须翻转的条件是 $a_i < x$.
+
+一个卡牌不能翻转的条件是 $b_i < x$.
+
+其余的卡牌一定满足 $a_i \geq x$ 且 $b_i \geq x$, 那么我们利用剩余的翻转次数, 对于 $a_i > b_i$ 的卡牌按 $a_i$ 从大到小的顺序将它们进行翻转.
+
+很容易写出枚举 $x$ 然后 $O(n)$ 进行翻转的 $O(n^2)$ 写法.
+
+我们把卡牌分为两类, 一类是 $\min(a_i, b_i) < x$ 的卡牌, 它们的状态已经定了. 剩下的是按需要翻转的卡牌. 我们只需要对两类的卡分别算最大值, 然后取最大的即可.
+
+第二类卡牌按 $a_i$ 大小分成两段, $a_i$ 较小的一段保持 $a_i$ 朝上, 第二段是将 $a_i$, $b_i$ 中较小的一段朝上. 我们可以预处理 $a$ 的前缀最大值, $\min(a_i, b_i)$ 的后缀最大值. 只要知道分段的分界点 $End$ 就可以查询第二类的最大值了. 我们认为 $[1, End)$ 不翻转, $[End, n]$ 将最小值朝上.
+
+一开始所有点都是第二类, 我们贪心地按 $a_i$ 从大到小, 将 $a_i > b_i$ 的卡翻过去即可, 直到次数用完或序列扫完为止. 计仍然可以翻转的次数为 $Emp$.
+
+容易发现, $x$ 每次增加 $1$, 都会将一个第二类卡牌变成第一类卡牌, 这张卡牌一定需要使 $a_i$, $b_i$ 的最大值朝上, 因此我们统计第二类的最大值的时候就算是把已经变成第一类的卡牌统计进去也不会影响答案. 所以仍然是只要知道 $End$ 即可求出此时答案.
+
+从小到大枚举 $x$, 设每次变成第一类的点是 $y$. 那么一定有 $\min(a_y, b_y) = x - 1$, 我们不能让 $x - 1$ 朝上, 所以只能是 $\max(a_y, b_y)$ 朝上, 我们用这个值更新一下第一类点的最大值, 然后对第二类点的最大值进行修正.
+
+如果 $a_y = x - 1$, 则它应该被翻转. 如果这时 $Emp = 0$, 那么我们将 $End$ 往右移动, 撤销一个翻转. 然后将 $Emp$ 减少 $1$, 因为我们用一次翻转将 $y$ 的 $b$ 朝上了. 
+
+如果 $b_y = x - 1$, 则它不能被翻转. 而且因为 $x \leq \min_{i = 1}^n(\max(a_i, b_i))$, 所以一定有 $b_y < a_y$. 如果这时 $y \geq End$, 说明它已经被翻转了. 而这种翻转是不允许的, 所以我们应该把它们翻过来. 由于 $a_y$ 一定朝上, 所以无论 $y$ 左边的点如何挣扎, 都无法使最大值小于 $a_y$, 所以我们选择摆烂, 疯狂撤销第二类点的翻转使 $End > y$. 
+
+这样我们就可以对每个 $x$, 均摊 $O(1)$ 地查询进行操作后的最大值了, 算上离散化就可以 $O(n \log n)$ 通过此题.
+
+```cpp
+unsigned Li[2000005], a[1000005], b[1000005], At[2000005], Suf[1000005], Pre[1000005], m, n;
+unsigned A, B, C, D, t, K, End, Emp;
+unsigned Cnt(0), Ans(0x3f3f3f3f), Tmp(0), Top(0x3f3f3f3f);
+signed main() {
+  m = ((n = RD()) << 1), Emp = K = RD();
+  for (unsigned i(1); i <= n; ++i) Li[i] = a[i] = RD();
+  for (unsigned i(1); i <= n; ++i) Li[i + n] = b[i] = RD();
+  sort(Li + 1, Li + m + 1);
+  for (unsigned i(1); i <= n; ++i) a[i] = lower_bound(Li + 1, Li + m + 1, a[i]) - Li;
+  for (unsigned i(1); i <= n; ++i) b[i] = lower_bound(Li + 1, Li + m + 1, b[i]) - Li;
+  for (unsigned i(1); i <= n; ++i) Top = min(Top, max(a[i], b[i]));
+  for (unsigned i(1); i <= n; ++i) At[a[i]] = At[b[i]] = i;
+  for (unsigned i(1); i <= n; ++i) Pre[i] = max(Pre[i - 1], a[i]);
+  for (unsigned i(n); i; --i) Suf[i] = max(Suf[i + 1], min(a[i], b[i]));
+  for (unsigned i(n), j(K); i; --i) {
+    if(j) End = i; 
+    if((a[i] > b[i]) && j) --j, --Emp, Tmp = max(b[i], Tmp);
+    else Tmp = max(a[i], Tmp);
+  }
+  Ans = Li[max(Pre[End - 1], Suf[End])] - Li[1];
+  for (unsigned i(1); i < Top; ++i) {
+    unsigned Pos(At[i]);
+    if(a[Pos] == i) {
+      Tmp = max(Tmp, b[Pos]);
+      if(Pos < End) {
+        while ((!Emp) && (End <= n)) {if(a[End] > b[End]) ++Emp; ++End;}
+        --Emp;
+      }
+    }
+    else {
+      Tmp = max(Tmp, a[Pos]);
+      while (End <= Pos) {if(a[End] > b[End]) ++Emp; ++End;}
+    }
+    Ans = min(Ans, Li[max(Tmp, max(Pre[End - 1], Suf[End]))] - Li[i + 1]);
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+## Day $-10$ Mar 24, 2022, Thursday
+
+### [最短负环](https://hydro.ac/d/bzoj/p/4773)
+
+需要知道 Floyd 的本质是一个邻接矩阵的卷积 $n$ 次幂. 卷积 $\otimes$ 定义为:
+
+$$
+(A \otimes B)_{i, j} = \min(\min_{k = 1}^{n}(A_{i, k} + B_{k, j}), min(A_{i, j}, B_{i, j}))
+$$
+
+如果邻接矩阵 $A$ 的 $\otimes$ 卷积 $i$ 次方表示为 $A^i$, 那么 $(A^i)_{j, k}$ 表示的就是 $j$ 到 $k$ 的小于等于 $i$ 条边的最短路.
+
+我们进行一次卷积运算需要 $O(n^3)$, 所以进行 $O(\log n)$ 次计算求出所有邻接矩阵的二的整数幂, 最后倍增地求出现负环 ($(A^{Ans})_{i, i} < 0$) 的最小幂次 $Ans$ 即可.
+
+```cpp
+int Pool[1080005], *TopP(Pool);
+unsigned m, n, N, Size, C, D, t, Lgn(1);
+unsigned Cur(0), Ans(0);
+struct Matrix {
+  int *a;
+  inline void CP(const Matrix& x) { memcpy(a, x.a, Size); }
+  inline void Constr () { a = TopP, TopP += N;}
+  inline void Constr (const Matrix& x) {Constr(), CP(x); }
+  inline void INF () { memset(a, 0x3f, Size); }
+  inline char Chk () { for (unsigned i(0); i < N; i += (n + 1)) if(a[i] < 0) return 1; return 0; }
+  inline void Prt () {
+    printf("Matrix Pool %u\n", a - Pool);
+    for (unsigned i(0); i < N; i += n) { for (unsigned j(0); j < n; ++j) printf("%d ", a[i + j]); putchar(0x0A); }
+  }
+  inline Matrix operator *(const Matrix& x) {
+    Matrix Rt;
+    Rt.Constr(), Rt.INF();
+    for (int *i(Rt.a), I(0); I < N; I += n) for (int j(0); j < n; ++j, ++i) {
+      for (int k(0), K(0); k < n; ++k, K += n) *i = min(*i, a[I + k] + x.a[K + j]);
+      *i = min(a[I + j], min(*i, x.a[I + j]));
+    }
+    return Rt;
+  }
+}A, B[10], Tmp;
+signed main() {
+  n = RD(), m = RD(), Size = ((N = n * n) << 2), A.Constr(), A.INF();
+  for (unsigned i(1); i <= m; ++i) C = RD() - 1, D = RD() - 1, A.a[(C * n) + D] = RDsg();
+  B[0].Constr(A);
+  for (unsigned i(2); i <= n; i <<= 1, ++Lgn) B[Lgn] = B[Lgn - 1] * B[Lgn - 1]; --Lgn;
+  A.INF(), Tmp.Constr(), Cur = 0;
+  for (unsigned i(Lgn); ~i; --i) {
+    Cur += (1 << i), Tmp.CP(A * B[i]), TopP -= N;
+    if(Tmp.Chk()) Cur -= (1 << i);
+    else A.CP(Tmp), Ans = Cur + 1;
+  }
+  printf("%u\n", (Ans > n) ? 0 : Ans);
+  return Wild_Donkey;
+}
+```
+
+### [CF1656](https://codeforces.com/contest/1656)
+
+这次的 A 还是很简单的, 转化为数轴上有 $n$ 个点, 则问题转化为从 $i$ 到任意一点 $k$ 再到 $j$ 的路程等于 $i$ 到 $j$ 的路程. 相当于 $i$ 到 $j$ 的路上经过了所有点. 因此输出最大值和最小值的下标即可.
+
+其实把 B 题任意一个删除方案的数字按删除顺序排列, 记为 $a_1, a_2,...,a_n$. 那么最后留下的数字一定是 $a_n - a_{n - 1}$. 因此我们只要判断给定的数中是否存在一个数减另一个等于 $k$ 的情况即可.
+
+C 的策略是把所有数变成 $0$ 或 $1$. 如果序列里面没有 $1$, 我们从大到小取模成 $0$ 即可. 接下来只讨论有 $1$ 的情况.
+
+如果有 $1$ 也有 $0$, 那么这一定是不行的, 我们没法动 $1$ 和 $0$. 如果没有 $0$, 那么只要序列中没有相邻的数字即可从大到小取模它减 $1$, 这样就都变成 $1$ 了. 如果序列中有相邻的数字则不行.
+
+D 比较折磨, 对于一个 $k$, 如果是选模 $k$ 等于不同的 $k$ 个值的正整数, 则最小的方案一定是 $1, 2, 3,...,k$, 由于我们只关心总和, 所以 $k$ 其它的可行的方案只是在这个基础上加 $k$ 罢了. 因此对于 $n$, 我们认为 $k$ 可以作为答案的充要条件是存在自然数 $x$ 使得, $n = \dfrac{k(k + 1)}2 + xk$. 等式两边同时乘以 $2$, 变形得到 $2n = k(k + 2x + 1)$.
+
+这启示我们可以设 $a = 2x + 1$, 因为 $x$ 是任意自然数, 所以这个 $a$ 是任意正奇数. 我们把 $2n$ 分解为因数 $2^b$, $c$, 要求是 $c$ 是个奇数.
+
+我们需要找出一个 $k$, 使得 $k(k + a) = 2n$, 因为 $a$ 是个奇数, 所以 $k$ 和 $k + a$ 的奇偶性不同.
+
+对于 $c = 1$ 的情况, $2n = 2^b$. 找不到 $2n$ 的奇因数, 所以无解.
+
+其他情况, 对于 $c < 2^b$ 的情况, 我们设 $k = c$, 则 $2^b$ 一定可以写成 $c + a$ 的形式, 构造出了一个解.
+
+对于 $c > 2^b$ 的情况, 我们设 $k = 2^b$, 则 $c$ 一定可以写成 $2^b + a$ 的形式, 构造出了一个解.
+
+因此除了 $2n = 2^b$ 的情况, 都有解.
+
+E 的思维难度比 D 是小的, 但是一眼如果出不来也是非常困难的. 从删除点 $x$ 开始考虑, 它的每个儿子的子树和需要相等, 并且所有点的总和减去自己的子树和要等与儿子的子树和. 如果我们使深度为偶数的点的子树和为 $1$, 使深度为奇数的点的子树和为 $-1$, 使所有点的总和也就是根的子树和为 $0$, 即可满足题目的要求.
+
+如果删除的是根, 它的所有儿子深度相同, 所以子树和也相同.
+
+如果删除的是奇深度的点, 它的儿子的子树和都是 $1$, 它的子树和是 $-1$, 总和 $0$ 减去 $-1$ 也等于 $1$, 所以合法.
+
+如果删除的是偶深度的点, 它的儿子的子树和都是 $-1$, 它的子树和是 $1$, 总和 $0$ 减去 $1$ 也等于 $-1$, 所以合法.
+
+最后只要考虑如何构造这种树即可, 一个显然的方法是 DFS, 每次确定了子树中所有点的权值最后规定子树根的权值.
+
+其实也有更好的方法: 对于叶子, 我们直接赋给他们对应的值即可, 对于它们的父亲, 设儿子数量为 $a$, 则这个点的绝对值就是 $a + 1$, 符号就是它目标的符号, 这样和儿子抵消之后它们的权值就是 $1$ 了. 对于根, 我们可以先按深度要求将它的子树和搞成 $-1$, 最后再给它加 $1$.
+
+于是我们发现: 每个点的绝对值等于它的度数, 并且每个点的符号取决于它的深度. 这样即可高效确定权值了. 并且每个点的度数不会比点数多, 符合值域要求.

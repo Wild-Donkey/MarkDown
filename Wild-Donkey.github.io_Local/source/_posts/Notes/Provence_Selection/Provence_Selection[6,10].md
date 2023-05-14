@@ -1,0 +1,637 @@
+---
+title: 省选日记 Day6~10
+date: 2022-04-14 18:28
+categories: Notes
+tags:
+  - Data_Structure
+  - Segment_Tree
+  - Dynamic_Programming
+  - State_Compression
+  - 01_Trie
+  - Merging_01_Trie
+  - Finite_Difference_on_Tree
+  - Inclusion_Exclusion_Principle
+  - Mobius_Inversion
+  - Kirchhoff's_Theorem
+  - Multiplication_Inverse_Element
+thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC12.png
+---
+
+# 省选日记 Day $6$ - Day $10$
+
+## Day $6$ Apr 9, 2022, Saturday
+
+### [CF1665E MinimizOR](https://codeforces.com/contest/1665/problem/E)
+
+因为只有五道题, 所以这应该是我们离 AK Div2 最近的一次. (虽然我没有打)
+
+静态序列区间查询选择两个数的最小或和. 位运算的区间查询问题, 一般我们会选择使用可持久化 0/1 Trie.
+
+考虑从可持久化 Trie 上查询, 每次选择往 $0$ 走还是往 $1$ 走. 如果这一位有两个 $0$, 那么直接选择 $0$, 如果没有那么直接去 $1$. 如果有一个 $0$, 那么答案的这一位也得是 $1$, 考虑将这一位为零的唯一的数字插到另一个临时 Trie 里, 和可持久化的这一段一起查询. 复杂度是 $O(n\log^2 n)$.
+
+但是这样写代码是会让人疯掉的, 仔细思考我们在 Trie 上做的事情的本质. 如果子树 $0$ 有 $2$ 个元素及以上, 我们选择子树 $0$. 如果子树 $0$ 没有东西, 我们选择子树 $1$. 如果子树 $0$ 只有一个元素, 那么我们把这个元素纳入考虑范围, 然后继续递归. 按照这个策略, 最后被我们纳入考虑范围的 $x$ 个元素一定是这个区间里权值最小的 $x$ 个. 现在考虑 $x$ 有多少个, 发现每次往下走最多会把一个数加入考虑范围, 最后一层可能会把两个数加入考虑范围. 因此一共最多 $O(\log V)$ 个数. 找出这些数直接暴力组合只需要 $O(\log^2 V)$ 的时间.
+
+接下来考虑如何找出这些数. 建立一棵线段树, 每个节点存这个节点中最小的 $O(\log V)$ 个数, 查询的时候直接把 $O(\log n)$ 个节点里面 $O(\log n\log V)$ 个数字都插到一个堆里, 然后直接嗯取 $O(\log V)$ 个暴力组合就可以了, 复杂度 $O(\log V(\log V + \log n \log V))$.
+
+发现没有必要进行 $O(\log V \log n)$ 次插入, 这样太傻了, 我们可以把这些数乱序存起来, 然后排个序, 这样就优化到了 $O(\log V \log n \log (\log V \log n))$, 总复杂度 $O(n \log n \log \log n + m \log V(\log V + \log n \log (\log V \log n)))$.
+
+这份代码简直是一件艺术品.
+
+```cpp
+unsigned m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+vector <unsigned> Out;
+struct Node {
+  Node *LS, *RS;
+  vector<unsigned> Mn; 
+  inline void Build(unsigned L, unsigned R);
+  inline void Qry(unsigned L, unsigned R) {
+    if((A <= L) && (R <= B)) { for (auto i:Mn) Out.push_back(i); return;}
+    unsigned Mid((L + R) >> 1);
+    if(A <= Mid) LS->Qry(L, Mid);
+    if(B > Mid) RS->Qry(Mid + 1, R);
+  }
+}N[200005], *CntN(N);
+inline void Clr() {
+  memset(N, 0, (CntN - N + 1) * sizeof(Node));
+  n = RD(), CntN = N;
+}
+inline void Node::Build(unsigned L, unsigned R) {
+  if(L == R) { Mn.push_back(RD()); return; }
+  unsigned Mid((L + R) >> 1);
+  (LS = ++CntN)->Build(L, Mid);
+  (RS = ++CntN)->Build(Mid + 1, R);
+  for (auto i:LS->Mn) Mn.push_back(i);
+  for (auto i:RS->Mn) Mn.push_back(i);
+  sort(Mn.begin(), Mn.end());
+  while (Mn.size() > 31) Mn.pop_back();
+}
+signed main() {
+  t = RD();
+  for (unsigned T(1); T <= t; ++T){
+    Clr(), N->Build(1, n); 
+    m = RD();
+    for (unsigned i(1); i <= m; ++i) {
+      Out.clear(), A = RD(), B = RD(), N->Qry(1, n);
+      sort(Out.begin(), Out.end()), Ans = 0xffffffff;
+      for (unsigned j(min(30, (int)(Out.size() - 1))); ~j; --j)
+        for (unsigned k(0); k < j; ++k) Ans = min(Ans, Out[j] | Out[k]);
+      printf("%u\n", Ans);
+    }
+  }
+  return Wild_Donkey;
+}
+```
+
+### [PrSl2020 信号传递](https://www.luogu.com.cn/problem/P6622)
+
+首先将序列中连续的相同站点删到只剩一个就可以不考虑第 $4$ 条规则. 记站 $i$ 最终位置为 $p_i$, 则最终花费可以记为:
+
+$$
+\sum_{i = 1}^{n - 1}
+\begin{cases} 
+k(p_{S_{i + 1}} + p_{S_i})~~~&(p_{S_{i + 1}} < p_{S_i})\\
+p_{S_{i + 1}} - p_{S_i}&(p_{S_{i + 1}} > p_{S_i})
+\end{cases}
+$$
+
+发现 $S$ 中每个位置的贡献只和它的位置和前一个和后一个位置的大小关系有关, 所以我们可以记录每个站点 $i$ 后面是站点 $j$ 的次数 $Suf_{i, j} = Pre_{j, i}$. 然后就可以把 $S$ 丢进垃圾桶里.
+
+接下来分站点讨论贡献.
+
+$$
+\sum_{i = 1}^{m} p_i \sum_{j = 1, j \neq i}^{m} \left (
+Suf_{i, j}
+\begin{cases} 
+k~&(p_j < p_i)\\
+-1&(p_j > p_i)
+\end{cases}
++Pre_{i, j}
+\begin{cases} 
+k~&(p_i < p_j)\\
+1&(p_i > p_j)
+\end{cases} \right )
+$$
+
+只要从小到大将位置分配给站点即可判断某个状态中, 当前站点和其它站点的位置关系. 设计状态 $f_{i, S}$ 表示已经分配了 $i$ 个位置给集合 $S$ 的站点, 已经分配位置的站点的最小的花费是多少.
+
+$$
+f_{i + 1, S + j} = \min \left(f_{i + 1, S + j}, f_{i, S} + (i + 1)\left(\sum_{l \in S} (Suf_{j, l}k + Pre_{j, l}) + \sum_{l \notin (S + j)} (Pre_{j, l}k - Suf_{j, l}) \right) \right)
+$$
+
+状态 $O(m2^m)$, 转移 $O(m^2)$, 总复杂度 $O(m^32^m)$.
+
+我们发现, 知道 $S$ 就可以唯一地确定 $i$, 因此只需要 $f_S$ 存储状态即可. $O(2^m)$ 状态, $O(m^2)$ 转移, 总复杂度 $O(m^22^m)$.
+
+$$
+f_{S + j} = \min \left(f_{S + j}, f_{S} + (\text{popcnt}(S) + 1)\left(\sum_{l \in S} (Suf_{j, l}k + Pre_{j, l}) + \sum_{l \notin (S + j)} (Pre_{j, l}k - Suf_{j, l}) \right) \right)
+$$
+
+```cpp
+unsigned f[8400000], Pre[25][25], Suf[25][25], m, n, K, M(0);
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Ans(0), Tmp(0);
+signed main() {
+  n = RD(), M = ((1 << (m = RD())) - 1), K = RD(), B = RD() - 1;
+  for (unsigned i(1); i < n; ++i) A = RD() - 1, ++Pre[A][B], ++Suf[B][A], B = A;
+  memset(f + 1, 0x3f, M << 2);
+  for (unsigned i(0); i < M; ++i) {
+    unsigned Ppc(0), I(i);
+    while (I) Ppc += (I & 1), I >>= 1;
+    for (unsigned j(0); j < m; ++j) if(!((i >> j) & 1)) {
+      unsigned &J(f[i | (1 << j)]), Add(0);
+      for (unsigned k(0); k < m; ++k) if(k ^ j) {
+        if((i >> k) & 1) Add += Suf[j][k] * K + Pre[j][k];
+        else Add += Pre[j][k] * K - Suf[j][k];
+      }
+      J = min(J, f[i] + Add * (Ppc + 1));
+    }
+  }
+  printf("%u\n", f[M]);
+  return Wild_Donkey;
+}
+```
+
+这个复杂度理论上只有 $60'$, 但是我奇迹般地拿到了 $70'$, 开启 `-O2` 之后搞到了 $80'$ 的好成绩.
+
+$$
+更加恐怖的是\\
+它甚至无法通过最小的样例
+$$
+
+输入:
+
+```
+3 3 1
+1 2 3
+```
+
+答案: `2`
+
+程序输出: `5`
+
+原因是在出现负数的时候, `unsigned` 类型识别为 $\infin$, 以至于把更优的方案放掉.
+
+$$
+\color{red}{\huge{更加恐怖的是}}\\
+\color{red}{\huge{我在写完正解前完全没有发现这个问题}}
+$$
+
+然后我们发现, 可以定义数组 $g_{S, i}$, 表示 $f_S$ 转移到 $f_{S + i}$ 的时候, $(\text{popcnt}(S) + 1)$ 的贡献. 这个可以 $O(1)$ 地转移.
+
+很遗憾, 这个数组无法被开出来, 因为 $512MB$ 内存限制, 大小为 $2^{23}$ 的 $32$ 位整型数组最多可以容纳 $16$ 个.
+
+但是发现实际使用的内存其实只有一半, 因为 $g_{S, i}$ 在 $i \in S$ 的时候是无意义的, 因此我们使用 $S$ 扣掉 $i$ 这一位的集合作为下标, 然后就可以只存储 $2^{22}$ 大小的数组了, 也就可以开 $32$ 个了.
+
+复杂度 $O(n + m2^m)$, 进行一定的卡常可以通过此题.
+
+```cpp
+int K, g[4194304][23], f[8388608], Pre[23][23];
+unsigned A, B, m, n, M, M2;
+inline unsigned T(unsigned x, unsigned y) {return ((x & ((1 << y) - 1)) | ((x >> (y + 1)) << y));}
+inline unsigned IT(unsigned x, unsigned y) {return ((x & ((1 << y) - 1)) | ((x >> y) << (y + 1)));}
+signed main() {
+  n = RD(), M2 = ((M = ((1 << (m = RD())) - 1)) >> 1), K = RD(), B = RD() - 1;
+  for (unsigned i(1); i < n; ++i) ++Pre[A = RD() - 1][B], B = A;
+  memset(f + 1, 0x3f, M << 2);
+  for (unsigned i(0); i < m; ++i) for (unsigned j(0); j < m; ++j)
+    if(j ^ i) g[0][i] += K * Pre[i][j] - Pre[j][i];
+  for (unsigned i(1); i < M; ++i) {
+    unsigned k, kk(0); 
+    while (!((i >> kk) & 1)) ++kk; k = (i ^ (1 << kk));
+    for (unsigned j(0); j < m; ++j) if(!((i >> j) & 1))
+      g[T(i, j)][j] = g[T(k, j)][j] - (K - 1) * Pre[j][kk] + (K + 1) * Pre[kk][j];
+  }
+  for (unsigned i(0); i <= M2; ++i) {
+    unsigned I(i);
+    int Ppc(0);
+    while (I) Ppc += (I & 1), I >>= 1;
+    for (unsigned j(0), ji; j < m; ++j) {
+      int &J(f[(ji = IT(i, j)) | (1 << j)]);
+      J = min(J, f[ji] + g[i][j] * (Ppc + 1));
+    }
+  }
+  printf("%d\n", f[M]);
+  return Wild_Donkey;
+}
+```
+
+## Day $7$ Apr 10, 2022, Sunday
+
+### [PrSl2020 树](https://www.luogu.com.cn/problem/P6623)
+
+一开始看到这个题, 发现可以每个元素进行因为我们无法快速维护一个序列的区间加和异或和.
+
+因为是位运算, 所以想到可以按位考虑, 计算一个节点到它祖先的贡献.
+
+后来在统计贡献的路上越走越远, 直到有朋友给我说, 这个东西是可以维护的, 你凭什么说无法维护区间加异或和. 首先无需区间修改, 可以转化为全局修改, 每次将子树内的权值全局加 $1$, 然后合并 Trie. (类似于线段树合并)
+
+关于 Trie 的全局修改, 我们用 Trie 从低位到高位存所有点数字. 每次全局加 $1$, 从根节点开始, 交换左右儿子, 然后递归地处理进位. 交换的同时维护子树和即可. 我们用树上启发式合并, 可以做到 $O(n \log n)$.
+
+```cpp
+unsigned m, n;
+unsigned A, B, C, D, t;
+unsigned Cnt(0), Tmp(0);
+unsigned long long Ans(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Cnt, Sum;
+  inline void Udt() {
+    Sum = 0;
+    if(LS) Sum = ((LS->Sum) << 1);
+    if(RS) Sum ^= (((RS->Sum) << 1) ^ ((RS->Cnt) & 1));
+  }
+  inline void Insert(unsigned Len);
+  inline void Add(unsigned Len) {
+    if(!Len) return;
+    swap(LS, RS); if(LS) LS->Add(Len - 1);
+    Udt();
+  }
+}N[12000005], *CntN(N);
+inline void Node::Insert(unsigned Len) { // Insert the Highest Len To this node
+  ++Cnt, Sum ^= A;
+  if(!Len) return;
+  if(A & 1) {if(!RS) RS = ++CntN; A >>= 1, RS->Insert(Len - 1);}
+  else {if(!LS) LS = ++CntN; A >>= 1, LS->Insert(Len - 1);}
+}
+inline void Merge(Node* x, Node* y, unsigned Len) {
+  x->Cnt += y->Cnt, x->Sum ^= y->Sum;
+  if(!Len) return;
+  if(x->LS && y->LS) Merge(x->LS, y->LS, Len - 1);
+  else { if(!(x->LS)) x->LS = y->LS; }
+  if(x->RS && y->RS) Merge(x->RS, y->RS, Len - 1);
+  else { if(!(x->RS)) x->RS = y->RS; }
+}
+inline Node* MERGE(Node* x, Node* y) {
+  if(x->Cnt < y->Cnt) {Merge(y, x, 21); return y;}
+  else {Merge(x, y, 21); return x;}
+}
+struct Tree {
+  vector <Tree*> Son;
+  Node* Root;
+  inline void DFS() {
+    for (auto i:Son) i->DFS(), Root = MERGE(Root, i->Root);
+    Root->Add(21), Ans += Root->Sum;
+  }
+}T[525050];
+signed main() {
+  n = RD();
+  for (unsigned i(1); i <= n; ++i) A = RD() - 1, (T[i].Root = ++CntN)->Insert(21);
+  for (unsigned i(2); i <= n; ++i) T[RD()].Son.push_back(T + i);
+  T[1].DFS();
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+当然按位统计贡献也不是一无是处, 发现统计第 $i$ 位时, 我们对祖先的贡献是按 $2^{i + 1}$ 为周期循环的. 所以我们可以记录一个绝对位置的贡献, 也就是对于深度对 $2^{i + 1}$ 取模的位置的贡献. 这个东西是可以差分维护的, 我们可以在回溯的时候统计这个子树的答案即可. 代码更短, 细节更多, 常数变成之前的 $36\%$. 复杂度仍然是 $O(n\log n)$.
+
+```cpp
+unsigned long long Ans;
+char Pool[2100000], *a[21];
+struct Tree {
+  vector <Tree*> Son;
+  unsigned Dep, Val;
+  inline unsigned DFS() {
+    unsigned TmpC(0);
+    for (unsigned i(0), j(1); i < 21; ++i, j <<= 1) TmpC ^= ((unsigned)a[i][Dep & (j - 1)] << i);
+    for (auto i:Son) i->Dep = Dep + 1, TmpC ^= i->DFS();
+    for (unsigned i(0), j(1); i < 21; ++i, j <<= 1) TmpC ^= ((unsigned)a[i][Dep & (j - 1)] << i);
+    for (unsigned i(0), j(1); i < 21; ++i, j <<= 1) {
+      unsigned Ned(j - (Val & (j - 1)));
+      if(Ned <= Dep) a[i][(Dep - Ned) & (j - 1)] ^= 1;
+    }
+    Ans += (TmpC ^= Val);
+    return TmpC;
+  }
+}T[525050];
+unsigned m, n;
+unsigned A, B, C, D, t;
+signed main() {
+  n = RD(), a[20] = Pool;
+  for (unsigned i(20); i; --i) a[i - 1] = a[i] + (1 << i);
+  for (unsigned i(1); i <= n; ++i) T[i].Val = RD();
+  for (unsigned i(2); i <= n; ++i) T[RD()].Son.push_back(T + i);
+  T[1].DFS();
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+## Day $8$ Apr 11, 2022, Monday
+
+### [PrSl2020 作业题](https://www.luogu.com.cn/problem/P6624)
+
+首先是一手莫比乌斯容斥把问题转化为在每一个边集上查询所有生成树边权总和. 然后就卡住了, 因为我无法在短时间内求出一个图所有生成树的权值和. 并且因为 D1T3 就是拟阵相关, 无向图和它的生成树也是一个拟阵结构, 因此有端联想此题也和拟阵有关.
+
+接着, 我在脑中反复重复着我需要解决的问题 "无向图生成树权值和, 无向图生成树权值和, ..., 无向图生成树权值和, 无向图生成树计数". 走神了, 把要解决的问题记错了. 等等, 无向图生成树计数貌似就是个裸的基尔霍夫矩阵, 我们可以分别计算每条边的贡献, 把这条边的两端的点缩成一个点, 然后计数即可记录这条边在多少棵生成树中出现.
+
+表面上, 每个边集需要枚举 $O(n^2)$ 条边, 然后 $O(n^3)$ 计算贡献, 所以我们的复杂度是 $O(Vn^5)$. 即使 $n$ 只有 $30$, $V$ 只有 $1.5*10^5$. 但是这显然是无法通过的, 但是感性理解进行剪枝之后实际跑 $O(n^5)$ 的边集其实很少. 具体剪枝是边集大小不足 $n - 1$ 的时候果断弃, 然后 DFS 一下, 图不连通的直接放弃. 最后剩下的情况就不多了.
+
+```cpp
+const unsigned long long Mod(998244353), InTwo(499122177);
+bitset<153000> No;
+unsigned P[20000], CntP(0), Mu[153000];
+unsigned E[455][3];
+vector<unsigned> Edge[153000];
+unsigned f[153000];
+unsigned Pool[900], *Mat[30];
+unsigned Fa[31], Stack[31], *STop(Stack), m, n, N, Size, A, B, C, D;
+unsigned long long Ans(0), Tmp(0);
+inline void Mn(unsigned& x) {x -= (x >= Mod) ? Mod : 0;}
+inline unsigned Find (unsigned x) {
+  while (x ^ Fa[x]) *(++STop) = x, x = Fa[x];
+  while (STop > Stack) Fa[*(STop--)] = x;
+  return x;
+}
+inline unsigned long long Pow(unsigned long long x, unsigned y) {
+  unsigned long long Rt(1);
+  while (y) { if(y & 1) Rt = Rt * x % Mod; x = x * x % Mod, y >>= 1; }
+  return Rt;
+}
+inline unsigned long long Calc () {
+  unsigned long long Rt(1);
+  for (unsigned i(1); i < N; ++i) {
+    unsigned Wr(i);
+    while ((Wr < N) && (!Mat[Wr][i])) ++Wr;
+    if(Wr == N) return 0;
+    if(Wr ^ i) swap(Mat[Wr], Mat[i]), Rt = Mod - Rt;
+    Rt = Rt * Mat[i][i] % Mod;
+    unsigned long long Mul(Pow(Mat[i][i], 998244351));
+    for (unsigned j(i); j < N; ++j) Mat[i][j] = Mat[i][j] * Mul % Mod;
+    for (unsigned j(i + 1); j < N; ++j) {
+      Mul = Mod - Mat[j][i];
+      for (unsigned k(i); k < N; ++k) Mat[j][k] = (Mat[j][k] + Mul * Mat[i][k]) % Mod;
+    }
+  }
+  return Rt;
+}
+signed main() {
+  N = (n = RD()) - 1, m = RD(), Mu[1] = 1, Mat[0] = Pool, Size = ((N * N) << 2);
+  for (unsigned i(2); i <= 152501; ++i) {
+    if(!No[i]) P[++CntP] = i, Mu[i] = 998244352;
+    for (unsigned j(1), k(2); (j <= CntP) && (k * i <= 152501); k = P[++j]) {
+      No[i * k] = 1;
+      if(!(i % k)) { Mu[i * k] = 0; break; }
+      Mu[i * k] = (unsigned long long)Mu[i] * Mu[k] % Mod;
+    }
+  }
+  for (unsigned i(1); i < N; ++i) Mat[i] = Mat[i - 1] + n - 1;
+  for (unsigned i(1); i <= m; ++i) {
+    E[i][0] = A = RD(), E[i][1] = B = RD(), D = sqrt(E[i][2] = C = RD());
+    if(!(C % D)) {Edge[D].push_back(i); if((D * D) ^ C) Edge[C / D].push_back(i);}
+    for (unsigned j(D - 1); j; --j) if(!(C % j))
+      Edge[j].push_back(i), Edge[C / j].push_back(i);
+  }
+  for (unsigned i(1); i <= 152501; ++i) {
+    if(Edge[i].size() < N) continue;
+    for (unsigned j(1); j <= n; ++j) Fa[j] = j;
+    C = n;
+    for (auto j:Edge[i]) {
+      A = Find(E[j][0]), B = Find(E[j][1]);
+      if(A ^ B) Fa[A] = B, --C;
+    }
+    if(C > 1) continue;
+    Tmp = 0;
+    for (auto j:Edge[i]) {
+      memset(Pool, 0, Size), A = E[j][0], B = E[j][1];
+      for (auto k:Edge[i]) if(k ^ j) {
+        C = E[k][0], D = E[k][1];
+        if((C == A) || (C == B)) C = 0; else C -= (C > A) + (C > B); 
+        if((D == A) || (D == B)) D = 0; else D -= (D > A) + (D > B);
+        Mn(Mat[D][C] += 998244352), Mn(Mat[C][D] += 998244352), ++Mat[C][C], ++Mat[D][D];
+      }
+      Tmp += Calc() * E[j][2];
+    }
+    f[i] = Tmp % Mod;
+  }
+  for (unsigned i(1); i <= 152501; ++i) {
+    Tmp = 0;
+    for (unsigned j(152501 / i), k(i * j); j; --j, k -= i) {
+      Tmp = (Tmp + (unsigned long long)f[k] * Mu[j]) % Mod;
+    }
+    Ans = (Ans + (Tmp * i)) % Mod;
+  }
+  printf("%llu\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+这道题调了很久, 因为我在枚举 $C$ 的因数的时候, 取 $D = \lfloor \sqrt C \rfloor$, 从 $[1, D]$ 枚举 $i$ 判断是否 $i|C$, 然后找到对应的因数. 但是有情况是 $D^2 = C$, 这时就会重复统计 $D$ 两次. 所以我们枚举 $[1, D)$, 对 $D$ 进行特判, 如果 $D^2 \neq C$, 则统计 $D$ 和 $\frac CD$, 如果 $D^2 = C$, 则统计 $D$. 看起来没什么问题, 但是如果 $D|C$ 压根不成立, 那么我们就会错误地统计 $D$ 和 $\frac CD$ 作为因数.
+
+即使是 D2T3, 这仍然是我在 2020 省选中能单杀的三道题之一, 其它两道分别是 D1T1 (冰火战士), D2T1 (信号传递).
+
+## Day $9$ Apr 12, 2022, Tuesday
+
+心态崩了, 一天没学习. 乒乓球比赛自己把球扔了痛失前 $4$.
+
+SDOI 重出江湖, 貌似是五月 $2 \sim 3$ 号举办. 也就是说, 今天实际上是 Day $-19$, 原计划的天数减去 $28$ 即为实际天数.
+
+## Day $10$ Apr 13, 2022, Wednesday
+
+### [SDOI2019 快速查询](https://www.luogu.com.cn/problem/P5358)
+
+一开始没看懂题, 看见数据范围里的 $t$ 还以为是个多测. 最后发现这个题没有什么多测, 而且看似 $10^9$ 的序列长度, 只有 $10^5$ 个有效位置, 其它基础操作没有涉及的位置在任何时刻的值应该是相等的.
+
+询问序列貌似就是从标准操作里随机找一个进行操作, 所以没有什么周期性.
+
+如果直接用数据结构维护, 我完全可以 $O(qt\log n)$ 维护所有这些东西, 但是这样做的复杂度是 $2*10^8$ 左右. 因为有大量的取模和乘法, 所以常数极大, 因此拿到了 $60'$ 的好成绩.
+
+```cpp
+inline unsigned RDsg() {
+  unsigned rdtp(0);
+  char Sg(0), rdch(getchar());
+  while ((rdch < '0' || rdch > '9') && (rdch != '-')) rdch = getchar();
+  if (rdch == '-') Sg = 1, rdch = getchar();
+  while (rdch >= '0' && rdch <= '9')
+    rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
+  return Sg ? (Mod - (rdtp % Mod)) : (rdtp % Mod);
+}
+inline void Mn(unsigned& x) { x -= ((x >= Mod) ? Mod : 0);}
+unsigned Q[100005][3], Pos[100005];
+unsigned m, n, t, Val;
+unsigned A, B, C, D, OpP, OpV;
+unsigned Cnt(0), Ans(0), Tmp(0);
+struct Node {
+  Node *LS, *RS;
+  unsigned Sum, Def, Mul, Pls;
+  inline void Build(unsigned L, unsigned R);
+  inline void PsDw(unsigned long long Llen, unsigned long long Rlen) {
+    if(Def ^ 0x3f3f3f3f) {
+      LS->Mul = RS->Mul = 1;
+      LS->Pls = RS->Pls = 0;
+      LS->Def = RS->Def = Def;
+      LS->Sum = Def * Llen % Mod;
+      RS->Sum = Def * Rlen % Mod;
+      Def = 0x3f3f3f3f;
+    }
+    if(Mul ^ 1) {
+      LS->Mul = (unsigned long long)Mul * LS->Mul % Mod;
+      LS->Pls = (unsigned long long)Mul * LS->Pls % Mod;
+      LS->Sum = (unsigned long long)Mul * LS->Sum % Mod;
+      RS->Mul = (unsigned long long)Mul * RS->Mul % Mod;
+      RS->Pls = (unsigned long long)Mul * RS->Pls % Mod;
+      RS->Sum = (unsigned long long)Mul * RS->Sum % Mod;
+      Mul = 1;
+    }
+    if(Pls) {
+      Mn(LS->Pls += Pls), Mn(RS->Pls += Pls);
+      LS->Sum = (LS->Sum + Pls * Llen) % Mod;
+      RS->Sum = (RS->Sum + Pls * Rlen) % Mod;
+      Pls = 0;
+    }
+  }
+  inline void Define(unsigned L, unsigned R) {
+    if(L == R) {Mul = 1, Pls = 0, Def = Sum = OpV; return;}
+    unsigned Mid((L + R) >> 1);
+    this->PsDw(Mid - L + 1, R - Mid);
+    if(OpP <= Mid) LS->Define(L, Mid);
+    else RS->Define(Mid + 1, R);
+    Sum = LS->Sum + RS->Sum, Mn(Sum);
+  }
+  inline void Qry(unsigned L, unsigned R) {
+    if(L == R) {OpV = Sum; return;}
+    unsigned Mid((L + R) >> 1);
+    this->PsDw(Mid - L + 1, R - Mid);
+    if(OpP <= Mid) LS->Qry(L, Mid);
+    else RS->Qry(Mid + 1, R);
+  }
+}N[200005], *CntN(N);
+inline void Node::Build(unsigned L, unsigned R) {
+  Def = 0x3f3f3f3f, Mul = 1, Pls = 0, Sum = 0;
+  if(L == R) return;
+  unsigned Mid((L + R) >> 1);
+  (LS = ++CntN)->Build(L, Mid);
+  (RS = ++CntN)->Build(Mid + 1, R);
+}
+signed main() {
+  n = RD(), m = RD(), Val = 0;
+  for (unsigned i(1); i <= m; ++i) {
+    Q[i][0] = A = RD();
+    if(A ^ 6) {
+      if(A ^ 5) { if(A == 1) Pos[++Cnt] = Q[i][1] = RD(), Q[i][2] = RDsg(); else Q[i][1] = RDsg(); }
+      else Q[i][1] = Pos[++Cnt] = RD();
+    }
+  }
+  sort(Pos + 1, Pos + Cnt + 1), Cnt = unique(Pos + 1, Pos + Cnt + 1) - Pos - 1;
+  N->Build(1, Cnt), t = RD(), n -= Cnt;
+  for (unsigned i(1); i <= m; ++i) if((Q[i][0] == 5) || (Q[i][0] == 1))
+    Q[i][1] = lower_bound(Pos + 1, Pos + Cnt + 1, Q[i][1]) - Pos;
+  for (unsigned i(1); i <= t; ++i) {
+    A = RD(), B = RD();
+    for (unsigned j(1); j <= m; ++j) {
+      D = ((A + (unsigned long long)B * j) % m) + 1;
+      switch(Q[D][0]) {
+        case (1) :{
+          OpP = Q[D][1], OpV = Q[D][2], N->Define(1, Cnt);
+          break;
+        }
+        case (2) :{
+          Mn(Val += Q[D][1]);
+          Mn(N->Pls += Q[D][1]), N->Sum = (N->Sum + ((unsigned long long)Cnt * Q[D][1])) % Mod;
+          break;
+        }
+        case (3) :{
+          Val = (unsigned long long)Q[D][1] * Val % Mod;
+          N->Mul = (unsigned long long)N->Mul * Q[D][1] % Mod;
+          N->Pls = (unsigned long long)N->Pls * Q[D][1] % Mod;
+          N->Sum = (unsigned long long)N->Sum * Q[D][1] % Mod;
+          break;
+        }
+        case (4) :{
+          N->Mul = 1, N->Pls = 0, Val = N->Def = Q[D][1];
+          N->Sum = (unsigned long long)Cnt * Q[D][1] % Mod;
+          break;
+        }
+        case (5) :{
+          OpP = Q[D][1], N->Qry(1, Cnt), Mn(Ans += OpV);
+          break;
+        }
+        case (6) :{
+          Ans = (Ans + N->Sum + (unsigned long long)Val * n) % Mod;
+          break;
+        }
+      }
+    }
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
+
+对于全局修改, 我们记录了一个值来表示没有任何单点操作的点的情况. 每次全局修改后, 我们都可以 $O(1)$ 从之前的总和求出新的总和, 而只要我们可以快速查询单点, 就可以实现快速单点修改, 因为这样可以通过单点原来的值和新值求出新的总和.
+
+接下来考虑, 我们对单点修改到底做了什么, 我们把这个点的值改变了, 然后让它接受接下来的全局修改. 在线段树的做法中, 我们记录了赋值, 乘法, 加法三个标记. 所以新的做法里, 尝试直接维护这三个标记, 努力使所有元素的加法和乘法的标记相等, 通过修改初值也就是所有点的初始值来维护整个序列.
+
+每次进行全局乘法加法, 只需要修改全局的乘法加法标记 $Mul$, $Pls$. 每次全局赋值, 就记录一个全局值 $Val$, 这个时候所有的数字都是相等的, 打一个时间戳 $VT$, 表示最后一次全局赋值.
+
+单点修改时, 设 $Cur = Mul \times Val + Pls$, 我们希望把第 $i$ 个值变成 $Des$, 则我们需要求出一个 $a_i$ 使得 $Des = a_i \times Mul + Pls$, 也就是 $a_i = (Des - Pls) \times Inv_{Mul}$. 每个 $a_i$ 打一个时间戳 $T_i$, 表示这个值是什么时候赋的.
+
+单点查询时如果 $T_i > VT$, 则按 $a_i$ 计算单点值, 否则按 $Val$ 计算.
+
+由于模数只有 $10^7$ 级别, 所以我们只要在一开始预处理所有逆元即可. 有时候 $Mul = 0$ 我们无法进行单点修改, 所以每次 $Mul$ 变成 $0$ 的时候把操作改成全局赋值即可.
+
+```cpp
+unsigned Inv[10000020], Q[100005][3], Pos[100005], a[100005], T[100005], Sum;
+unsigned long long C;
+unsigned Val(0), Mul(1), Pls(0), m, n, t;
+unsigned A, B, D;
+unsigned Cnt(0), Ans(0), Tmp(0);
+inline void Mn(unsigned& x) { x -= ((x >= Mod) ? Mod : 0);}
+inline unsigned Single(unsigned x) {return (((T[x] > T[0]) ? a[x] : Val) * (unsigned long long)Mul + Pls) % Mod;}
+signed main() {
+  Inv[1] = 1; for (unsigned i(2); i < Mod; ++i) Inv[i] = (Mod - (Mod / i)) * Inv[Mod % i] % Mod;
+  n = RD(), m = RD(), Val = 0;
+  for (unsigned i(1); i <= m; ++i) {
+    Q[i][0] = A = RD();
+    if(A ^ 6) {
+      if(A ^ 5) { if(A == 1) Pos[++Cnt] = Q[i][1] = RD(), Q[i][2] = RDsg(); else Q[i][1] = RDsg(); }
+      else Q[i][1] = Pos[++Cnt] = RD();
+    }
+  }
+  sort(Pos + 1, Pos + Cnt + 1), Cnt = unique(Pos + 1, Pos + Cnt + 1) - Pos, t = RD();
+  for (unsigned i(1); i <= m; ++i) if((Q[i][0] == 5) || (Q[i][0] == 1))
+    Q[i][1] = lower_bound(Pos + 1, Pos + Cnt, Q[i][1]) - Pos;
+  for (unsigned i(1), k(1); i <= t; ++i) {
+    A = RD(), B = RD();
+    for (unsigned j(1); j <= m; ++j, ++k) {
+      D = ((A + (unsigned long long)B * j) % m) + 1, C = Q[D][1];
+      switch(Q[D][0]) {
+        case (1) :{
+          Mn(Sum += Mod - Single(C));
+          a[C] = ((unsigned long long)Q[D][2] + Mod - Pls) * Inv[Mul] % Mod;
+          Mn(Sum += Q[D][2]), T[C] = k;
+          break;
+        }
+        case (2) :{
+          Mn(Pls += C), Sum = (Sum + n * C) % Mod;
+          break;
+        }
+        case (3) :{
+          Sum = Sum * C % Mod;
+          Mul = Mul * C % Mod;
+          Pls = Pls * C % Mod;
+          if(Mul == 0) T[0] = k, Val = Pls = 0, Mul = 1;
+          break;
+        }
+        case (4) :{
+          Mul = 1, Pls = 0, Val = C, T[0] = k;
+          Sum = n * C % Mod;
+          break;
+        }
+        case (5) :{
+          Mn(Ans += Single(C));
+          break;
+        }
+        case (6) :{
+          Mn(Ans += Sum);
+          break;
+        }
+      }
+    }
+  }
+  printf("%u\n", Ans);
+  return Wild_Donkey;
+}
+```
