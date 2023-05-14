@@ -8,7 +8,7 @@ tags:
   - Knuth_Morris_Pratt_Algorithm
   - Inclusion_Exclusion_Principle
   - Lagrange_Polynomial
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC9.png
+thumbnail: /images/MC9.png
 ---
 
 # 省选日记 Day $21$ - Day $25$

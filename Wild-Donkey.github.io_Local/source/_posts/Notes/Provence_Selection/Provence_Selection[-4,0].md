@@ -11,7 +11,7 @@ tags:
   - Data_Structure_Rollback
   - Calculate_Contribution_in_Advance
   - Dominator_Tree
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC14.png
+thumbnail: /images/MC14.png
 ---
 
 # 省选日记 Day $-4$ - Day $0$

@@ -12,7 +12,7 @@ tags:
   - Data_Structure
   - Binary_Lifting
   - Floyd
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC16.png
+thumbnail: /images/MC16.png
 ---
 
 # 省选日记 Day $-14$ - Day $-10$

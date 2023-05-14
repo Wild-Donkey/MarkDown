@@ -2,7 +2,7 @@
 title: 一些想法
 date: 2022-06-19 23:43
 categories: Essays
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo11.jpg
+thumbnail: /images/Photo11.jpg
 ---
 
 # 一些想法

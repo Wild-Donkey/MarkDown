@@ -14,7 +14,7 @@ tags:
   - Mobius_Inversion
   - Kirchhoff's_Theorem
   - Multiplication_Inverse_Element
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC12.png
+thumbnail: /images/MC12.png
 ---
 
 # 省选日记 Day $6$ - Day $10$

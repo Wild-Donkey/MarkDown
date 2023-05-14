@@ -10,7 +10,7 @@ tags:
   - Construction
   - Factorial
   - Matrix_Fast_Exponentiation
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC5.png
+thumbnail: /images/MC5.png
 ---
 
 # 省选日记 Day $31$ - Day $35$

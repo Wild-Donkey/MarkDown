@@ -19,7 +19,7 @@ tags:
   - Engineering
   - Two_Dimensional_Segment_Tree
   - Pruning
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC15.png
+thumbnail: /images/MC15.png
 ---
 
 # 省选日记 Day $-9$ - Day $-5$

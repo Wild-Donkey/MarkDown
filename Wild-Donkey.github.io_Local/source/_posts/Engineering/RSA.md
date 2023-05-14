@@ -7,7 +7,7 @@ tags:
   - Cryptography
   - RSA_Algorithm
   - Number_Theroy
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo15.JPG
+thumbnail: /images/Photo15.JPG
 ---
 
 # RSA 加密算法

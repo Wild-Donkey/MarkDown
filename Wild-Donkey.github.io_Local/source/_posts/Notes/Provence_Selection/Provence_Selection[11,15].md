@@ -11,7 +11,7 @@ tags:
   - Topological_Sorting
   - Simulation
   - String_Hash
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC11.png
+thumbnail: /images/MC11.png
 ---
 
 # 省选日记 Day $11$ - Day $15$

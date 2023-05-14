@@ -18,7 +18,7 @@ tags:
   - Inclusion_Exclusion_Principle
   - Sieve_Theory
   - Hash
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC13.png
+thumbnail: /images/MC13.png
 ---
 
 # 省选日记 Day $1$ - Day $5$

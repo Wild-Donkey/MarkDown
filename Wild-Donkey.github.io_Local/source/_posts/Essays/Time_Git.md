@@ -2,7 +2,7 @@
 title: 时间树
 date: 2023-05-14 01:00
 categories: Essays
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo13.jpg
+thumbnail: /images/Photo13.jpg
 ---
 # 时间树
 

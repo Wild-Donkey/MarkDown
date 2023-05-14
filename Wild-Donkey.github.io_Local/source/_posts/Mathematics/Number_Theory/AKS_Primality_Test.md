@@ -7,7 +7,7 @@ tags:
   - Number_Theory
   - AKS_Primality_Test
   - Primality_Test
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo12.JPG
+thumbnail: /images/Photo12.JPG
 ---
 
 # AKS Primality Test

@@ -6,7 +6,7 @@ tags:
   - Mathematics
   - Fast_Fourier_Transform
   - Random_Wandering_Transform
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo4.JPG
+thumbnail: /images/Photo4.JPG
 ---
 
 # 再探傅里叶变换

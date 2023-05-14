@@ -16,7 +16,7 @@ tags:
   - Heavy_Light_Decomposition
   - Tarjan_Algorithm
   - Round_Square_Tree
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo3.JPG
+thumbnail: /images/Photo3.JPG
 ---
 
 # 省选日记 Day $-34$ - Day $-30$

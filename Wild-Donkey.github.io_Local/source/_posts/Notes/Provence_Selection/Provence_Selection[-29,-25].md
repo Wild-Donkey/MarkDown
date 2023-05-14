@@ -11,7 +11,7 @@ tags:
   - Greedy_Algorithm
   - Convex_Hull_Optimization
   - Dynamic_Programming_Optimization
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo2.JPG
+thumbnail: /images/Photo2.JPG
 ---
 
 # 省选日记 Day $-29$ - Day $-25$

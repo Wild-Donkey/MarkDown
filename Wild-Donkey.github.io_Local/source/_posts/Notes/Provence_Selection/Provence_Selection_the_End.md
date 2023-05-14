@@ -13,7 +13,7 @@ tags:
   - General_Suffix_Automaton
   - Suffix_Automaton
   - Aho_Corasick_Algorithm
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/GTA7.png
+thumbnail: /images/GTA7.png
 ---
 
 # 省选日记-终章 (SDOI2022 游记)

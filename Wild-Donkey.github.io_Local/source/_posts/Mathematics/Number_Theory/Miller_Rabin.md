@@ -7,7 +7,7 @@ tags:
   - Number_Theory
   - Miller_Rabin
   - Primality_Test
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo10.jpg
+thumbnail: /images/Photo10.jpg
 ---
 
 # Miller-Rabin 素性检验

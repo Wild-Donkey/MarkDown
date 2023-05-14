@@ -18,7 +18,7 @@ tags:
   - Number_Theory_Transform
   - Sieve_Theory
   - Du_Sieve
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC17.png
+thumbnail: /images/MC17.png
 ---
 
 # 省选日记 Day $-19$ - Day $-15$

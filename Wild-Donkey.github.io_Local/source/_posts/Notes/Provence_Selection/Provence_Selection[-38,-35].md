@@ -12,7 +12,7 @@ tags:
   - Self_Balancing_Binary_Search_Tree
   - Greedy_Algorithm
   - OI_Puzzle
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo4.JPG
+thumbnail: /images/Photo4.JPG
 ---
 
 # 省选日记 Day $-38$ - Day $-35$

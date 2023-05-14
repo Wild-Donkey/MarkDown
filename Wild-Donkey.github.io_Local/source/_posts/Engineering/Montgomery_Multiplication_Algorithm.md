@@ -5,7 +5,7 @@ categories: Engineering
 tags:
   - Mathematics
   - Optimization
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo6.jpg
+thumbnail: /images/Photo6.jpg
 ---
 
 # 蒙哥马利模乘 (Montgomery Modular Multiplication)

@@ -9,7 +9,7 @@ tags:
   - Factorial_Power
   - Number_Theory_Transform
   - Convolution
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo7.jpg
+thumbnail: /images/Photo7.jpg
 ---
 
 # 多项式插值

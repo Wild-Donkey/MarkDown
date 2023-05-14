@@ -16,7 +16,7 @@ tags:
   - Mo_Algorithm
   - Mo_Algorithm_Rollback
   - Linking_Table
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo1.JPG
+thumbnail: /images/Photo1.JPG
 ---
 
 # 省选日记 Day $-24$ - Day $-20$

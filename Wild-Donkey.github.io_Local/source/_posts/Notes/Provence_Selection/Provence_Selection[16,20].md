@@ -8,7 +8,7 @@ tags:
   - Inclusion_Exclusion_Principle
   - Dynamic_Programming_Optimization
   - Greedy_Algorithm
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC10.png
+thumbnail: /images/MC10.png
 ---
 
 # 省选日记 Day $16$ - Day $20$

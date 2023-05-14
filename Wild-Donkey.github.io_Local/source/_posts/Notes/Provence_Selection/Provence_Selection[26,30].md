@@ -7,7 +7,7 @@ tags:
   - Virtual_Tree
   - Network
   - Engineering
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC8.png
+thumbnail: /images/MC8.png
 ---
 
 # 省选日记 Day $26$ - Day $30$

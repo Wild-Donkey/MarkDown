@@ -6,7 +6,7 @@ tags:
   - Polynomial
   - Generating_Function
   - Mathematics
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/THU1.JPG
+thumbnail: /images/THU1.JPG
 ---
 # 数列展示架: 母函数(Generating Function)
 ## 普通母函数篇

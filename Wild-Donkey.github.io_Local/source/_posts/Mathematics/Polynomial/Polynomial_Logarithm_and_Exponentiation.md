@@ -12,7 +12,7 @@ tags:
   - Tylor_Series
   - Newtons_Method
   - Polynomial_Exponentiation
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo5.jpg
+thumbnail: /images/Photo5.jpg
 ---
 
 # 多项式对数函数和指数函数

@@ -6,7 +6,7 @@ tags:
   - Polynomial
   - Polynomial_Multiplication_Inverse_Element
   - Number_Theory_Transform
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/Photo9.jpg
+thumbnail: /images/Photo9.jpg
 ---
 
 # 多项式乘法逆

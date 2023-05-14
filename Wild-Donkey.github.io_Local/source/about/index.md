@@ -1,6 +1,6 @@
 ---
 title: About Me
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/About.JPG
+thumbnail: /images/About.JPG
 ---
 
 ```cpp

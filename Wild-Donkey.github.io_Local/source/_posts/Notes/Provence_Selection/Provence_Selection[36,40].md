@@ -18,7 +18,7 @@ tags:
   - Cantor_Expansion
   - Cartesian_Tree
   - System_of_Difference_Constraints
-thumbnail: https://wild-donkey-gallery.oss-cn-hangzhou.aliyuncs.com/BlogImg/MC1.png
+thumbnail: /images/MC1.png
 ---
 
 # 省选日记 Day $36$ - Day $40$
