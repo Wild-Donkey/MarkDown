@@ -1,0 +1,22 @@
+'use strict';
+
+const path = require('path');
+const fs = require('fs');
+const nunjucks = require('nunjucks');
+const env = new nunjucks.Environment();
+
+const searchTmplSrc = path.join(__dirname, '../templates/search.xml');
+const searchTmpl = nunjucks.compile(fs.readFileSync(searchTmplSrc, 'utf8'), env);
+
+module.exports = function(locals) {
+  const config = this.config;
+  const database = require('./database')(locals, config);
+  const xml = searchTmpl.render({
+    articles: database,
+    config  : config.search
+  });
+  return {
+    path: config.search.path,
+    data: xml
+  };
+};

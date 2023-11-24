@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "/comment/waline.json",
+  "description": "Waline comment plugin configurations",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "waline"
+    },
+    "server_url": {
+      "type": "string",
+      "description": "Waline server address url."
+    },
+    "path": {
+      "type": "string",
+      "description": "Article path id. Used to distinguish different article pages to ensure loading the correct comment list under the article page."
+    },
+    "lang": {
+      "type": "string",
+      "description": "Display language.",
+      "enum": ["zh", "zh-CN", "zh-TW", "en", "en-US", "jp", "jp-JP"],
+      "default": "zh-CN",
+      "nullable": true
+    },
+    "visitor": {
+      "type": "boolean",
+      "description": "Show visitor count",
+      "default": false,
+      "nullable": true
+    },
+    "emoji": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "description": "Emoji set configuration.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Emoji name on the tab."
+              },
+              "folder": {
+                "type": "string",
+                "description": "Image folder link."
+              },
+              "prefix": {
+                "type": "string",
+                "description": "The general prefix of images' filename."
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the picture, which will be used as file extension."
+              },
+              "icon": {
+                "type": "string",
+                "description": "Filename of the icon image used in tab (requirement is the same as items)."
+              },
+              "items": {
+                "type": "array",
+                "description": "Each item is the picture filename without common prefix (do not include file extension).",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["name", "folder"]
+          }
+        ]
+      },
+      "description": "Emoji settings.",
+      "default": ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],
+      "nullable": true
+    },
+    "dark": {
+      "type": "string",
+      "description": "Darkmode support.",
+      "nullable": true
+    },
+    "meta": {
+      "type": "array",
+      "description": "Reviewer attributes.",
+      "items": {
+        "type": "string"
+      },
+      "default": ["nick", "mail", "link"],
+      "nullable": true
+    },
+    "required_meta": {
+      "type": "array",
+      "description": "Required commenter information fields.",
+      "default": [],
+      "nullable": true
+    },
+    "login": {
+      "type": "string",
+      "description": "Login mode status.",
+      "enum": ["enable", "disable", "force"],
+      "default": "enable",
+      "nullable": true
+    },
+    "word_limit": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "nullable": true
+        }
+      ],
+      "description": "Comment word s limit. When a single number is filled in, it 's the maximum number of comment words. No limit when set to 0.",
+      "default": 0
+    },
+    "page_size": {
+      "type": "number",
+      "description": "number of comments per page.",
+      "default": 10,
+      "nullable": true
+    },
+    "upload_image": {
+      "type": "boolean",
+      "description": "If you set it to false, image upload feature will be disabled.",
+      "default": true,
+      "nullable": true
+    },
+    "highlight": {
+      "type": "boolean",
+      "description": "Code highlighting, it's enabled by default, please close it selectively.",
+      "default": true,
+      "nullable": true
+    },
+    "math": {
+      "type": "boolean",
+      "description": "If you set it to 'false', math preview feature will be disabled.",
+      "default": false,
+      "nullable": true
+    },
+    "copyright": {
+      "type": "boolean",
+      "description": "Whether show copyright and version in footer.",
+      "default": true,
+      "nullable": true
+    },
+    "locale": {
+      "type": "object",
+      "description": "I18n configurations",
+      "nullable": true
+    }
+  },
+  "required": ["type", "server_url"]
+}
