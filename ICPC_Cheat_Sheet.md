@@ -3,20 +3,26 @@ $$
 $$
 
 $$
-\large{\text{2023-11-24 By Micheal}}
+\large{\text{2024-09-12 By Micheal}}
 $$
 
-$$
-\text{Before ICPC2023 Hefei}
-$$
+# Out of template
 
-# Compile Command
+## Compile Command
 
 ```
 g++ a.cpp -Wall -std=gnu++20 -O2 -o a
 ```
 
-# Convolution
+## RD
+
+## cin
+
+## include
+
+# Math
+
+## Convolution
 
 ```cpp
 const unsigned long long Mod(998244353);
@@ -62,7 +68,31 @@ inline void Mul(unsigned *A, unsigned *B, unsigned Ln, unsigned Rn) {
 }
 ```
 
-# Suffix Array
+## ExGCD
+
+```cpp
+long long Exgcd(long long x, long long y, long long &X, long long &Y) {
+  if(y) {
+    long long ExTmp(Exgcd(y, x % y, Y, X));
+    Y -= X * (x/y);
+    return tmp; 
+  }
+  X = 1;
+  Y = 0;
+  return x;
+}
+```
+
+## Calculate Number Theory Inverse in Linear Time
+
+```cpp
+Inv[1] = 1;
+Inv[i] = (Mod - Mod / i) * Inv[Mod % i] % Mod;
+```
+
+# String
+
+## Suffix Array
 
 ```cpp
 unsigned n, t, A, B;
@@ -94,7 +124,7 @@ while (Cnt < n) {
 }
 ```
 
-# Suffix Automaton
+## Suffix Automaton
 
 ```cpp
 unsigned m, n, Len;
@@ -135,7 +165,9 @@ signed main() {
 }
 ```
 
-# Max Flow
+# Graph
+
+## Dinic
 
 ```cpp
 int a[1005][1005];
@@ -185,29 +217,112 @@ while (BFS()) Tmp += DFS(N, 0x3f3f3f3f);
 //Tmp is Answer
 ```
 
-# ExGCD
+## HLPP
 
 ```cpp
-long long Exgcd(long long x, long long y, long long &X, long long &Y) {
-  if(y) {
-    long long ExTmp(Exgcd(y, x % y, Y, X));
-    Y -= X * (x/y);
-    return tmp; 
+unsigned Hd(0), Tl(0), Gap[1205], m, n, Cnt(0), C, D, t, Tmp(0);
+struct Node; 
+struct Edge {
+  Node *To;
+  Edge *Nxt;
+  unsigned Contain;
+}E[240005], *CntE(E - 1);
+struct Node {
+  Edge *Fst;
+  unsigned Dep, Contain;
+}N[1205], *Qu[1205], *A, *B, *S, *T;
+struct Que {
+  Node *P;
+  inline const char operator<(const Que &x) const {
+    return this->P->Dep < x.P->Dep;
   }
-  X = 1;
-  Y = 0;
-  return x;
+};
+priority_queue <Que> Q;
+signed main() {
+  n = RD(), m = RD(), S = N + RD(), T = N + RD();
+  for (register unsigned i(1); i <= m; ++i) {
+    A = N + RD(), B = N + RD(), C = RD();
+    if(A == B) continue;
+    (++CntE)->Nxt = A->Fst;
+    A->Fst = CntE;
+    CntE->To = B;
+    CntE->Contain = C;
+    (++CntE)->Nxt = B->Fst;
+    B->Fst = CntE;
+    CntE->To = A;
+  }
+  T->Dep = 1, Qu[++Tl] = T;
+  register Node *x;
+  while(Hd < Tl) {
+    x = Qu[++Hd];
+    register Edge *Sid(x->Fst);
+    while (Sid) {
+      if((!(Sid->To->Dep)) && (!(Sid->Contain))) {
+        ++Gap[Sid->To->Dep = x->Dep + 1];
+        Qu[++Tl] = Sid->To;
+      }
+      Sid = Sid->Nxt;
+    }
+  }
+  --Gap[S->Dep];
+  ++Gap[S->Dep = n + 1];
+  register Que Pu;
+  register Edge *Sid(S->Fst);
+  while (Sid) {
+    if(Sid->Contain) { 
+      if(Sid->To != T && (!(Sid->To->Contain))) {
+        Pu.P = Sid->To;
+        Q.push(Pu);
+      }
+      Sid->To->Contain += Sid->Contain;
+      (Sid + 1)->Contain = Sid->Contain;
+      Sid->Contain = 0;
+    }
+    Sid = Sid->Nxt;
+  }
+  while(Q.size()) {
+    x = (Q.top()).P, Q.pop();
+    register unsigned Real;
+    Sid = x->Fst;
+    Tmp = 0x3f3f3f3f;
+    while(Sid) {
+      if(Sid->Contain) {
+        if(Sid->To->Dep + 1 == x->Dep) {
+          Real = min(x->Contain, Sid->Contain);
+          if(!Real) {Sid = Sid->Nxt; continue;}
+          x->Contain -= Real;
+          Sid->Contain -= Real;
+          E[(Sid - E) ^ 1].Contain += Real;
+          if(Sid->To != S && Sid->To != T && (!(Sid->To->Contain))) {
+            Pu.P = Sid->To, Q.push(Pu);
+          }
+          Sid->To->Contain += Real;
+          if(!(x->Contain)) break;
+        } else Tmp = min(Tmp, Sid->To->Dep);
+      }
+      Sid = Sid->Nxt;
+    }
+    if(x->Contain) {
+      if(!(--Gap[x->Dep])) {
+        for (register unsigned i(1); i <= n; ++i) {
+          if(N + i != S && N + i != T && N[i].Dep > x->Dep) {
+            N[i].Dep = n + 2;
+          }
+        }
+      }
+      ++Gap[x->Dep = Tmp + 1];
+      Pu.P = x;
+      Q.push(Pu);
+    }
+  }
+  printf("%u\n", T->Contain);
+  return Wild_Donkey;
 }
 ```
 
-# Calculate Number Theory Inverse in Linear Time
+# Data structure
 
-```cpp
-Inv[1] = 1;
-Inv[i] = (Mod - Mod / i) * Inv[Mod % i] % Mod;
-```
-
-# Lichao Tree
+## Lichao Tree
 
 ```cpp
 unsigned a[10005], l[10005], L[10005];
@@ -244,5 +359,156 @@ inline void Find(Node* x, unsigned L, unsigned R) { // Find f(C)
   unsigned Mid((L + R) >> 1);
   if(C <= Mid) {if(x->LS) Find(x->LS, L, Mid);}
   else {if(x->RS) Find(x->RS, Mid + 1, R);}
+}
+```
+
+## ZKW Tree
+
+下标从 $1$ 到 $n$.
+
+```cpp
+unsigned long long T[262144], Tag[262144];  //>= 2 (n + 2)
+void Build() {
+  for (unsigned i(N - 1); ~i; --i) T[i] = T[i << 1] + T[(i << 1) + 1];
+}
+void Edit(unsigned L, unsigned R, unsigned long long V) { //[L, R] += V;
+  L = L - 1 + N, R = R + 1 + N;
+  unsigned long long LLen(0), RLen(0);
+  for (unsigned Len(1); L ^ R ^ 1; L >>= 1, R >>= 1, Len <<= 1) {
+    T[L] += V * LLen, T[R] += V * RLen;
+    if (!(L & 1)) Tag[L ^ 1] += V, LLen += Len;
+    if (R & 1) Tag[R ^ 1] += V, RLen += Len;
+  }
+  while (L) T[L] += LLen * V, T[R] += RLen * V, L >>= 1, R >>= 1;
+}
+unsigned long long Qry(unsigned L, unsigned R) { // Qry Sum [L, R]
+  L = L - 1 + N, R = R + 1 + N;
+  unsigned long long Rt(0), LLen(0), RLen(0);
+  for (unsigned Len(1); L ^ R ^ 1; L >>= 1, R >>= 1, Len <<= 1) {
+    Rt += Tag[L] * LLen, Rt += Tag[R] * RLen;
+    if (!(L & 1)) Rt += T[L ^ 1] + Tag[L ^ 1] * Len, LLen += Len;
+    if (R & 1) Rt += T[R ^ 1] + Tag[R ^ 1] * Len, RLen += Len;
+  }
+  while (L) Rt += Tag[L] * LLen, Rt += Tag[R] * RLen, L >>= 1, R >>= 1;
+  return Rt;
+}
+signed main() {
+  n = RD(), N = 1;
+  while (N < n + 2) N <<= 1;
+  memset(T + N, N << 3, 0), memset(Tag, N << 4, 0);
+  for (unsigned i(1); i <= n; ++i) T[N + i] = RD();
+  Build();
+}
+```
+
+## Link Cut Tree
+
+- 0 Query: 查询 B, C 路径异或和, 保证联通
+
+- 1 Link: 若 B, C 不连通, 则加边 B-C
+
+- 2 Cut: 若存在 B-C 边, 断之
+
+- 3 Change: 将 B 的权值修改为 C
+
+Link: 若 B, C 未
+
+```cpp
+unsigned n, m;
+unsigned A, B, C;
+void *Stack[100005];
+struct Node {
+  Node *Son[2], *Fa;
+  char Tag;
+  unsigned Value, Sum;
+  inline char RealFather() {
+    return Fa && (Fa->Son[0] == this || Fa->Son[1] == this);
+  }
+  inline char Side() { return Fa->Son[1] == this; }
+  void Update() {
+    Sum = Value;
+    if (Son[0]) Sum ^= Son[0]->Sum;
+    if (Son[1]) Sum ^= Son[1]->Sum;
+    return;
+  }
+  void Push_Down() {
+    if (Tag) {
+      Tag = 0, swap(Son[0], Son[1]);
+      if (Son[0]) Son[0]->Tag ^= 1;
+      if (Son[1]) Son[1]->Tag ^= 1;
+    }
+  }
+  void Rotate() {
+    Node *Father(Fa);
+    char xSide(Side());
+    if ((Fa = Father->Fa) && Father->RealFather()) Fa->Son[Father->Side()] = this;
+    Father->Fa = this;
+    if (Father->Son[xSide] = Son[xSide ^ 1]) Father->Son[xSide]->Fa = Father;
+    Son[xSide ^ 1] = Father;
+    Father->Update(), Update();
+  }
+  void Splay() {
+    unsigned Head(0);
+    Node *Cur(this);
+    while (Cur->RealFather()) Stack[++Head] = Cur, Cur = Cur->Fa;
+    Cur->Push_Down();
+    if (!Head) return;
+    for (unsigned i(Head); i; --i) ((Node *)Stack[i])->Push_Down();
+    Cur = this;
+    while (Cur->RealFather()) {
+      if (Cur->Fa->RealFather())
+        ((Cur->Side() ^ Cur->Fa->Side()) ? Cur : Cur->Fa)->Rotate();
+      Cur->Rotate();
+    }
+  }
+  void Access() {
+    // printf("Access %u\n", this);
+    Splay(), Son[1] = NULL, Update();  // Delete x's right son
+    Node *Cur(this), *Father(Fa);
+    while (Father) {
+      Father->Splay(), Father->Son[1] = Cur;          // Change the right son
+      Cur = Father, Father = Cur->Fa, Cur->Update();  // Go up
+    }
+    return Splay();
+  }
+  Node *Find_Root() {  // Find the root
+    Access(), Push_Down();
+    Node *Cur(this);
+    while (Cur->Son[0]) Cur = Cur->Son[0], Cur->Push_Down();
+    return Cur;
+  }
+} N[100005];
+signed main() {
+  n = RD(), m = RD();
+  for (unsigned i(1); i <= n; ++i) N[i].Value = N[i].Sum = RD();
+  for (unsigned i(1); i <= m; ++i) {
+    A = RD(), B = RD(), C = RD();
+    switch (A) {
+      case 0: {                        // Query
+        N[B].Access(), N[B].Tag ^= 1;  // Makeroot(B)
+        N[C].Access();
+        printf("%u\n", N[C].Sum);
+        break;
+      }
+      case 1: {                        // Link
+        N[B].Access(), N[B].Tag ^= 1;  // Makeroot(B)
+        if (N[C].Find_Root() != N + B) N[B].Fa = N + C;
+        break;
+      }
+      case 2: {                        // Cut
+        N[B].Access(), N[B].Tag ^= 1;  // Makeroot(B)
+        if (N[C].Find_Root() == N + B) {
+          if (N[B].Fa == N + C && !(N[B].Son[1]))
+            N[B].Fa = N[C].Son[0] = NULL, N[C].Update();
+        }
+        break;
+      }
+      case 3: {  // Change
+        N[B].Splay(), N[B].Value = C, N[B].Update();
+        break;
+      }
+    }
+  }
+  return Wild_Donkey;
 }
 ```
