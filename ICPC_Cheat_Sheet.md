@@ -3,7 +3,7 @@ $$
 $$
 
 $$
-\large{\text{2024-09-12 By Micheal}}
+\large{\text{2024-09-20 By Micheal}}
 $$
 
 # Out of template
@@ -16,9 +16,53 @@ g++ a.cpp -Wall -std=gnu++20 -O2 -o a
 
 ## RD
 
+```cpp
+inline unsigned RD() {
+  unsigned intmp(0);
+  char rdch(getchar());
+  while (rdch < '0' || rdch > '9') rdch = getchar();
+  while (rdch >= '0' && rdch <= '9')
+    intmp = (intmp << 3) + (intmp << 1) + rdch - '0', rdch = getchar();
+  return intmp;
+}
+inline int RDsg() {
+  int rdtp(0), rdsg(1);
+  char rdch(getchar());
+  while ((rdch < '0' || rdch > '9') && (rdch != '-')) rdch = getchar();
+  if (rdch == '-') rdsg = -1, rdch = getchar();
+  while (rdch >= '0' && rdch <= '9')
+    rdtp = (rdtp << 3) + (rdtp << 1) + rdch - '0', rdch = getchar();
+  return rdtp * rdsg;
+}
+```
+
 ## cin
 
+```cpp
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+```
+
 ## include
+
+```cpp
+#include <algorithm>
+#include <bitset>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include<bits/stdc++.h>
+```
 
 # Math
 
