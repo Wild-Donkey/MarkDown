@@ -3,8 +3,10 @@ $$
 $$
 
 $$
-\large{\text{2024-09-20 By Micheal}}
+\large{\text{2024-10-25 By Micheal}}
 $$
+
+[TOC]
 
 # Out of template
 
@@ -46,21 +48,6 @@ cin.tie(nullptr);
 ## include
 
 ```cpp
-#include <algorithm>
-#include <bitset>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include<bits/stdc++.h>
 ```
 
@@ -133,6 +120,16 @@ long long Exgcd(long long x, long long y, long long &X, long long &Y) {
 Inv[1] = 1;
 Inv[i] = (Mod - Mod / i) * Inv[Mod % i] % Mod;
 ```
+
+## 容斥反演式
+
+$$
+f(n) = \sum_{i = 0}^{n} \binom ni g(i) \Leftrightarrow g(n) = \sum_{i = 0}^{n} (-1)^{n - i} \binom ni f(i)\\
+f(n) = \sum_{i = n}^{m} \binom in g(i) \Leftrightarrow g(n) = \sum_{i = n}^{m} (-1)^{n - i} \binom in f(i)\\
+f(n) = \sum_{d|n} g(d) \Leftrightarrow g(n) = \sum_{d|n} \mu(d) f(\frac nd)\\
+f(n) = \sum_{n|d} g(d) \Leftrightarrow g(n) = \sum_{n|d} \mu(\frac d n) f(d)\\
+\mu * 1 = \epsilon
+$$
 
 # String
 
@@ -554,5 +551,78 @@ signed main() {
     }
   }
   return Wild_Donkey;
+}
+```
+
+## ST table
+
+求区间最大值.
+
+```cpp
+unsigned ST[20][1000005], Lg2[1000005];
+Lg2[0] = 0xffffffff;
+for (unsigned i(1); i <= Cnt; ++i) Lg2[i] = Lg2[i >> 1] + 1;
+for (unsigned i(1), I(2); I <= Cnt; ++i, I <<= 1) {
+  for (unsigned j(1), J(j + (I >> 1)); j + I - 1 <= Cnt; ++j, ++J)
+    ST[i][j] = max(ST[i - 1][j], ST[i - 1][J]);
+}
+unsigned Mx(unsigned x, unsigned y) {
+  unsigned Del(Lg2[y - x + 1]);
+  return max(ST[Del][x], ST[Del][y - (1 << Del) + 1]);
+}
+```
+
+# DP
+
+## wqs 二分
+
+如果答案关于限制指标 $k$ 有凸性, 且 $k$ 是 dp 的状态. 则删掉这一维的限制, 可以求出凸函数的顶点.
+
+这时修改转移方程, 改变 dp 数组的定义, 如: 每次 $k$ 增加 $1$ 就使 dp 值增加 $c$, 这时 dp 值关于 $k$ 的凸函数就相当于叠加了一个斜率为 $c$ 的一次函数, 斜率和顶点的位置相关. 为了得到特定的 $k$ 对应的答案, 二分 $c$, 约束顶点的 $k$ 符合询问要求即可.
+
+## 决策单调性
+
+当状态转移方程形如 $f_i = \min_{j = 0}^i w_{j, i}$ 时, 如果 $w$ 满足对于 $a \leq b \leq c \leq d$ 有 $w_{a, c} + w_{b, d} \leq w_{b, c} + w_{a, d}$, dp 具有决策单调性.
+
+- 如果 $w_{i, j}$ 可以不依赖于 $f$ 快速求出, 则可以直接分治, 求 $f_{mid}$, 根据 $opt_{mid}$ 缩小左右两边决策范围.
+
+```cpp
+void Split(unsigned L, unsigned R, unsigned OpL, unsigned OpR) {
+  if (R < L) return;
+  unsigned Mid((L + R) >> 1), CurMn(2000000000), MnPos(0), Tmp;
+  for (unsigned i(OpL); i <= OpR && i < Mid; ++i) {
+    Tmp = Calc(i, Mid);
+    if (Tmp <= CurMn) CurMn = Tmp, MnPos = i;
+  }
+  Ans = min(Ans, CurMn);
+  Split(L, Mid - 1, OpL, MnPos);
+  Split(Mid + 1, R, MnPos, OpR);
+}
+```
+
+- 维护队列 $q$, 维护每个决策点作为最优决策的状态区间. 代码中队列元素的 `first` 是决策点, `second` 是决策点作为最优决策点的区间左端点, 且默认决策点小于状态.
+
+```cpp
+deque<pair<unsigned, unsigned> > Best;
+Best.push_back({ 1, 2 });
+for (unsigned i(2); i <= n; ++i) {
+  while (Best.size() > 1)
+    if (Best[1].second <= i) Best.pop_front();
+    else break;
+  Ans = min(Ans, Calc(Best.front().first, i));
+  while (Best.size() && Best.back().second > i &&
+    Calc(i, Best.back().second) <
+    Calc(Best.back().first, Best.back().second))
+    Best.pop_back();
+  if (Best.size()) {
+    unsigned L(i + 1), R(n), Mid;
+    while (L < R) {
+      Mid = ((L + R) >> 1);
+      if (Calc(i, Mid) < Calc(Best.back().first, Mid)) R = Mid;
+      else L = Mid + 1;
+    }
+    Best.push_back({ i, L });
+  } else
+    Best.push_back({ i, i + 1 });
 }
 ```
