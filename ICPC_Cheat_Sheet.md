@@ -3,7 +3,7 @@ $$
 $$
 
 $$
-\large{\text{2024-10-25 By Micheal}}
+\large{\text{2024-10-29 By Micheal}}
 $$
 
 [TOC]
@@ -65,6 +65,9 @@ inline void Init() {
   for (unsigned i(20); i; --i)
     IW[i - 1] = (unsigned long long)IW[i] * IW[i] % Mod;
 }
+```
+
+```cpp
 inline void DIT(unsigned *f, unsigned N) {
   for (unsigned i(1), I(1); !(i >> N); i <<= 1, ++I) {
     unsigned long long w(W[I]), Cur(1);
@@ -76,6 +79,9 @@ inline void DIT(unsigned *f, unsigned N) {
       }
   }
 }
+```
+
+```cpp
 inline void DIF(unsigned *f, unsigned N) {
   for (unsigned i(1 << (N - 1)), I(N); i; i >>= 1, --I) {
     unsigned long long w(IW[I]), Cur(1);
@@ -87,6 +93,9 @@ inline void DIF(unsigned *f, unsigned N) {
       }
   }
 }
+```
+
+```cpp
 inline void Mul(unsigned *A, unsigned *B, unsigned Ln, unsigned Rn) {
   unsigned Len(Ln + Rn - 1), N(0);
   while ((1 << N) < Len) ++N;
@@ -108,8 +117,7 @@ long long Exgcd(long long x, long long y, long long &X, long long &Y) {
     Y -= X * (x/y);
     return tmp; 
   }
-  X = 1;
-  Y = 0;
+  X = 1, Y = 0;
   return x;
 }
 ```
@@ -119,6 +127,116 @@ long long Exgcd(long long x, long long y, long long &X, long long &Y) {
 ```cpp
 Inv[1] = 1;
 Inv[i] = (Mod - Mod / i) * Inv[Mod % i] % Mod;
+```
+
+## Euler's Sieve
+
+```cpp
+bitset<100000005> Isnt;
+for (unsigned i(2); i <= n; ++i) {
+  if(!(Isnt[i])) Prime[++Cnt] = i;
+  for (unsigned j(1); (Prime[j] * i < n) && (j <= Cnt); ++j) {
+    Isnt[i * Prime[j]] = 1;
+    if(!(i % Prime[j])) break;
+  }
+}
+```
+
+## Du's Sieve
+
+$$
+Sum(n) = \sum_{i = 1}^n f(i)\\
+\sum_{i = 1}^n (g * f)(i) - \sum_{j = 2}^n g(j) Sum(\lfloor \frac nj \rfloor) = g(1)Sum(n)\\
+$$
+
+如果我们可以快速求出 $\displaystyle{\sum_{i = 1}^n (g * f)(i)}$, $\displaystyle{\sum_{i = 1}^n g(i)}$, 并且使用整除分块优化 $\displaystyle{\sum_{j = 2}^n g(j) Sum(\lfloor \frac nj \rfloor)}$, 那么就可以 $O(n^{\frac 34})$ 求出 $Sum(n)$.
+
+如果我们用线性筛算出前 $i \leq n^{\frac 23}$ 的 $Sum(i)$, 然后再求解, 复杂度就会优化到 $O(n^{\frac 23})$.
+
+- 求 $\mu$ 前缀和.
+
+$g = I$, $f = \mu$. $\epsilon = \mu * I$.
+
+```cpp
+inline int CalcM(unsigned x) {
+  if (x <= 10000000) return Mu[x]; //前缀和
+  if (SMu.find(x) != SMu.end()) return SMu[x];
+  int TmpS(1);
+  for (unsigned L, R(1), Now; R < x; ) {
+    L = R + 1, Now = x / L, R = x / Now;
+    TmpS -= CalcM(Now) * (R - L + 1);
+  }
+  return SMu[x] = TmpS;
+}
+```
+
+## 整除分块
+
+- 求 $\phi$ 前缀和.
+
+$$
+2 \sum_{i = 1}^n \phi(i) - 1 = \sum_{d = 1}^n \lfloor \frac nd \rfloor^2 \mu(d)\\
+$$
+
+利用 $\mu$ 的前缀和直接求.
+
+```cpp
+long long TmpS(0), Now(0);
+for (unsigned L, R(0); R < n; ) {
+  L = R + 1, Now = n / L, R = n / Now;
+  TmpS += Now * Now * (CalcM(R) - CalcM(L - 1));
+}
+return (TmpS + 1) >> 1;
+```
+
+## Powerful Number Seive
+
+把所有质因数次数至少为 $2$ 的数字称为 Powerful Number, 可以表示为 $x = a^2b^3$, $b$ 中无平方因子. 则满足条件的数对 $(a, b)$ 和 $x$ 一一对应. 数量为 $O(\sqrt N)$.
+
+求 $f$ 的前缀和, 构造 $g$, $h$, 使得 $f = g * h$, 且对于任意质数 $p$, 有 $g(p) = f(p)$, 且 $g$ 可以方便地求前缀和.
+
+推论: 对于非 powerful number 的 $x$, $h(x) = 0$.
+
+$$
+\sum_{i = 1}^n f(i) = \sum_{j \in PN}^n h(j) \sum_{i = 1}^{\lfloor \frac nj \rfloor} g(i)\\
+h(p^c) = f(p^c) - \sum_{i = 1}^\alpha g(p^{i})h(p^{c - i}) \text{这行可能不需要}\\
+$$
+
+- 模板
+
+求 $f(p^\alpha) = p^\alpha(p^\alpha - 1)$ 的前缀和.
+
+构造 $g(x) = \phi(x)x$.
+
+$g$ 前缀和使用线性筛优化的杜教筛 $O(n^{\frac 23})$ 求出.
+
+递推求 $h$.
+
+$$
+\frac {h(p^{\alpha})}{p^\alpha} = \frac{h(p^{\alpha - 1})}{p^{\alpha - 1}} + p - 1\\
+$$
+
+用 DFS 枚举 powerful number.
+
+```cpp
+inline void DFS(unsigned Dep) {//Dep_th Prime
+  if ((Dep > CntP) || ((n / Now) < (unsigned long long)Pri[Dep] * Pri[Dep])) {
+    unsigned long long Cur(n / Now);
+    Ans = (Ans + H * ((Cur <= m) ? G[Cur] : GM[n / Cur])) % Mod;
+    return;
+  }
+  unsigned long long Cur(Pri[Dep]), PriP(1), LaH(H), HPA(0), LaN(Now);
+  unsigned Poi(0);
+  DFS(Dep + 1);
+  while ((n / Now) >= Cur) {
+    Now *= Pri[Dep], PriP *= Pri[Dep], ++Poi;
+    H = LaH * (HPA * PriP % Mod) % Mod, HPA += Cur - 1;
+    if (Poi ^ 1) DFS(Dep + 1);
+  }
+  H = LaH, Now = LaN;
+  return;
+}
+DFS(1);
 ```
 
 ## 容斥反演式
@@ -131,6 +249,36 @@ f(n) = \sum_{n|d} g(d) \Leftrightarrow g(n) = \sum_{n|d} \mu(\frac d n) f(d)\\
 \mu * 1 = \epsilon
 $$
 
+恒等式: $\phi(i) = \sum_{j = 1}^{i} [gcd(i, j) = 1]$.
+
+## Linear Basis
+
+将 $2^i$ 预处理为 $Bin[i]$. (也可以不处理)
+
+- 插入数字 A 到线性空间.
+
+```cpp
+A = RD();
+for (unsigned j(50); ~j; --j) if (A & Bin[j]) {
+  if (B[j]) A ^= B[j];
+  else { B[j] = A; break; }
+}
+```
+
+- 求线性空间 Max.
+
+```cpp
+for (unsigned i(50); ~i; --i) if ((B[i]) && (!(Ans & Bin[i]))) Ans ^= B[i];
+```
+
+- 求线性空间 Min.
+
+即为基的最小元素.
+
+- 第 k 小元素.
+
+将基高斯消元. 然后二分查找即可.
+
 # String
 
 ## Suffix Array
@@ -140,7 +288,9 @@ unsigned n, t, A, B;
 unsigned SA[2000005], RK[2000005], BucSize;
 unsigned Tmp[(n + 1) << 1], Bucket[max((unsigned)256, n + 1)], Cnt(0), Cons(1);
 char a[2000005];
+```
 
+```cpp
 memset(RK, 0, (n + 1) << 3);
 BucSize = 255;
 memset(Bucket, 0, (BucSize + 1) << 2);
@@ -206,6 +356,45 @@ signed main() {
 }
 ```
 
+## Palindrome Automaton
+
+```cpp
+struct Node {
+  unsigned To[26];
+  Node *Link;
+  vector<Node *> Sons;
+  unsigned Dep;
+  int Len;
+} N[500005], *CntN(N + 1), *Last(N + 1);
+void Add(int Cur) {
+  char c = a[Cur];
+  Node *Jump(Last), *Nw;
+  while (Jump->Len + 1 > Cur) Jump = Jump->Link;
+  while (a[Cur - 1 - Jump->Len] != a[Cur]) Jump = Jump->Link;
+  if (Jump->To[c] ^ 0xffffffff) Nw = N + Jump->To[c];
+  else {
+    Jump->To[c] = (Nw = ++CntN) - N, Nw->Len = Jump->Len + 2;
+    Jump = Jump->Link;
+    memset(Nw->To, 0xff, 104);
+    while (Jump && (!((Jump->To[c] ^ 0xffffffff) &&
+                      (a[Cur - Jump->Len - 1] == a[Cur]))))
+      Jump = Jump->Link;
+    if (!Jump) Nw->Link = N + 1;
+    else Nw->Link = N + Jump->To[c];
+    Nw->Dep = Nw->Link->Dep + 1;
+  }
+  Last = Nw;
+}
+```
+
+```cpp
+n = strlen(a), N[0].Len = -1;
+N[1].Link = N, N[1].Len = 0;
+memset(N[0].To, 0xff, 104);
+memset(N[1].To, 0xff, 104);
+for (unsigned i(0); i < n; ++i) Add(i);
+```
+
 # Graph
 
 ## Dinic
@@ -252,16 +441,17 @@ inline unsigned DFS(Node* x, unsigned Come) {
     }
   return Gone;
 }
+```
 
+```cpp
 Link(N, N + i, C); // Add Edges
-while (BFS()) Tmp += DFS(N, 0x3f3f3f3f);
-//Tmp is Answer
+while (BFS()) Tmp += DFS(N, 0x3f3f3f3f); //Tmp is Answer
 ```
 
 ## HLPP
 
 ```cpp
-unsigned Hd(0), Tl(0), Gap[1205], m, n, Cnt(0), C, D, t, Tmp(0);
+unsigned Hd(0), Tl(0), Gap[1205];
 struct Node; 
 struct Edge {
   Node *To;
@@ -279,86 +469,72 @@ struct Que {
   }
 };
 priority_queue <Que> Q;
-signed main() {
-  n = RD(), m = RD(), S = N + RD(), T = N + RD();
-  for (register unsigned i(1); i <= m; ++i) {
-    A = N + RD(), B = N + RD(), C = RD();
-    if(A == B) continue;
-    (++CntE)->Nxt = A->Fst;
-    A->Fst = CntE;
-    CntE->To = B;
-    CntE->Contain = C;
-    (++CntE)->Nxt = B->Fst;
-    B->Fst = CntE;
-    CntE->To = A;
-  }
-  T->Dep = 1, Qu[++Tl] = T;
-  register Node *x;
-  while(Hd < Tl) {
-    x = Qu[++Hd];
-    register Edge *Sid(x->Fst);
-    while (Sid) {
-      if((!(Sid->To->Dep)) && (!(Sid->Contain))) {
-        ++Gap[Sid->To->Dep = x->Dep + 1];
-        Qu[++Tl] = Sid->To;
-      }
-      Sid = Sid->Nxt;
-    }
-  }
-  --Gap[S->Dep];
-  ++Gap[S->Dep = n + 1];
-  register Que Pu;
-  register Edge *Sid(S->Fst);
+```
+
+```cpp
+for (register unsigned i(1); i <= m; ++i) {
+  //A to B, value C
+  if(A == B) continue;
+  (++CntE)->Nxt = A->Fst, A->Fst = CntE;
+  CntE->To = B, CntE->Contain = C;
+  (++CntE)->Nxt = B->Fst, B->Fst = CntE;
+  CntE->To = A, CntE->Contain = 0;
+}
+T->Dep = 1, Qu[++Tl] = T;
+Node *x;
+while(Hd < Tl) {
+  x = Qu[++Hd];
+  register Edge *Sid(x->Fst);
   while (Sid) {
-    if(Sid->Contain) { 
-      if(Sid->To != T && (!(Sid->To->Contain))) {
-        Pu.P = Sid->To;
-        Q.push(Pu);
-      }
-      Sid->To->Contain += Sid->Contain;
-      (Sid + 1)->Contain = Sid->Contain;
-      Sid->Contain = 0;
+    if((!(Sid->To->Dep)) && (!(Sid->Contain))) {
+      ++Gap[Sid->To->Dep = x->Dep + 1];
+      Qu[++Tl] = Sid->To;
     }
     Sid = Sid->Nxt;
   }
-  while(Q.size()) {
-    x = (Q.top()).P, Q.pop();
-    register unsigned Real;
-    Sid = x->Fst;
-    Tmp = 0x3f3f3f3f;
-    while(Sid) {
-      if(Sid->Contain) {
-        if(Sid->To->Dep + 1 == x->Dep) {
-          Real = min(x->Contain, Sid->Contain);
-          if(!Real) {Sid = Sid->Nxt; continue;}
-          x->Contain -= Real;
-          Sid->Contain -= Real;
-          E[(Sid - E) ^ 1].Contain += Real;
-          if(Sid->To != S && Sid->To != T && (!(Sid->To->Contain))) {
-            Pu.P = Sid->To, Q.push(Pu);
-          }
-          Sid->To->Contain += Real;
-          if(!(x->Contain)) break;
-        } else Tmp = min(Tmp, Sid->To->Dep);
-      }
-      Sid = Sid->Nxt;
-    }
-    if(x->Contain) {
-      if(!(--Gap[x->Dep])) {
-        for (register unsigned i(1); i <= n; ++i) {
-          if(N + i != S && N + i != T && N[i].Dep > x->Dep) {
-            N[i].Dep = n + 2;
-          }
-        }
-      }
-      ++Gap[x->Dep = Tmp + 1];
-      Pu.P = x;
-      Q.push(Pu);
-    }
-  }
-  printf("%u\n", T->Contain);
-  return Wild_Donkey;
 }
+--Gap[S->Dep], ++Gap[S->Dep = n + 1];
+Que Pu;
+Edge *Sid(S->Fst);
+while (Sid) {
+  if(Sid->Contain) { 
+    if(Sid->To != T && (!(Sid->To->Contain)))
+      Pu.P = Sid->To, Q.push(Pu);
+    Sid->To->Contain += Sid->Contain;
+    (Sid + 1)->Contain = Sid->Contain;
+    Sid->Contain = 0;
+  }
+  Sid = Sid->Nxt;
+}
+while(Q.size()) {
+  x = (Q.top()).P, Q.pop();
+  register unsigned Real;
+  Sid = x->Fst, Tmp = 0x3f3f3f3f;
+  while(Sid) {
+    if(Sid->Contain) {
+      if(Sid->To->Dep + 1 == x->Dep) {
+        Real = min(x->Contain, Sid->Contain);
+        if(!Real) {Sid = Sid->Nxt; continue;}
+        x->Contain -= Real, Sid->Contain -= Real;
+        E[(Sid - E) ^ 1].Contain += Real;
+        if(Sid->To != S && Sid->To != T && (!(Sid->To->Contain)))
+          Pu.P = Sid->To, Q.push(Pu);
+        Sid->To->Contain += Real;
+        if(!(x->Contain)) break;
+      } else Tmp = min(Tmp, Sid->To->Dep);
+    }
+    Sid = Sid->Nxt;
+  }
+  if(x->Contain) {
+    if(!(--Gap[x->Dep]))
+      for (register unsigned i(1); i <= n; ++i)
+        if(N + i != S && N + i != T && N[i].Dep > x->Dep) 
+          N[i].Dep = n + 2;
+    ++Gap[x->Dep = Tmp + 1];
+    Pu.P = x, Q.push(Pu);
+  }
+}
+printf("%u\n", T->Contain);
 ```
 
 # Data structure
