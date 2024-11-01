@@ -1,9 +1,9 @@
 $$
-\Huge{\text{ICPC~Cheat~Sheet}}\\
+\Huge{\text{ICPC    Cheat   Sheet}}\\
 $$
 
 $$
-\large{\text{2024-10-29 By Micheal}}
+\large{\text{2024-11-01 By Micheal}}
 $$
 
 [TOC]
@@ -756,6 +756,18 @@ unsigned Mx(unsigned x, unsigned y) {
 
 这时修改转移方程, 改变 dp 数组的定义, 如: 每次 $k$ 增加 $1$ 就使 dp 值增加 $c$, 这时 dp 值关于 $k$ 的凸函数就相当于叠加了一个斜率为 $c$ 的一次函数, 斜率和顶点的位置相关. 为了得到特定的 $k$ 对应的答案, 二分 $c$, 约束顶点的 $k$ 符合询问要求即可.
 
+```cpp
+long long L(0), R(100000000), Mid, TmpD;
+while (L < R) {
+  TmpD = DP(Mid = ((L + R + 1) >> 1));
+  if (TmpD < m)
+    R = Mid - 1;
+  else
+    L = Mid;
+}
+DP(L), printf("%lld\n", f[N] - L * m);
+```
+
 ## 决策单调性
 
 当状态转移方程形如 $f_i = \min_{j = 0}^i w_{j, i}$ 时, 如果 $w$ 满足对于 $a \leq b \leq c \leq d$ 有 $w_{a, c} + w_{b, d} \leq w_{b, c} + w_{a, d}$, dp 具有决策单调性.
@@ -789,14 +801,15 @@ for (unsigned i(2); i <= n; ++i) {
   while (Best.size() && Best.back().second > i &&
     Calc(i, Best.back().second) <
     Calc(Best.back().first, Best.back().second))
-    Best.pop_back();
+    Best.pop_back();//i 优于 back
   if (Best.size()) {
-    unsigned L(i + 1), R(n), Mid;
+    unsigned L(i + 1), R(n + 1), Mid;
     while (L < R) {
       Mid = ((L + R) >> 1);
       if (Calc(i, Mid) < Calc(Best.back().first, Mid)) R = Mid;
       else L = Mid + 1;
     }
+    if(L == n + 1) ;//处理决策点 i 不会作为任何状态最优决策的情况.
     Best.push_back({ i, L });
   } else
     Best.push_back({ i, i + 1 });
