@@ -579,7 +579,7 @@ inline void Find(Node* x, unsigned L, unsigned R) { // Find f(C)
 }
 ```
 
-## ZKW Tree
+##   Tree
 
 下标从 $1$ 到 $n$.
 
