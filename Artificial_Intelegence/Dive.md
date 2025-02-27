@@ -1,3 +1,5 @@
+> [动手学深度学习](https://zh-v2.d2l.ai/)
+
 # 环境
 
 ## Miniconda
@@ -333,6 +335,43 @@ print(A.cumsum(axis=0)) # 沿轴 0 前缀和
 
 可以通过规定 `keepdims` 强制维数不变，被选中降维的轴的长度会变成 `1` 而不是消失。
 
+### 范数
+
+范数是从向量到标量的映射, 是衡量向量大小的标量. 需满足四个条件:
+
+- 线性缩放
+
+$$
+f(\alpha \bold x) = |\alpha| f (\bold x)
+$$
+
+- 三角形不等式
+
+$$
+f(\bold x + \bold y) \leq f(\bold x) + f(\bold y)
+$$
+
+- 非负
+
+$$
+f(\bold x) \geq 0
+$$
+
+- 最小元
+
+$$
+f(\bold x) = 0 \Leftrightarrow \forall i, x_i = 0
+$$
+
+常见的范数有: 欧几里得距离 $L_2$, 曼哈顿距离 $L_1$, Frobenius 范数. 其中 Frobenius 范数是矩阵形向量的 $L_2$ 范数.
+
+```py
+u = torch.tensor([3.0, -4.0])
+print(torch.norm(u)) # L2
+print(torch.abs(u).sum()) # L1
+print(torch.norm(torch.ones((4, 9)))) # Frobenuis
+```
+
 ## 微积分
 
 ## 概率论
@@ -372,4 +411,6 @@ $$
 (\bold w, b) \leftarrow (\bold w, b) - \frac {\eta}{|\mathcal B|} \sum \partial_{(\bold w,b)}\bold l^{(i)}(\bold w,b)
 $$
 
-其中 $\eta$ 是一个用来控制调整幅度的常数. 梯度下降可以帮我们找到损失函数在参数空间的一个极小值, 但是面对的问题不是线性回归时, 极小值往往不止一个. 但是也不见得需要令损失函数最小, 因为损失函数的评价是仅仅基于给定训练集的, 而我们更关心的是模型在训练集外的表现.
+其中 $\eta$ 是一个用来控制调整幅度的常数. 梯度下降可以帮我们找到损失函数在参数空间的一个极小值, 但是面对的问题不是线性回归时, 极小值往往不止一个. 但是也不见得需要令损失函数最小, 因为损失函数的评价是仅仅基于给定训练集的, 而我们更关心的是模型在训练集外的表现, 也即**泛化**.
+
+### 
