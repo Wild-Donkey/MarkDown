@@ -264,7 +264,76 @@ print(type(int(a))) # 标量(整数)
 <class 'int'>
 ```
 
+## 预处理
+
+```py
+import pandas as pd
+
+data = pd.read_csv("house_tiny.csv")
+print(data)
+print(type(data))
+```
+
+用 `pandas` 将数据从 csv 读入到对象 `data` 中。
+
+`data` 的 type 为:
+
+```
+pandas.core.frame.DataFrame
+```
+
+切片为输入和输出，填充缺失值，处理离散的分类信息。
+
+```py
+inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
+inputs = inputs.fillna(inputs.mean()) # 用同一列的均值填充缺失值
+inputs = pd.get_dummies(inputs, dummy_na=True) # 用两个布尔列代替原来的分类列
+print(inputs)
+```
+
+最后转换为张量。
+
+```py
+import torch
+
+X = torch.tensor(inputs.to_numpy(dtype=float)) # 转换为张量
+y = torch.tensor(outputs.to_numpy(dtype=float))
+print(X, y)
+```
+
 ## 线性代数
+
+```py
+A = torch.arange(20, dtype=torch.float32).reshape(5, 4) # 规定元素为浮点数, 否则若元素是整数则无法调用 mean() 计算均值, 但是 sum / numel 仍可用
+print(len(A)) # 5
+print(A.T) # 转置
+```
+
+向量或轴的维度被用来表示向量或轴的长度，即向量或轴的元素数量。
+
+可以用 `T` 转置一个矩阵。
+
+```py
+a = 2
+X = torch.arange(24).reshape(2, 3, 4)
+print(a + X), print(a * X)
+```
+
+张量和标量的线性运算结果是对于张量的每个元素都执行同样的运算。
+
+```py
+print(A.sum(axis=0))
+print(A.sum(axis=1))
+print(A.mean() == (A.sum() / A.numel())) # 两种表达等价
+print(A.sum(axis=1, keepdims=True))
+print(A.cumsum(axis=0)) # 沿轴 0 前缀和
+```
+
+`sum` 和 `mean` 都可以规定沿哪个轴进行运算，沿哪个轴运算，就会将这个轴降维。当所有轴都被选中时，就是对所有轴进行运算，效果和不带参数一样。 
+
+可以通过规定 `keepdims` 强制维数不变，被选中降维的轴的长度会变成 `1` 而不是消失。
+
+
 
 ## 微积分
 
