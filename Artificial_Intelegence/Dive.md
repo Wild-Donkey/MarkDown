@@ -413,4 +413,301 @@ $$
 
 其中 $\eta$ 是一个用来控制调整幅度的常数. 梯度下降可以帮我们找到损失函数在参数空间的一个极小值, 但是面对的问题不是线性回归时, 极小值往往不止一个. 但是也不见得需要令损失函数最小, 因为损失函数的评价是仅仅基于给定训练集的, 而我们更关心的是模型在训练集外的表现, 也即**泛化**.
 
-### 
+## 线性回归的实现
+
+仅仅是一个简单的梯度下降, 三个参数.
+
+```py
+import random
+import torch
+from d2l import torch as d2l
+def synthetic_data(w, b, num_examples):  #@save
+  """生成y=Xw+b+噪声"""
+  X = torch.normal(0, 1, (num_examples, len(w))) # 1000 * 2 的矩阵
+  y = torch.matmul(X, w) + b # 长度为 1000 的向量
+  y += torch.normal(0, 0.01, y.shape) # epsilon
+  return X, y.reshape((-1, 1))
+
+true_w = torch.tensor([3., -2.])
+true_b = 114
+features, labels = synthetic_data(true_w, true_b, 1000)
+
+print('features:', features[0],'\nlabel:', labels[0])
+
+def data_iter(batch_size, features, labels):
+  num_examples = len(features)
+  indices = list(range(num_examples))
+  # 这些样本是随机读取的，没有特定的顺序
+  random.shuffle(indices) # indices 乱序下标数组
+  for i in range(0, num_examples, batch_size):
+    batch_indices = torch.tensor(
+      indices[i: min(i + batch_size, num_examples)])
+    yield features[batch_indices], labels[batch_indices] # yeild 将函数变成一个生成器, 分批次返回数据集
+
+batch_size = 10
+
+w = torch.normal(0, 0.01, size=(2,1), requires_grad=True)
+b = torch.zeros(1, requires_grad=True)
+
+def linreg(X, w, b):
+  """线性回归模型"""
+  return torch.matmul(X, w) + b
+
+def squared_loss(y_hat, y):
+  return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+
+def sgd(params, lr, batch_size):
+  """小批量随机梯度下降"""
+  with torch.no_grad():
+    for param in params:
+      param -= lr * param.grad / batch_size
+      param.grad.zero_()
+
+lr = 0.03 # 学习率
+num_epochs = 10 # 轮数
+net = linreg
+loss = squared_loss
+
+for epoch in range(num_epochs):
+  for X, y in data_iter(batch_size, features, labels): # 每次取一批数据
+    lr = (num_epochs - epoch) / num_epochs * 0.03
+    l = loss(net(X, w, b), y)  # X和y的小批量损失
+    l.sum().backward() # 反向传播计算损失函数总和关于各个参数的偏导
+    sgd([w, b], lr, batch_size)  # 使用参数的梯度更新参数
+  with torch.no_grad():
+    train_l = loss(net(features, w, b), labels)
+    print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
+    print(f'w {w}, b {b}')
+
+# 太准了, 简直是魔法
+```
+
+## Softmax
+
+对于分类问题，我们希望输出向量 $y$ 的每一个分量是对应类别的条件概率. 条件概率的性质要求 $y$ 的分量和应当为 $1$, 并且所有概率都非负. 但是线性回归的结果 $o$ 是不一定满足这两个性质的, 所以我们希望进行一些映射, 使得保留概率大小的相对关系的前提下, 新的输出向量满足这个性质。
+
+对于非负, 我们可以对原有的数值取 exp, 将实数映射到正数. 然后进行标准化, 将每个数值除以所有分量的总和.
+
+$$
+\hat y_j = \frac{ \exp o_j}{\sum_k{\exp o_k}}
+$$
+
+对向量的 softmax 运算用 python 的实现：
+
+```py
+def softmax(X): # x 是 (batch_size, 10) 的矩阵
+  X_exp = torch.exp(X)
+  partition = X_exp.sum(1, keepdim=True) # partition size 为 (batch_size, 1) 的矩阵
+  return X_exp / partition  # 这里应用了广播机制, 每一行除以同样的分量
+```
+
+评估 $\hat y$ 的预测效果, 我们希望 $y_j = 1$ 的位置, $\hat y_j$ 尽可能大, 也就是负对数尽可能小, 其损失函数为:
+
+$$
+\sum_j -y_j \log \hat y_j\\
+$$
+
+为了计算这个值, 我们没必要对 $y$ 的值为 $0$ 的部分做乘法并相加, 这部分对结果没有影响. 单独将 $y_j = 1$ 的元素拿出来计算 $-y_j \log \hat y_j = -\log \hat y_j$ 即可.
+
+所以实现上, `y` 仅保留每个样本的正确标签的标号, 而 `y_hat` 则仍然完整保存对于每个结果的条件概率预测.
+
+```py
+def cross_entropy(y_hat, y):
+  return - torch.log(y_hat[range(len(y_hat)), y]) # 把每一行的 y 指出的元素拿出来做对数运算
+```
+
+整理损失函数的表达式：
+
+$$
+\sum_j -y_j \log \hat y_j\\
+= - \sum_j y_j \log \frac{ \exp o_j}{\sum_k{\exp o_k}}\\
+= \sum_j y_j (\log \sum_k{\exp o_k} - o_j)\\
+= \log \sum_k{\exp o_k} -\sum_j y_j o_j\\
+$$
+
+对这个损失函数求偏导，可以得到：
+
+$$
+\partial_{o_j}(\log \sum_k{\exp o_k} -\sum_j y_j o_j)\\
+= \frac {\exp o_j}{\sum_k{\exp o_k}} - y_j\\
+= \hat y_j - y_j
+$$
+
+# 多层感知机
+
+对于一般的线性模型, 无论加多少层线性的隐藏层，本质都是对上一层的向量进行矩阵乘法。根据矩阵乘法的结合律，这些层的计算都可以被简化为一个矩阵，也就可以被等价为没有隐藏层的线性网络，这显然是徒增计算量的。
+
+那么，如何尝试拟合更加复杂的关系呢？在每一层定义一个非线性的激活函数，使得一个节点的输出是线性输入结果的非线性函数值，而这种模型是不能被化归为单层线性网络的。
+
+## 通用近似
+
+利用一层隐藏层和特定的激活函数，理论上是可以通用地实现任意函数的映射的。但是通过增加隐藏层可以更容易地拟合函数关系，所以多层感知机仍然是有意义的。
+
+## 激活函数
+
+- ReLU
+
+ReLU (Rectified linear unit) 是最简单常用的激活函数。
+
+$$
+\text{ReLU}(x) = \max(0, x)
+$$
+
+存在一些变体，比如加一项线性项的 pReLU。
+
+$$
+\text{pReLU}(x) = \max(0, x) + \alpha \min (0, x)
+$$
+
+- sigmoid
+
+最早的，基于生物神经元的激活函数建模。
+
+$$
+\text{sigmoid} = \frac {1}{1 + e^{-x}}
+$$
+
+将 $R$ 上的定义域压缩到 $(0, 1)$ 的区间中. 在原点的邻域近似于线性.
+
+对 $x$ 求导的结果是：
+
+$$
+\frac {e^{-x}}{(1 + e^{-x})^2}
+$$
+
+- tanh
+
+$$
+\tanh (x) = \frac {1 - e^{-2x}}{1 + e^{-2x}}
+$$
+
+类似于 sigmoid，值域为 $(-1,1)$. 导数为:
+
+$$
+1 - \tanh ^2 (x)
+$$
+
+## 过拟合和欠拟合
+
+- 训练误差：训练集上的误差
+
+- 泛化误差：测试集上的误差
+
+模型的目的：拟合由特征向标签映射的模式。模式可能复杂也可能简单，需要有目的地选择模型和调整超参数。
+
+### 过拟合
+
+训练误差 << 泛化误差
+
+模型过于复杂, 训练集过于小
+
+### 欠拟合
+
+训练误差和泛化误差都很大
+
+模型过于简单, 训练轮数不够
+
+### 模型复杂性
+
+参数数量显然决定了模型复杂性，参数的取值范围也影响模型复杂性.
+
+## 正则化
+
+在机器学习中，正则化用来描述避免或减轻过拟合现象的做法。
+
+### 权重衰减
+
+缩小参数取值范围，降低模型复杂程度从而抑制过拟合。
+
+定义正则化损失函数:
+
+$$
+J = L + \frac \lambda 2 ||\bold w||^2
+$$
+
+这样可以对绝对值大的参数施加更大的惩罚, 从而控制参数取值范围大小。
+
+### 暂退法
+
+作为从特征向标签的映射，模型可以被认为是一个函数，而一个尽可能平滑的函数被认为是好的。
+
+为了使训练出的模型尽可能的平滑，我们在训练时加入一些随机的噪声作为扰动，期望得到更加平滑的模型。
+
+具体做法是：随机取消某些节点，进行一轮梯度下降后还原取消的节点，然后继续训练。
+
+每个节点取消的概率设为 $p$, 那么一个节点的激活值就有两种可能：
+
+$$
+\phi(h' = 0) 概率 = p\\
+\phi(h' = \frac {h}{1 - p}) 概率 = 1 - p
+$$
+
+暂退法的另一个作用是打破隐藏层的对称性. 对于一层全连接的隐藏层的节点，如果初始化的权值相同，那么它们彼此之间应当是本质相同的，这也就是对称性。无论如何进行梯度下降，这一层每一个节点输入的权值应当被更新为相同的值。
+
+暂退法可以对这种局面进行扰动来打破这个对称性。
+
+## Xavier 初始化
+
+初始化模型的权重参数的时候，需要打破对称性，加快收敛，避免过拟合，一般采用随机化的方式对参数初始化。为了防止输出的大小过大或过小，导致梯度爆炸或梯度消失，我们需要规定随机生成初始化参数的大小。
+
+假设没有非线性激活函数存在，对于一个线性网络，一套好的初始值分布需要使得每层激活值的方差不变，并且梯度的方差也不变。
+
+一个经验公式是，一个线性全连接层的权值采用均匀分布的值域应当为：
+
+$$
+(-\sqrt{\frac 6{n_{in} + n_{out}}},\sqrt{\frac 6{n_{in} + n_{out}}})
+$$
+
+这个经验公式在有激活函数的非线性网络中的效果仍然优秀。
+
+## 分布偏移和修正
+
+### 协变量偏移
+
+即特征在训练集和验证集的分布不同。
+
+假设训练集的特征分布为 $q(x)$, 验证集的分布为 $p(x)$. 目标是令损失函数在验证集的期望最小:
+
+$$
+\iint l(x, y) p(xy) dxdy\\
+= \iint l(x, y) p(y | x) p(x) dxdy\\
+= \iint l(x, y) q(y | x) q(x) \frac {p(x)}{q(x)} dxdy\\
+$$
+
+在不考虑修正的时候，模型会倾向于令下面的式子最小化:
+
+$$
+\iint l(x, y) q(y | x) q(x) dxdy\\
+= \iint l(x, y) p(y | x) p(x) \frac {q(x)}{p(x)} dxdy
+$$
+
+定义每个特征的修正权重为 $\beta_i = \dfrac {p(x)}{q(x)}$, 则修正后需要最小化的值就是：
+
+$$
+\sum l(x_i, y_i) q(y_i | x_i) q(x_i) \frac {p(x_i)}{q(x_i)}\\
+= \sum  \beta_i l(x_i, y_i) p(y_i | x_i) q(x_i)\\
+$$
+
+为了计算 $\beta$, 可以从训练集和验证集抽取同样数量的特征, 然后计算每个特征出现的条件概率(令 $1$ 表示验证集, 令 $-1$ 表示训练集)：
+
+$$
+P(z = 1|x) = \frac{p(x)}{p(x) + q(x)}\\
+P(z = -1|x) = \frac{q(x)}{p(x) + q(x)}\\
+\frac{P(z = 1|x)}{P(z = -1|x)} = \frac {p(x)}{q(x)} = \beta
+$$
+
+然后利用修正的损失函数进行训练即可。
+
+### 标签偏移
+
+即标签在训练集和验证集的分布不同。
+
+需要最小化的式子和前面的修正类似。但是实现上，由于验证集标签是未知的，所以没法直接求出修正权重 $\beta$.
+
+这里一个妥协的做法是先用已有的模型预测验证集，用验证集标签的估计值作为计算 $\beta$ 的依据.
+
+### 概念偏移
+
+是标签的定义会发生缓慢的改变。
+
+修正这种偏移一般只能依赖在线的算法，逐步更新模型，而不是隔一段时间重新训练。
