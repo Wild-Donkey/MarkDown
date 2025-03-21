@@ -711,3 +711,52 @@ $$
 是标签的定义会发生缓慢的改变。
 
 修正这种偏移一般只能依赖在线的算法，逐步更新模型，而不是隔一段时间重新训练。
+
+# 深度学习计算
+
+`Sequential` 可以串联多个层，构成一个网络，然后封装成一个块。块又能通过 `Sequential` 串联起来, 成为更大的网络.
+
+在 `Sequential` 中, 相同的层可以出现大于一次:
+
+```py
+shared = nn.Linear(8, 8)
+net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
+                    shared, nn.ReLU(),
+                    shared, nn.ReLU(),
+                    nn.Linear(8, 1))
+```
+
+可以认为是这两个线性全连接层共享了一套参数, 计算梯度的时候会以两个位置分别计算, 并且累加.
+
+可以将张量保存在文件里, 事后读取.
+
+```py
+x = torch.arange(4)
+torch.save(x, 'x-file')
+x2 = torch.load('x-file')
+```
+
+测试当前环境是否可以用cuda:
+
+```py
+print(torch.version.cuda) 
+print(torch.cuda.is_available()) 
+print(torch.cuda.device_count())
+```
+
+在 cuda 上进行计算:
+
+```py
+X = torch.ones(2, 3, device=torch.device('cuda')) # 在 gpu0 上定义一个张量
+Y = torch.ones(3, 2) # cpu 上定义另一个张量
+# Z = torch.mm(X, Y) # 禁止在不同设备上进行操作
+Z = torch.mm(X, Y.cuda(0))
+print(Z)
+```
+
+输出:
+
+```
+tensor([[3., 3.],
+        [3., 3.]], device='cuda:0')
+```
