@@ -49,14 +49,14 @@ class LlamaRotaryEmbedding(nn.Module):
     self.original_inv_freq = self.inv_freq
 ```
 
-`inv_freq` 是一个一轴张量, 存储了不同的频率, 长度 (频率的数量) 是 $\lfloor \frac {dim}{2} \rfloor$, 这里 `dim` 是词向量的维数.
+`inv_freq` 是一个一轴张量, 存储了不同的频率, 长度 (频率的数量) 是 $\lfloor \frac {head\_dim}{2} \rfloor$, 这里 `head_dim` 是注意力向量的维数, 因为只有注意力模块内需要进行位置编码.
 
 这是为了将位置信息存储到每个向量的每个分量中, 而每个频率需要用到两个分量来分别存储 $\sin$ 和 $\cos$.
 
 它的值由这个公式给出:
 
 $$
-\text{inv\_freq}_i = \frac {1}{10000^{\frac {2i}{\text{dim}}}}
+\text{inv\_freq}_i = \frac {1}{10000^{\frac {2i}{\text{head\_dim}}}}
 $$
 
 前面的频率高, 后面的频率低.
@@ -86,11 +86,11 @@ def _dynamic_frequency_update(self, position_ids, device):
 
 `inv_freq` 原本只有一轴, 在前后各加一轴, `expand` 操作中, 第一个轴扩展到和 $position_ids$ 的首个轴相同 (`batch`), 第二个轴的 `-1` 表示大小不变.
 
-因此 `inv_freq_expanded` 和 `position_ids_expanded` 的形状分别为: `(batch, dim // 2, 1)` 和 `(batch, 1, seq_len)`. 这两个张量在 `@` 运算符下做矩阵乘法，其实就是对最后两轴的矩阵乘法, 即做 `batch` 次矩阵乘法, 每次矩阵乘法是 `(dim // 2, 1)` 和 `(1, seq_len)` 两个张量运算, 结果是 `(dim // 2, seq_len)`, 作为结果的后两轴, 第一轴则是 `batch`.
+因此 `inv_freq_expanded` 和 `position_ids_expanded` 的形状分别为: `(batch, head_dim // 2, 1)` 和 `(batch, 1, seq_len)`. 这两个张量在 `@` 运算符下做矩阵乘法，其实就是对最后两轴的矩阵乘法, 即做 `batch` 次矩阵乘法, 每次矩阵乘法是 `(head_dim // 2, 1)` 和 `(1, seq_len)` 两个张量运算, 结果是 `(head_dim // 2, seq_len)`, 作为结果的后两轴, 第一轴则是 `batch`.
 
-所以 `freqs` 的形状在转置后两轴 (轴 $1$ 和轴 $2$) 后, 是 `(batch, seq_len, dim // 2)`. 而 `emb` 是两个 `freqs` 在最后一轴上的连接, 形状是 `(batch, seq_len, dim)`.
+所以 `freqs` 的形状在转置后两轴 (轴 $1$ 和轴 $2$) 后, 形状是 `(batch, seq_len, head_dim // 2)`. 而 `emb` 是两个 `freqs` 在最后一轴上的连接, 形状是 `(batch, seq_len, head_dim)`.
 
-`fraqs[i][j][k]` 的意义可以这样理解: 第 `i` 个序列的第 `j` 个元素在第 `k mod (dim // 2)` 频率下旋转的角度.
+`fraqs[i][j][k]` 的意义可以这样理解: 第 `i` 个序列的第 `j` 个元素在第 `k mod (head_dim // 2)` 频率下旋转的角度.
 
 > 有一个比较迷惑的点在于命名中 `inv` 的意义. 因为把 `position_id` 看作旋转的时间 $t$, 把 `inv_freq` 的值和 `position_id` 的值相乘, 得到旋转角度 $\theta$, 所以在 $\theta = t\omtga$ 里, `inv_freq` 相当于角速度 $\omega$. 而频率 $f = \frac {\omega}{2\pi}$. 所以 `inv_freq` 无论是什么都应该是和频率 $f$ 成正比的, `inv` 的存在没有道理.
 
@@ -119,7 +119,54 @@ def forward(self, x, position_ids):
   return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
 ```
 
-输出两个张量, 表示了每个位置在每个频率的 $\sin$ 和 $\cos$.
+输出两个张量, 表示了每个位置在每个频率的 $\sin$ 和 $\cos$. 接下来是在注意力模块中, 应用 `sin` 和 `cos` 进行位置编码.
+
+```py
+def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
+  """Applies Rotary Position Embedding to the query and key tensors.
+
+  Args:
+    q (`torch.Tensor`): The query tensor.
+    k (`torch.Tensor`): The key tensor.
+    cos (`torch.Tensor`): The cosine part of the rotary embedding.
+    sin (`torch.Tensor`): The sine part of the rotary embedding.
+    position_ids (`torch.Tensor`, *optional*):
+      Deprecated and unused.
+    unsqueeze_dim (`int`, *optional*, defaults to 1):
+      The 'unsqueeze_dim' argument specifies the dimension along which to unsqueeze cos[position_ids] and
+      sin[position_ids] so that they can be properly broadcasted to the dimensions of q and k. For example, note
+      that cos[position_ids] and sin[position_ids] have the shape [batch_size, seq_len, head_dim]. Then, if q and
+      k have the shape [batch_size, heads, seq_len, head_dim], then setting unsqueeze_dim=1 makes
+      cos[position_ids] and sin[position_ids] broadcastable to the shapes of q and k. Similarly, if q and k have
+      the shape [batch_size, seq_len, heads, head_dim], then set unsqueeze_dim=2.
+  Returns:
+    `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
+  """
+  cos = cos.unsqueeze(unsqueeze_dim)
+  sin = sin.unsqueeze(unsqueeze_dim)
+  q_embed = (q * cos) + (rotate_half(q) * sin)
+  k_embed = (k * cos) + (rotate_half(k) * sin)
+  return q_embed, k_embed
+```
+
+用 `unsqueeze` 给两个张量插入一个轴, `unsqueeze_dim` 指定了新轴的位置, 将张量的形状变成 `(batch, 1, seq_len, head_dim)`, 以便在接下来的计算中利用广播机制.
+
+`rotate_half` 函数的操作类似于平面向量 $(x, y)$ 旋转 $90^{\circ}$ 到 $(-y, x)$ 的操作. 只不过这里的 $x$ 和 $y$ 是张量沿最后一轴切开的前一半和后一半. 这里 `q` 的形状是 `(batch, att_heads, seq_len, head_dim)`, 那么将它沿最后一轴切开, 前半部分是 `ql`, 后半部分是 `qr`, 形状都是 `(batch, att_heads, seq_len, head_dim // 2)`, 然后将 `-qr` 和 `ql` 沿最后一轴连结, 形状还原, 这就是 `rotate_half(q)` 的结果.
+
+将 `rotate_half(q)` 利用广播机制, 逐元素和 `sin` 相乘, 加上 `q` 本身逐元素和 `cos` 相乘. 微观地考察新的 `(batch, att_heads, seq_len, head_dim)` 张量的每个 `head_dim` 维向量 `q_embed[i][j][k]` 的意义, 应当是第 $i$ 个序列的第 $j$ 个注意力头上, 序列上第 $k$ 个向量, 叠加了位置信息的结果.
+
+将这个向量记为 $y$, 原向量 `q_{i, j, k}` 记为 $x$.
+
+假设这个向量的位置是 $Pos$, 那么它在 $\omega_i$ 上旋转的角度就是 $\theta_i = \omega_i Pos$. 共 $\frac{head\_dim}2$ 个频率, 这里枚举变量 $i$ 的范围也是 $[0, \frac{head\_dim}2)$. 接下来分析每一个分量的意义:
+
+$$
+y_i = \cos(\theta_i)x_i - \sin(\theta_i) x_{\frac{head\_dim}2 + i}\\
+y_{\frac {head\_dim}2 + i} = \cos(\theta_i)x_{\frac {head\_dim}2 + i} + \sin(\theta_i) x_i
+$$
+
+分析几何意义, 将 $(x_i, x_{\frac{head\_dim}2 + i})$ 逆时针旋转角度 $\theta_i$ 恰好就是 $(y_i, y_{\frac{head\_dim}2 + i})$.
+
+所以旋转嵌入实际做的事情就是将输入张量沿最后一轴分成两半, 将前后两半对应的元素当成是二维向量的坐标, 然后将所有二维向量逆时针旋转对应的角度. 由于输入向量共 `head_dim` 维, 所以恰好可以看成是 `head_dim // 2` 个二维向量, 又存在 `head_dim // 2` 个频率, 和位置信息一起, 规定了每个向量旋转的角度.
 
 ## Normalization
 
@@ -246,37 +293,49 @@ def forward(
 
   cos, sin = position_embeddings
   query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
-
-  if past_key_value is not None:
-    # sin and cos are specific to RoPE models; cache_position needed for the static cache
-    cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
-    key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
-
-  attention_interface: Callable = eager_attention_forward
-  if self.config._attn_implementation != "eager":
-    if self.config._attn_implementation == "sdpa" and kwargs.get("output_attentions", False):
-      logger.warning_once(
-        "`torch.nn.functional.scaled_dot_product_attention` does not support `output_attentions=True`. Falling back to "
-        'eager attention. This warning can be removed using the argument `attn_implementation="eager"` when loading the model.'
-      )
-    else:
-      attention_interface = ALL_ATTENTION_FUNCTIONS[self.config._attn_implementation]
-
-  attn_output, attn_weights = attention_interface(
-    self,
-    query_states,
-    key_states,
-    value_states,
-    attention_mask,
-    dropout=0.0 if not self.training else self.attention_dropout,
-    scaling=self.scaling,
-    **kwargs,
-  )
-
-  attn_output = attn_output.reshape(*input_shape, -1).contiguous()
-  attn_output = self.o_proj(attn_output)
-  return attn_output, attn_weights
 ```
+
+先看前面这部分, `hidden_states.shape[:-1]` 提取了隐藏状态的形状, `hidden_states` 的形状应当是 `(batch, seq_len, dim)` 的. 但是 `[:-1]` 删掉了最后一轴, 得到 `(batch, seq_len)`. 然后用 `*` 将元组 `input_shape` 解包, 在后面加上两个轴. 其中倒数第二个轴规定的 `-1` 表示这一轴的大小自动计算, 维持张量的元素数不变. 这样计算的 `hidden_shape` 也就是 `(batch, seq_len, -1, head_dim)`.
+
+根据前面的分析, `q_proj` 的结果的形状应当是 `(batch, seq_len, att_heads * head_dim)`, 而 `k_proj` 和 `v_proj` 的形状是 `(batch, seq_len, kv_heads * head_dim)`. 通过 `view` 在不改变元素存储位置的情况下, 自动计算的第三个轴显然应该是对应的注意力头数, 最后转置中间两个轴, 得到的张量形状应该分别是: `(batch, att_heads, seq_len, head_dim)`, `(batch, kv_heads, seq_len, head_dim)`. 每个头应该处理的也便是后两轴的信息, 长度为 `seq_len` 的 `head_dim` 维向量的序列.
+
+通过旋转嵌入, 将位置信息加入到查询和键中.
+
+```py
+if past_key_value is not None:
+  # sin and cos are specific to RoPE models; cache_position needed for the static cache
+  cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
+  key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
+
+attention_interface: Callable = eager_attention_forward
+if self.config._attn_implementation != "eager":
+  if self.config._attn_implementation == "sdpa" and kwargs.get("output_attentions", False):
+    logger.warning_once(
+      "`torch.nn.functional.scaled_dot_product_attention` does not support `output_attentions=True`. Falling back to "
+      'eager attention. This warning can be removed using the argument `attn_implementation="eager"` when loading the model.'
+    )
+  else:
+    attention_interface = ALL_ATTENTION_FUNCTIONS[self.config._attn_implementation]
+
+attn_output, attn_weights = attention_interface(
+  self,
+  query_states,
+  key_states,
+  value_states,
+  attention_mask,
+  dropout=0.0 if not self.training else self.attention_dropout,
+  scaling=self.scaling,
+  **kwargs,
+)
+
+attn_output = attn_output.reshape(*input_shape, -1).contiguous()
+attn_output = self.o_proj(attn_output)
+return attn_output, attn_weights
+```
+
+更新了 kv_cache, 然后选择了注意力计算函数 `attention_interface`, 这部分是外部定义的, 作用是根据给定的查询, 键-值, 掩码, 给出对应的注意力输出.
+
+通过 `attention_interface` 函数得到注意力输出后, 将 `attn_output` 的形状从 `(batch, att_heads, seq_len, head_dim)` 变成 `(batch, seqlen, -1)`, 最后一轴的大小经过自动计算后应当是 `att_heads * head_dim`. `contiguous` 则是将张量的内存重新整理, 使得元素的存储连续. 最后通过 `o_proj` 将 `att_heads * head_dim` 维的向量恢复成 `dim` 维的向量.
 
 ## Decoder Layer
 
@@ -295,38 +354,38 @@ class LlamaDecoderLayer(nn.Module):
     self.post_attention_layernorm = LlamaRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 ```
 
-在层内部采用了:
+采用了残差连接, 输出为输入和残差的和.
 
 ```py
-  residual = hidden_states
+residual = hidden_states
 
-  hidden_states = self.input_layernorm(hidden_states)
+hidden_states = self.input_layernorm(hidden_states)
 
-  # Self Attention
-  hidden_states, self_attn_weights = self.self_attn(
-    hidden_states=hidden_states,
-    attention_mask=attention_mask,
-    position_ids=position_ids,
-    past_key_value=past_key_value,
-    output_attentions=output_attentions,
-    use_cache=use_cache,
-    cache_position=cache_position,
-    position_embeddings=position_embeddings,
-    **kwargs,
-  )
-  hidden_states = residual + hidden_states
+# Self Attention
+hidden_states, self_attn_weights = self.self_attn(
+  hidden_states=hidden_states,
+  attention_mask=attention_mask,
+  position_ids=position_ids,
+  past_key_value=past_key_value,
+  output_attentions=output_attentions,
+  use_cache=use_cache,
+  cache_position=cache_position,
+  position_embeddings=position_embeddings,
+  **kwargs,
+)
+hidden_states = residual + hidden_states
 
-  # Fully Connected
-  residual = hidden_states
-  hidden_states = self.post_attention_layernorm(hidden_states)
-  hidden_states = self.mlp(hidden_states)
-  hidden_states = residual + hidden_states
+# Fully Connected
+residual = hidden_states
+hidden_states = self.post_attention_layernorm(hidden_states)
+hidden_states = self.mlp(hidden_states)
+hidden_states = residual + hidden_states
 
-  outputs = (hidden_states,)
-  if output_attentions:
-      outputs += (self_attn_weights,)
+outputs = (hidden_states,)
+if output_attentions:
+    outputs += (self_attn_weights,)
 
-  return outputs
+return outputs
 ```
 
 
