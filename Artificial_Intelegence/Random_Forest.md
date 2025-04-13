@@ -161,6 +161,14 @@ NVIDIA cuML: harness the power of CUDA on NVIDIA GPUs using familiar scikit-lear
 
 [SynMeter](https://github.com/zealscott/SynMeter)
 
+## Plan
 
+try cuML optimize
+
+Cython + cuda + OpenMP (from cuML)
+
+OpenMP for CPU parallel: 1 tree per thread
+
+cuda for GPU parallel: calculating metrics
 
 ddl: 04_22/29
