@@ -1,3 +1,5 @@
+[TOC]
+
 # Llama 代码阅读
 
 Llama 是基于 Decoder only 架构的语言模型。
@@ -354,7 +356,9 @@ class LlamaDecoderLayer(nn.Module):
     self.post_attention_layernorm = LlamaRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 ```
 
-采用了残差连接, 输出为输入和残差的和.
+在注意力层和 MLP 层都采用了残差连接, 输出为输入和残差的和. 让模型学习的是残差而不是输出, 是为了防止加入模块后, 不存在参数集合能够输出原来的输出. 采用残差连接后, 至少可以保证可能的输出一定不会更劣.
+
+在自注意力模块前后都存在规范化层, 保证了数值大小的相对稳定.
 
 ```py
 residual = hidden_states
@@ -388,8 +392,7 @@ if output_attentions:
 return outputs
 ```
 
-
-## 传递
+## Llama.forward
 
 初始化: 
 
@@ -410,7 +413,9 @@ all_self_attns = () if output_attentions else None
 
 接下来就是在所有 decoder 中依次传递：
 
-中间区分了是否记录梯度检查点两种传递方式，但是流程都是将现有的数据放进解码器中，然后得到对应的 `layer_outputs`.
+中间区分了是否记录梯度检查点两种传递方式，但是流程都是将现有的数据放进解码器中，然后得到对应的 `layer_outputs`. 
+
+这里 `layer_outputs` 是一个元组, 它的首个元素才是输出的隐藏状态, 也是作为下一个 decoder 的输入的隐藏状态.
 
 ```py
 for decoder_layer in self.layers[: self.config.num_hidden_layers]:
@@ -448,7 +453,7 @@ for decoder_layer in self.layers[: self.config.num_hidden_layers]:
     all_self_attns += (layer_outputs[1],)
 ```
 
-在传递经过所有层后再归一化，输出。
+最后根据 `config` 的规定输出对应的结果到元组 `output` 中.
 
 ```py
 # add hidden states from the last decoder layer
@@ -462,4 +467,5 @@ output = BaseModelOutputWithPast(
   hidden_states=all_hidden_states,
   attentions=all_self_attns,
 )
+return output if return_dict else output.to_tuple()
 ```

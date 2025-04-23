@@ -153,6 +153,9 @@ In a tree, $W(x_i, x') = \frac 1{k'}$ if $x_i$ is one of the k' points in the sa
 
 NVIDIA cuML: harness the power of CUDA on NVIDIA GPUs using familiar scikit-learn APIs and Python libraries
 
+[cuML API](https://docs.rapids.ai/api/cuml/stable/api/#regression-and-classification)
+[Training and Evaluating Machine Learning Models](https://docs.rapids.ai/api/cuml/stable/estimator_intro/#Random-Forest-Classification-and-Accuracy-metrics)
+
 ## Implement
 
 > [cuML implement](https://github.com/rapidsai/cuml/tree/fdc14b38fcff98103258ef5410a53205b55b90c9/cpp/src/randomforest)
