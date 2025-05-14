@@ -68,6 +68,10 @@ $$
 交叉验证法: 分成 $k$ 个互斥子集, 每次用一个子集做测试集, 剩下的 $k - 1$ 个做训练集.
 自助法: 有放回随机抽样.
 
+## 生成-判别
+
+可以认为监督学习是在估计 $P(X, Y)$, 当认为 $P(X, Y) = P(X|Y)P(Y)$ 时, 称为生成学习, 否则直接估计 $P(X, Y)$ 即为判别学习.
+
 # k-NN
 
 假设: 相似的输入有相似的输出.
@@ -130,7 +134,251 @@ $$
 
 类离群点的寻找可以给出一个阈值 $r < k$, 如果一个点的 $k$ 近邻中有大于等于 $r$ 个和它不在同一个类别, 则删除之.
 
+# 感知机
+
+假设: 二分类, 线性可分.
+
+求一个超平面: $w^Tx + b = 0$, 将空间中的点分成两类.
+
+为了处理偏置项, 增加一维, 令 $x$ 在这个维度上固定为 $1$, 则这个维度上的 $w$ 值就相当于 $b$, 即对增加维度后的 $x$ 只需要学习 $w$, 得到过原点的超平面 $wx = 0$ 即可.
+
+记两类的 $y$ 分别为 ${+1, -1}$, 那么我们认为 $w^Tx > 0$ 的点的标签应当是 $1$, $w^Tx < 0$ 的点的标签应当是 $-1$.
+
+## 迭代法
+
+$w$ 加上一个向量相当于将平面的法向量沿增量的方向拖拽. 对于 $y = 1$, 但是 $w^Tx < 0$ 的样本, 我们希望拖拽 $w$ 所以需要 $x$; 反之对于 $y = -1$, 但是 $w^Tx > 0$ 的样本, 我们希望推开 $w$, 所以减去 $x$. 对于其他正确分类的情况, 便不需要进行更多调整.
+
+更一般的, 只要 $yw^Tx \leq 0$, 就用 $w + yx$ 更新 $w$.
+
+规定一个迭代次数上界, 每次遍历所有样本点, 如果所有样本点都被正确分类或到达最大迭代次数停止.
+
+## 收敛
+
+对于线性可分的数据, 感知机可在有限次迭代后找到一个可分离两个类的超平面.
+
+假设存在一个解 $w^*$. 不失一般性, 将所有数据点缩放到单位超球内, 然后将 $w^*$ 标准化. 定义 Margin $\gamma = \min_{(x_i, y_i)\in D} |x_i^T w^*|$. 也就是距离超平面最近的点的距离.
+
+这时断言: 感知机最多出现 $\frac 1{\gamma^2}$ 次错误.
+
+证明: 对于 $w$ 到 $w + yx$ 的一次更新, 有 $y(w^Tx) \leq 0$, 不然不更新, 还有 $y({w^*}^Tx) > 0$, 因为 $w^*$ 是一个解.
+
+$$
+{(w+yx)}^Tw^* - w^Tw^* = yx^T w^* > 0
+$$
+
+又因为 $\gamma$ 的定义, 有 $|{(w+yx)}^Tw^* - w^Tw^*| \geq \gamma$. 即每次更新 $w^Tw^*$ 至少增加 $\gamma$.
+
+$$
+{(w+yx)}^T(w+yx) - w^Tw = 2yw^Tx + y^2x^Tx = 2yw^Tx + |x|^2 \leq |x|^2 \leq 1
+$$
+
+所以每次更新 ${(w+yx)}^T(w+yx)$ 最多增加 $1$. 假设做了 $M$ 次更新, $M\gamma \leq w^Tw^* \leq |w| = \sqrt{w^Tw} \leq \sqrt M$, 因此 $\gamma \leq \frac 1{\sqrt M}$, 得到: $M \leq \frac 1{\gamma^2}$ 
+
+如果不缩放, 记 $\alpha = \max |x|$, 则有 $M \leq {(\frac 1{\alpha})}^2$.
+
+## 思考
+
+其实感知机的训练过程可以认为是梯度下降的过程. 考虑损失函数为: 如果正确分类就是 $0$, 否则损失就是点到超平面的距离 $|w^Tx|$, 关于 $w$ 的梯度就是 $x$. 所以减去梯度 $x$.
+
+# 概率估计
+
+## MLE (最大似然估计)
+
+目标: 似然函数最大.
+
+先对数据的分布做假设, 考虑在假设中, 训练数据 $D$ 出现的概率. 我们希望找到让 $D$ 出现的概率最大的分布参数 $\theta$. 如果所有样本都是独立同分布的, 那么整个训练数据出现的概率应该是它们的乘积.
+
+令概率的乘积最大也就是令概率的对数的总和最大. 我们对这个似然函数进行求导, 然后令其等于 $0$ 即可找到 $\theta$.
+
+## MAP (最大后验估计)
+
+### Beta 分布
+
+$$
+P(\theta) = \frac{\theta^{\alpha - 1}(1 - \theta)^{\beta - 1}}{B(\alpha, \beta)}
+$$
+
+其中 $B(\alpha, \beta)$ 是 Beta 函数, 确保了 $P$ 的积分为 $1$:
+
+$$
+B(\alpha, \beta) = \frac{\Gamma (\alpha) \Gamma (\beta)}{\Gamma (\alpha + \beta)}
+$$
+
+$\Gamma (z)$ 是 Gamma 函数, 可以感性理解为是 $(z - 1)!$ 的插值.
+
+### MAP
+
+我们对于 $\theta$ 的先验认识是 Beta 分布. MAP 需要做的是基于训练数据 $D$, 选择一个最有可能的 $\hat \theta$ 作为后验估计.
+
+由于 $P(\theta | D) = \frac{P(D|\theta)P(\theta)}{P(D)}$, $D$ 已经出现了, 可以认为是 $1$, 所以令 $P(\theta | D)$ 最大, 就是令 $\log P(\theta | D)$ 最大, 就是令 $\log P(D|\theta) + \log P(\theta)$ 最大:
+
+$$
+\arg \max_{\theta} \log P(D|\theta) + \log P(\theta)\\
+= \arg \max_{\theta} \sum_{x \in D} \log P(X|\theta) + (\alpha - 1) \log \theta + (\beta - 1) \log (1 - \theta)
+$$
+
+当样本足够多, $\hat \theta_{MAP} \to \hat \theta_{MLE}$. 如果样本较少, 那么 MAP 的可靠性更大程度上取决于先验.
+
+本质上 MAP 是添加了正则项的 MLE.
+
+## 二项分布的特化
+
+$$
+\arg \max_{\theta} \sum_{x \in D} \log P(X|\theta)\\
+= \arg \max_{\theta} n_1 \log \theta + n_0 \log \theta\\
+\arg \max_{\theta} \log P(D|\theta) + \log P(\theta)\\
+= \arg \max_{\theta} (n_1 + \alpha - 1) \log \theta + (n_0 + \beta - 1) \log \theta\\
+$$
+
+在 MLE 中, $\theta$ 的闭式解是 $\frac {n_1}{n}$, 在 MAP 中是 $\frac {n_1 + \alpha - 1}{n + \beta + \alpha - 2}$.
+
+# 朴素贝叶斯
+
+假设: feature 互相独立.
+
+则 $P(x|y) = \prod P(x_i|y)$.
+
+朴素贝叶斯分类器是一个线性分类器, 感性理解就是由于它假设特征独立, 所以它是没法解决异或问题的.
+
+最大化 $D$ 中每对 $(x, y)$ 出现的概率的乘积, 也就是最大化概率对数的总和.
+
+$$
+\arg \max_y P(y|x)\\
+= \arg \max_y P(x|y)P(y)\\
+= \arg \max_y \sum \log P(x_i|y) + \log P(y)\\
+$$
+
+接着就可以用训练数据来拟合后验分布了, 其中 $K_{\alpha}$ 表示特征 $\alpha$ 的类别数量:
+
+$$
+[\theta_{jc}]_\alpha = \frac{\sum [y_i == c] * [x_{i\alpha} == j] + l}{\sum [y_i == c] + lK_{\alpha}}
+pi_{c} = \frac{n_c}{n}
+$$
+
+平滑参数 $l = 0$ 的时候, 我们相当于对每个取值建立了 MLE 估计器. 当 $l = 1$ 时, 即为拉普拉斯平滑.
+
+预测时, 只需令各个 feature 的后验概率尽可能大即可:
+
+$$
+h(x) = \arg \max_y \prod P(x_\alpha|y)P(y)\\
+\arg \max_y \prod [\theta_{jy}]_\alpha \frac {\sum {y_i = y}}n\\
+$$
+
+## 推广到整数特征
+
+用多项分布代替二项分布:
+
+令 $m = \sum x_i$, 则:
+
+$$
+P(x|m,y) = \frac {m!\prod (\theta_{ic})^{x_i}}{\prod x_i!}\\
+\theta_{\alpha c} = \frac{\sum [y == c]x_{i\alpha} + l}{\sum [y == c]m_i + ld}
+$$
+
+预测:
+
+$$
+h(x) = \arg \max_y \prod P(x_\alpha|y)P(y)\\
+= \arg \max_y \prod \theta_{jy}^{x_\alpha} \frac {\sum {y_i = y}}n\\
+$$
+
+如果是二分类, 则:
+
+$$
+[w]_\alpha =  \log \theta_{\alpha +} - \log \theta_{\alpha -}\\
+b =  \log \pi_{+} - \log \pi_{-}\\
+$$
+
+则 $w^Tx + b > 0$ 时预测 $y = +$, 否则 $y = -$. 这证明了朴素贝叶斯分类器是线性分类器.
+
+![alt text](image.png)
+
+## 推广到连续特征
+
+使用高斯分布:
+
+$$
+P(x_\alpha|y) = \frac 1{\sqrt{2\pi}\sigma_{\alpha c}} e^{-\frac 12(\frac{x_\alpha - \mu_{\alpha c}}{\sigma_{\alpha c}})^2}\\
+\mu_{\alpha c} = \frac {\sum [y_i == c]x_{i\alpha}}{n_c}\\
+\sigma^2_{\alpha c} = \frac {\sum [y_i == c](x_{i\alpha} - \mu_{\alpha c})^2}{n_c}\\
+$$
+
+将每一维合起来, 得到总的高维高斯分布的参数 $\mu_c$ 和 $\Sigma_c$, $\mu_c$ 的分量就是 $\mu_{\alpha c}$; 而协方差矩阵 $\Sigma_c$ 是一个对角矩阵, 对角线元素是 $\sigma^2_{\alpha c}$, 剩下的元素全是 $0$, 这是因为假设了所有特征互相独立.
+
+预测的式子和上面原理相同, 都是用贝叶斯公式推出 $P(y|x)$.
+
+## 逻辑回归
+
+对于二分类问题, 高斯朴素贝叶斯本质上是逻辑回归.
+
+![alt text](image-1.png)
+
+高斯朴素贝叶斯二分类器的决策边界:
+
+$$
+\log \frac {P(+|x)}{P(-|x)} = w^Tx + b\\
+\frac {P(+|x)}{P(-|x)} = e^{w^Tx + b}\\
+\frac {P(+|x)}{1 - P(+|x)} = e^{w^Tx + b}\\
+P(+|x) = e^{w^Tx + b}(1 - P(+|x))\\
+P(+|x) = \frac{e^{w^Tx + b}}{1 + e^{w^Tx + b}}\\
+P(+|x) = \frac{1}{1 + e^{-w^Tx - b}}\\
+P(-|x) = \frac{1}{1 + e^{w^Tx + b}}\\
+P(y|x) = \frac{1}{1 + e^{y(w^Tx + b)}}\\
+$$
+
+$P(y|x)$ 的形式符合 sigmoid 函数.
+
+我们需要得到 $P(y|x)$ 的参数 $w$, $b$, 仍然是增加一维, 吸收掉 $b$. 如果用 MLE 估计, 则:
+
+$$
+w = \argmin_w \sum \log{(1 + e^{-y_iw^Tx_i})}
+$$
+
+直接令梯度为 $0$ 难以求出闭式解, 所以进行梯度下降.
+
+在 MAP 中, 假设 $w$ 的先验为 $n$ 元标准正态分布, 加入正则项:
+
+$$
+w = \argmin_w \sum \log{(1 + e^{-y_iw^Tx_i})} + \lambda w^Tw
+$$
+
+同样没有闭式解, 需要梯度下降.
+
+与生成算法朴素贝叶斯直接求出闭式解之后计算出 $P(y)P(x|y)$ 不同, 逻辑回归是判别算法.
+
+# 梯度下降
+
+## 梯度
+
+泰勒展开的一次项是梯度, 二次项是 Hessian 矩阵.
+
+$$
+l(w + s) \approx l(w) + s^Tg(w) + \frac 12 s^TH(w)s
+$$
+
+## AdaGrad
+
+对每个特征单独计算偏导数 $g_i$, 然后对每个特征记录历史偏导数的平方和 $z_i = \sum_{j = 1}^k g_i^2$, 则本次学习率就是 $\frac{\eta g_i}{\sqrt z_i + \epsilon}$. 学习率单调下降, 符合一般梯度下降的规律. (收敛之前步长小)
+
+## 牛顿迭代
+
+考虑泰勒展开后的结果达到局部最优值, 则 $s^T$ 的系数为 $0$.
+
+$$
+g(w) + H(w)s = 0\\
+s = -g(w)(H(w))^{-1}\\
+w^* = w - (H(w))^{-1}g(w)
+$$
+
+二次收敛, 对于二次以内的函数, 一步收敛 (得到闭式解).
+
+优化: 只计算 $H(w)$ 的对角线项, 减小学习率, 本质上 mix 了牛顿迭代和梯度下降.
+
+优化: 可以先做梯度下降, 接近局部最优后用牛顿迭代. (可以防止牛顿迭代发散)
+
 # 核方法
+
+
 
 ## 核函数
 
@@ -168,7 +416,7 @@ $|\Sigma|$ 表示协方差矩阵的行列式.
 
 我们认为, 我们需要的函数 $f(x)$ 对于一些输入 $x_1, x_2, ..., x_n$, 相似的 $x$ 就会得到相似的 $f(x)$.
 
-则 $f(x_1), f(x_2), ..., f(x_n) \~ N(\mu(x), K(x,x'))$, $f(x_i)$ 和 $f(x_j)$ 的协方差, 也就是分布的相似程度, 也就是 $K(x_i, x_j)$.
+则 $f(x_1), f(x_2), ..., f(x_n) \sim N(\mu(x), K(x,x'))$, $f(x_i)$ 和 $f(x_j)$ 的协方差, 也就是分布的相似程度, 也就是 $K(x_i, x_j)$.
 
 对于训练数据和测试数据, 我们把它们放在同一个分布里面:
 
