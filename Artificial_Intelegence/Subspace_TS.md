@@ -22,8 +22,6 @@ Problem: Data lay in a cream. (main dim be the $h$ of the cream)
 
 Scoring for feature-importance.
 
-
-
 ## Strange
 
 $$
