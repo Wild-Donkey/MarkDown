@@ -540,6 +540,32 @@ $$
 \argmin_h R(h)
 $$
 
+# 期望分析
+
+假设一个 $x$ 对应的 $y$ 并不唯一, 而是一个分布.
+
+训练数据 $D$ 是在某个分布中采样的, 我们用 $D$ 训练了一个符合 $D$ 分布的学习器 $h_D$. 假设存在用全体分布训练的学习器 $\overline h$ (显然是不存在的).
+
+计算 $h_D$ 在同分布下采样的训练数据 $(x, y)$ 上的损失 (下面以均方损失为例):
+
+$$
+\begin{aligned}
+&E_{x, y, D}(h_D(x) - y)^2\\
+= &E_{x, y, D}(h_D(x) - \overline h(x) + \overline h(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + 2E_{x, y, D} (h_D(x) - \overline h(x))(\overline h(x) - y) + E_{x, y}(\overline h(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + 2E_{x, y} (\overline h(x) - \overline h(x))(\overline h(x) - y) + E_{x, y}(\overline h(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + E_{x, y}(\overline h(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + E_{x, y}(\overline h(x) - \overline y(x) + \overline y(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + E_{x}(\overline h(x) - \overline y(x))^2 + 2E_{x, y}(\overline h(x) - \overline y(x))(\overline y(x) - y) + E_{x, y}(\overline y(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + E_{x}(\overline h(x) - \overline y(x))^2 + 2E_{x}(\overline h(x) - \overline y(x))(\overline y(x) - \overline y(x)) + E_{x, y}(\overline y(x) - y)^2\\
+= &E_{x, D}(h_D(x) - \overline h(x))^2 + E_{x}(\overline h(x) - \overline y(x))^2 + E_{x, y}(\overline y(x) - y)^2\\
+\end{aligned}
+$$
+
+其中, 第一项 $h_D$ 和 $\overline h$ 的方差, 表示过拟合程度; 第二项 $\overline h$ 和 $\overline y$ 的偏差的平方, 指示了算法固有的偏差; 第三项 $\overline y$ 和 $y$ 的偏差, 表示的是固有分布的方差, 也就是噪声.
+
+模型过拟合的时候, 方差更大; 欠拟合的时候, 偏差更大.
+
 # 线性回归
 
 标量 $x$ 对标量 $y$: 简单线性回归.
@@ -574,17 +600,67 @@ $$
 
 # 核方法
 
+对于线性不可分的数据, 可以通过升维让其在高维空间中线性可分.
 
+高维度的计算性能差, 考虑不是学习 $w$, 而是直接学习 $w^Tx$ 这种高维度函数, 通过低维的 $x$ 输入, 直接求出高维运算的结果. (高维运算一般是点积)
+
+在常见的损失函数中, $w$ 的梯度应当是 $x$ 的线性组合: $w = \sum \alpha_i x_i$. 所以 $w^Tx_i = \sum \alpha_j x_j^Tx_i$.
+
+所以我们的问题就被分解成: 学习权重 $\alpha$, 快速计算 $x$ 的点积 $x_i^Tx_j$.
+
+如果选择均方误差, 则梯度就是 $\sum 2(w^Tx_i - y_i) x_i$, $x_i$ 系数是 $\eta 2(w^Tx_i - y_i)$, 记作 $\eta \gamma_i$. 所以每次梯度下降的 $\alpha_i$ 更新为 $\alpha_i - \eta \gamma_i$. 显然 $\gamma$ 的计算也可以通过计算 $w^Tx_i + y_i = \sum \alpha_j x_j^Tx_i + y_i$ 来计算.
 
 ## 核函数
 
-衡量输入相似度的函数.
+接下来的问题就只剩求点积了. 核函数 $k(x_i, x_j)$ 就是计算高维 $\phi(x_i)\phi(x_j)$ 的函数. 通常计算两两内积后, 为了防止重复计算, 我们都会放在核矩阵 $K$ 中随时取用.
 
-## 核矩阵
+### 多项式核
 
-$K$.
+$$
+\prod_{i = 1}^{d} (1 + x_iz_i)\\
+= [1, x_1, x_2, ..., x_d, x_1x_2, ..., x_1x_2...x_d][1, z_1, z_2, ..., z_d, z_1z_2, ..., z_1z_2...z_d]^T
+$$
 
-$n$ 阶方阵, 元素是 $n$ 个输入的两两核函数值.
+可在 $O(d)$ 时间内计算 $O(2^d)$ 维的点积. 事实上, 多项式的指数不必选择 $d$, 较小的指数也能有不错的表现.
+
+### 高斯核
+
+$$
+e^{-\frac{||x-z||^2}{\sigma^2}}\\
+$$
+
+对它泰勒展开之后可以得到:
+
+$$
+\sum_{i = 0}^{\infin} (\frac{||x-z||^2}{\sigma^2})^i\frac{(-1)^i}{i!}
+$$
+
+$||x-z||^2 = x^Tx + z^Tz + 2x^Tz$ 这里面有 $x$ 和 $z$ 的内积, 而这一项的次数从 $0$ 到 $\infin$. 所以可以认为存在无穷维的信息.
+
+### 指数核
+
+$$
+e^{-\frac{||x-z||}{2\sigma^2}}\\
+$$
+
+### 拉普拉斯核
+
+$$
+e^{-\frac{|x-z|}{\sigma}}\\
+$$
+
+### Sigmoid 核
+
+$$
+\tanh(a^Tx + c)\\
+\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}
+$$
+
+## 条件
+
+良定义的核函数需要满足是某些实际向量的内积, 当且仅当核矩阵是半正定的.
+
+这两者可以互推, 因为正定的 $K$ 可以分解成 $\Phi^T\Phi$, 而对任意非零 $q$ 又可以得到 $q^T\Phi^T\Phi q \geq 0$.
 
 # 高斯过程
 
@@ -680,6 +756,14 @@ $$
 \frac {\partial A^TxB}{\partial x} = AB^T\\
 \frac {\partial A^Tx^TB}{\partial x} = BA^T\\
 $$
+
+## 正定/半正定
+
+矩阵 $A$ 是半正定的, 当且仅当对所有非零的 $q$, 有 $q^TAq \geq 0$.
+
+矩阵 $A$ 是正定的, 当且仅当对所有非零的 $q$, 有 $q^TAq > 0$.
+
+## 特征值/特征向量
 
 # 最后一节
 
