@@ -164,6 +164,57 @@ NVIDIA cuML: harness the power of CUDA on NVIDIA GPUs using familiar scikit-lear
 
 [SynMeter](https://github.com/zealscott/SynMeter)
 
+## Done
+
+I studied the code of a CUDA-based random forest library called thunderGBM. Since the library has not been maintained for a long time, it can no longer be compiled properly with the current CUDA 12. After modifying the code and recompiling it, I replaced the dynamic library files in the Python package, fixed the Python thundergbm, and integrated the updated package into our experimental code. Unfortunately, although thunderGBM improved GPU utilization, its overall stability remains unsatisfactory.
+
+Next, I plan to replace thunderGBM's random forest implementation with cuML. However, due to the limited number of cores and threads on my machine, the optimization was not very significant. I believe that the parallel implementation of thunderGBM would perform better on a server with more cores.
+
+adult:
+(80% train, 20% test)
+sklearn: 42.92106890678406s
+sklearnRegr_and_myClas: 38.301167011260986s
+sklearnRegr_and_myClas_parallel: 7.111868143081665s
+sklearn_parallel: 7.163606882095337s
+cuML: 14.758105993270874s
+cuML_parallel: 12.961956977844238s
+my_parallel: 2.7210822105407715s
+
+news:
+sklearn_parallel: 380.5815238952637s
+4 MSL 5.0447571611443685e-08
+11 MSL 0.011423899609030145
+12 MSL 0.007590541051835036
+14 MSL 0.0038345819144911084
+38 MSL 0.00042786694134679793
+39 MSL 0.0008945897733937104
+40 MSL 0.000518226548419579
+41 MSL 0.0008354308389436489
+42 MSL 0.0004271832322414798
+43 MSL 0.003748509014284209
+49 MSL 0.0014227425825035708
+51 MSL 0.016177781161845026
+52 MSL 0.0017540768994114572
+53 MSL 0.014384449543452365
+54 MSL 0.0012318654931866852
+55 MSL 0.02628461332862743
+56 MSL 0.044964308146361896
+57 MSL 3.6990568308149803e-08
+58 MSL 1.4196858074066377e-07
+59 MSL 81806129.83340344
+
+my_parallel: 77.39582300186157s
+49 MSL 0.017658283816454536
+52 MSL 0.01952711626334497
+53 MSL 0.10108411983002594
+54 MSL 0.01033140319815616
+55 MSL 0.11269539222807146
+56 MSL 0.07374729952653962
+59 MSL 67897772.96412708
+57 MSL 0.037226179920556136
+58 MSL 0.056781647789839976
+18 MSL 3.1652039764365663
+
 ## Plan
 
 try cuML optimize
