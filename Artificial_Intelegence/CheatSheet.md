@@ -286,7 +286,7 @@ $$
 
 ## 思考
 
-其实感知机的训练过程可以认为是梯度下降的过程. 考虑损失函数为: 如果正确分类就是 $0$, 否则损失就是点到超平面的距离 $|w^Tx|$, 关于 $w$ 的梯度就是 $x$. 所以减去梯度 $x$.
+其实感知机的训练过程可以认为是梯度下降的过程. 考虑损失函数为: $\min{\left(0,-yw^Tx\right)}$ 如果正确分类就是 $0$, 否则损失就是点到超平面的距离 $|w^Tx|$, 关于 $w$ 的梯度就是 $x$. 所以减去梯度 $x$.
 
 # 支持向量机 (SVM)
 
@@ -336,7 +336,7 @@ $$
 
 $$
 \argmin_{w,b} w^Tw + C\sum \xi\\
-y(w^Tx + b) \geq 1 - \xi
+y(w^Tx + b) \geq 1 - \xi\\
 \xi \geq 0\\
 $$
 
@@ -393,7 +393,7 @@ $$
 w = \sum \alpha_i y_ix_i\\
 0 = \sum \alpha_i y_i
 \alpha_i(1 - \xi_i - y_i(w^Tx_i + b)) = 0\\
-\mu_i \xi_i = 0
+\mu_i \xi_i = 0\\
 0 \leq \alpha_i \leq C
 $$
 
@@ -512,7 +512,7 @@ $$
 接着就可以用训练数据来拟合后验分布了, 其中 $K_{\alpha}$ 表示特征 $\alpha$ 的类别数量:
 
 $$
-[\theta_{jc}]_\alpha = \frac{\sum [y_i == c] * [x_{i\alpha} == j] + l}{\sum [y_i == c] + lK_{\alpha}}
+[\theta_{jc}]_\alpha = \frac{\sum [y_i == c] * [x_{i\alpha} == j] + l}{\sum [y_i == c] + lK_{\alpha}}\\
 pi_{c} = \frac{n_c}{n}
 $$
 
