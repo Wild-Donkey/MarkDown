@@ -147,6 +147,22 @@ In kNN, $W(x_i, x') = \frac 1k$ if $x_i$ is one of the $k$ points closest to $x'
 
 In a tree, $W(x_i, x') = \frac 1{k'}$ if $x_i$ is one of the k' points in the same leaf as x'.
 
+# Complexity Analysis
+
+Let $t$ denote the numbers of trees, $h$ the maximum tree height, $M$ and $m$ the total and subsampled number of samples, $N$ and $n$ the total and subsampled number of features. Assume that the bagging fraction is a constant. Due to the use of the well-designed splitting criteria in decision trees, which tend to partition the data approximately evenly at each split, the expected $h$ can be bounded by $O(\log m)$. Therefore, a random forest has $O(tmn \log m)$ training and $O(tm \log m)$ predicting time complexity.
+
+In RFOD, $n$ features modeled independently by a dedicated random forest. Thus, the total training complexity is $O(tmn^2 \log m)$, and prediction complexity is $O(tmn \log m)$.
+
+## Acceleration by Distributed Learning
+
+Since RFOD estimates each dimension independently, and every tree in random forest process independently, it is suited for distributed learning acceleration with multiple workers. 
+
+Given there are $c$ available workers for distributed computing, e.g., $c$ cores on a single machine. This constructs the worker pool as $W = \{W_1, ..., W_c\}$.
+
+During the training process, a generic scheduling system equally splits $nt$ trees into $c$ groups, such that each available worker in $W$ will process roughly $\frac{nt}c$ tasks, each with time complexity of $O(mn \log m)$.
+
+During the prediction process, every test samples can process independently, such that prediction process can be split into $nmt$ tasks, each with time complexity of $O(\log m)$. Thus, prediction parallelism can reach a finer granularity. Afterward, the results from each task will then be aggregated to generate the predicted test samples and get the outlier scores.
+
 ## [cuML](https://github.com/rapidsai/cuml)
 
 [Zero Code Change Acceleration to scikit-learn](https://developer.nvidia.com/blog/nvidia-cuml-brings-zero-code-change-acceleration-to-scikit-learn)
